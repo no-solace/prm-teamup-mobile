@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TeamUp EXE - FinLite</title>
+<!-- Google Fonts: Be Vietnam Pro -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "outline-variant": "#e0c0b4",
+            "surface-container-lowest": "#ffffff",
+            "secondary-fixed-dim": "#dcc1b2",
+            "surface-container-low": "#f8f3ed",
+            "surface-container": "#f2ede8",
+            "tertiary-container": "#247242",
+            "on-surface-variant": "#584239",
+            "tertiary-fixed": "#a5f4b8",
+            "primary": "#8a2e00",
+            "tertiary-fixed-dim": "#8ad79e",
+            "on-tertiary-fixed": "#00210d",
+            "background": "#fdf9f3",
+            "on-error-container": "#93000a",
+            "error-container": "#ffdad6",
+            "on-error": "#ffffff",
+            "surface-variant": "#e6e2dd",
+            "primary-container": "#b23e00",
+            "on-secondary-container": "#756053",
+            "on-background": "#1c1b18",
+            "on-primary": "#ffffff",
+            "secondary": "#6f5a4e",
+            "surface-dim": "#ded9d4",
+            "inverse-primary": "#ffb59a",
+            "primary-fixed-dim": "#ffb59a",
+            "on-secondary-fixed": "#27180f",
+            "surface": "#fdf9f3",
+            "surface-container-highest": "#e6e2dd",
+            "on-tertiary-container": "#a5f4b8",
+            "on-primary-fixed": "#370e00",
+            "on-primary-fixed-variant": "#802a00",
+            "error": "#ba1a1a",
+            "on-surface": "#1c1b18",
+            "secondary-container": "#faddcd",
+            "on-secondary-fixed-variant": "#564337",
+            "surface-bright": "#fdf9f3",
+            "inverse-surface": "#32302d",
+            "inverse-on-surface": "#f5f0eb",
+            "on-tertiary-fixed-variant": "#005229",
+            "on-secondary": "#ffffff",
+            "primary-fixed": "#ffdbce",
+            "surface-tint": "#a73a00",
+            "secondary-fixed": "#faddcd",
+            "on-tertiary": "#ffffff",
+            "on-primary-container": "#ffdbcf",
+            "surface-container-high": "#ece7e2",
+            "outline": "#8c7168",
+            "tertiary": "#00592d",
+            "tactile-border": "#D6D4CE",
+            "tactile-mint": "#D6F0DD",
+            "tactile-mint-text": "#07301A",
+            "tactile-mint-border": "#1B6B3C",
+            "tactile-subtext": "#55534D",
+            "tactile-disabled-bg": "#E9E7E2",
+            "tactile-disabled-text": "#77756F"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-xs": "0.25rem",
+            "space-sm": "0.5rem",
+            "space-md": "1rem",
+            "space-lg": "1.5rem",
+            "space-xl": "2rem",
+            "gutter": "1rem",
+            "margin": "1rem"
+          },
+          "fontFamily": {
+            "label-field": ["Be Vietnam Pro"],
+            "card-title": ["Be Vietnam Pro"],
+            "title": ["Be Vietnam Pro"],
+            "headline": ["Be Vietnam Pro"],
+            "metadata": ["Be Vietnam Pro"],
+            "button": ["Be Vietnam Pro"],
+            "body": ["Be Vietnam Pro"],
+            "chip": ["Be Vietnam Pro"]
+          },
+          "fontSize": {
+            "label-field": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "card-title": ["16px", { "lineHeight": "24px", "letterSpacing": "0px", "fontWeight": "600" }],
+            "title": ["20px", { "lineHeight": "28px", "letterSpacing": "0px", "fontWeight": "600" }],
+            "headline": ["24px", { "lineHeight": "32px", "letterSpacing": "0px", "fontWeight": "700" }],
+            "metadata": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "400" }],
+            "button": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "body": ["16px", { "lineHeight": "24px", "letterSpacing": "0px", "fontWeight": "400" }],
+            "chip": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      line-height: 1;
+      text-transform: none;
+      letter-spacing: normal;
+      word-wrap: normal;
+      white-space: nowrap;
+      direction: ltr;
+    }
+    * {
+      box-shadow: none !important;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface antialiased flex justify-center min-h-screen">
+<!-- Mobile Viewport Container 360 x 800 standard frame -->
+<div class="w-full max-w-[360px] min-h-[800px] bg-surface-container-lowest flex flex-col justify-between relative border-x border-tactile-border">
+<!-- Top Area: App Bar & Main Content -->
+<div class="flex flex-col flex-1">
+<!-- TopAppBar Shared Component Execution -->
+<header class="bg-surface-container-lowest border-b border-tactile-border docked full-width top-0 z-10">
+<div class="flex items-center justify-between h-16 w-full px-margin max-w-[360px] mx-auto">
+<div class="flex items-center gap-space-sm">
+<button aria-label="Go back" class="w-12 h-12 flex items-center justify-center -ml-2 rounded-full hover:bg-surface-container-low active:scale-95 transition-all text-on-surface" type="button">
+<span class="material-symbols-outlined text-[24px]">arrow_back</span>
+</button>
+<h1 class="font-title text-title text-on-surface tracking-tight">FinLite</h1>
+</div>
+<div class="w-12 h-12 flex items-center justify-end">
+<span class="font-chip text-chip text-tactile-subtext">5/5</span>
+</div>
+</div>
+</header>
+<!-- Main Canvas Screen Content -->
+<main class="px-margin pt-space-lg pb-space-xl flex flex-col">
+<!-- Team Overview Details -->
+<div class="mb-space-lg">
+<div class="flex items-center gap-space-xs mb-space-xs">
+<span class="font-metadata text-metadata text-tactile-subtext">Fintech &amp; micro-investing</span>
+</div>
+<p class="font-body text-body text-on-surface">
+            Automated micro-investing engine built for students and early-career operators.
+          </p>
+</div>
+<!-- Role Row Section -->
+<section aria-label="Team member allocation" class="mb-space-lg">
+<div class="flex items-center justify-between mb-space-sm">
+<h2 class="font-card-title text-card-title text-on-surface">Current squad</h2>
+<span class="font-metadata text-metadata text-tactile-subtext">Capacity reached</span>
+</div>
+<!-- 5 Filled Slots: 48dp each, mint background, dark text, no captions -->
+<div class="flex items-center justify-between gap-space-xs py-space-xs">
+<!-- Slot 1 -->
+<div class="w-12 h-12 rounded-xl bg-tactile-mint border border-tactile-mint-border flex items-center justify-center select-none" title="HQ - Team Lead">
+<span class="font-button text-button text-tactile-mint-text font-bold">HQ</span>
+</div>
+<!-- Slot 2 -->
+<div class="w-12 h-12 rounded-xl bg-tactile-mint border border-tactile-mint-border flex items-center justify-center select-none" title="LN - Product Designer">
+<span class="font-button text-button text-tactile-mint-text font-bold">LN</span>
+</div>
+<!-- Slot 3 -->
+<div class="w-12 h-12 rounded-xl bg-tactile-mint border border-tactile-mint-border flex items-center justify-center select-none" title="TM - Backend Engineer">
+<span class="font-button text-button text-tactile-mint-text font-bold">TM</span>
+</div>
+<!-- Slot 4 -->
+<div class="w-12 h-12 rounded-xl bg-tactile-mint border border-tactile-mint-border flex items-center justify-center select-none" title="PA - Frontend Engineer">
+<span class="font-button text-button text-tactile-mint-text font-bold">PA</span>
+</div>
+<!-- Slot 5 -->
+<div class="w-12 h-12 rounded-xl bg-tactile-mint border border-tactile-mint-border flex items-center justify-center select-none" title="NB - Growth &amp; Marketing">
+<span class="font-button text-button text-tactile-mint-text font-bold">NB</span>
+</div>
+</div>
+</section>
+<!-- Status Alert Banner -->
+<div class="bg-error-container/40 border border-error/20 rounded-lg p-space-md flex items-center gap-space-sm mb-space-lg" role="alert">
+<span aria-hidden="true" class="material-symbols-outlined text-error text-[20px] shrink-0">warning</span>
+<span class="font-card-title text-card-title text-on-surface">Team is full</span>
+</div>
+<!-- Alternatives Section -->
+<section aria-label="Alternative open teams" class="flex flex-col">
+<h2 class="font-card-title text-card-title text-on-surface mb-space-sm">Try these instead</h2>
+<!-- Plain List Rows -->
+<div class="border border-tactile-border rounded-xl bg-surface-container-lowest divide-y divide-tactile-border">
+<!-- Row 1 -->
+<div class="p-space-md flex items-center justify-between hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="flex flex-col">
+<span class="font-card-title text-card-title text-on-surface group-hover:text-primary transition-colors">Tutor Match</span>
+<span class="font-metadata text-metadata text-tactile-subtext">Marketing, Design</span>
+</div>
+<div class="w-8 h-8 rounded-full flex items-center justify-center border border-tactile-border bg-surface-container-lowest">
+<span class="material-symbols-outlined text-[18px] text-tactile-subtext">arrow_forward</span>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="p-space-md flex items-center justify-between hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="flex flex-col">
+<span class="font-card-title text-card-title text-on-surface group-hover:text-primary transition-colors">GreenLoop</span>
+<span class="font-metadata text-metadata text-tactile-subtext">AI, Marketing, Design</span>
+</div>
+<div class="w-8 h-8 rounded-full flex items-center justify-center border border-tactile-border bg-surface-container-lowest">
+<span class="material-symbols-outlined text-[18px] text-tactile-subtext">arrow_forward</span>
+</div>
+</div>
+<!-- Row 3 -->
+<div class="p-space-md flex items-center justify-between hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="flex flex-col">
+<span class="font-card-title text-card-title text-on-surface group-hover:text-primary transition-colors">RecycleChain</span>
+<span class="font-metadata text-metadata text-tactile-subtext">Marketing</span>
+</div>
+<div class="w-8 h-8 rounded-full flex items-center justify-center border border-tactile-border bg-surface-container-lowest">
+<span class="material-symbols-outlined text-[18px] text-tactile-subtext">arrow_forward</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- Bottom Sticky Operational Action Area -->
+<div class="sticky bottom-0 left-0 right-0 w-full bg-surface-container-lowest border-t border-tactile-border p-margin z-20">
+<button aria-disabled="true" class="w-full h-12 rounded-full bg-tactile-disabled-bg text-tactile-disabled-text font-button text-button cursor-not-allowed flex items-center justify-center transition-none border border-tactile-border" disabled="" type="button">
+        Full
+      </button>
+</div>
+</div>
+</body></html>

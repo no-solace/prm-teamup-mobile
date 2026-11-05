@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TeamUp EXE - Invitations</title>
+<!-- Google Fonts: Be Vietnam Pro -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "error-container": "#ffdad6",
+            "tertiary": "#00592d",
+            "outline": "#8c7168",
+            "tertiary-fixed": "#a5f4b8",
+            "on-tertiary-container": "#a5f4b8",
+            "surface": "#fdf9f3",
+            "primary": "#8a2e00",
+            "surface-container-low": "#f8f3ed",
+            "secondary": "#6f5a4e",
+            "primary-container": "#b23e00",
+            "tertiary-fixed-dim": "#8ad79e",
+            "on-error": "#ffffff",
+            "on-primary-fixed": "#370e00",
+            "secondary-fixed": "#faddcd",
+            "inverse-surface": "#32302d",
+            "on-primary-fixed-variant": "#802a00",
+            "error": "#ba1a1a",
+            "surface-container-high": "#ece7e2",
+            "surface-bright": "#fdf9f3",
+            "secondary-fixed-dim": "#dcc1b2",
+            "outline-variant": "#e0c0b4",
+            "secondary-container": "#faddcd",
+            "surface-container-highest": "#e6e2dd",
+            "primary-fixed": "#ffdbce",
+            "tertiary-container": "#247242",
+            "on-primary-container": "#ffdbcf",
+            "surface-tint": "#a73a00",
+            "on-tertiary-fixed-variant": "#005229",
+            "on-surface": "#1c1b18",
+            "on-secondary": "#ffffff",
+            "inverse-primary": "#ffb59a",
+            "on-tertiary": "#ffffff",
+            "surface-variant": "#e6e2dd",
+            "on-secondary-fixed-variant": "#564337",
+            "on-tertiary-fixed": "#00210d",
+            "background": "#fdf9f3",
+            "on-secondary-fixed": "#27180f",
+            "inverse-on-surface": "#f5f0eb",
+            "on-primary": "#ffffff",
+            "on-secondary-container": "#756053",
+            "on-error-container": "#93000a",
+            "surface-container": "#f2ede8",
+            "on-surface-variant": "#584239",
+            "on-background": "#1c1b18",
+            "surface-container-lowest": "#ffffff",
+            "surface-dim": "#ded9d4",
+            "primary-fixed-dim": "#ffb59a"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "margin": "1rem",
+            "space-sm": "0.5rem",
+            "gutter": "1rem",
+            "space-lg": "1.5rem",
+            "space-md": "1rem",
+            "space-xs": "0.25rem",
+            "space-xl": "2rem"
+          },
+          "fontFamily": {
+            "headline": ["Be Vietnam Pro"],
+            "label-field": ["Be Vietnam Pro"],
+            "metadata": ["Be Vietnam Pro"],
+            "chip": ["Be Vietnam Pro"],
+            "button": ["Be Vietnam Pro"],
+            "body": ["Be Vietnam Pro"],
+            "card-title": ["Be Vietnam Pro"],
+            "title": ["Be Vietnam Pro"]
+          },
+          "fontSize": {
+            "headline": ["24px", { "lineHeight": "32px", "letterSpacing": "0px", "fontWeight": "700" }],
+            "label-field": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "metadata": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "400" }],
+            "chip": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "button": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "body": ["16px", { "lineHeight": "24px", "letterSpacing": "0px", "fontWeight": "400" }],
+            "card-title": ["16px", { "lineHeight": "24px", "letterSpacing": "0px", "fontWeight": "600" }],
+            "title": ["20px", { "lineHeight": "28px", "letterSpacing": "0px", "fontWeight": "600" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      font-size: 20px;
+    }
+    body {
+      font-family: 'Be Vietnam Pro', sans-serif;
+      background-color: #FFFFFF;
+      -webkit-font-smoothing: antialiased;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-container-lowest text-on-surface flex justify-center items-start min-h-screen">
+<!-- Mobile Viewport Frame (360 x 800 dp) -->
+<main class="w-[360px] h-[800px] max-h-[800px] bg-surface-container-lowest flex flex-col relative overflow-hidden select-none">
+<!-- Top App Bar -->
+<header class="h-14 px-margin flex items-center justify-start bg-surface-container-lowest border-b border-surface-variant flex-shrink-0">
+<h1 class="font-title text-title text-on-surface tracking-tight">Invitations</h1>
+</header>
+<!-- Navigation Segmented Tabs (Under App Bar) -->
+<section class="px-margin pt-3 pb-3 flex items-center gap-2 border-b border-surface-variant bg-surface-container-lowest flex-shrink-0">
+<!-- Inactive Tab: Received -->
+<button class="h-8 px-4 rounded-full bg-surface-container border border-surface-variant text-on-surface font-chip text-chip flex items-center justify-center transition-colors" type="button">
+        Received
+      </button>
+<!-- Active Tab: Sent -->
+<button class="h-8 px-4 rounded-full bg-secondary-container text-on-primary-fixed font-chip text-chip flex items-center justify-center" type="button">
+        Sent
+      </button>
+</section>
+<!-- Content List Canvas -->
+<section class="flex-1 overflow-y-auto px-margin">
+<div class="flex flex-col">
+<!-- Row 1: Tutor Match -->
+<div class="py-4 border-b border-surface-variant flex items-center justify-between min-h-[72px]">
+<div class="flex flex-col pr-2">
+<span class="font-card-title text-card-title text-on-surface">Tutor Match</span>
+<span class="font-metadata text-metadata text-secondary mt-0.5">SE</span>
+</div>
+<div class="flex-shrink-0">
+<!-- Chip Pending -->
+<span class="inline-flex items-center gap-1.5 h-8 px-3 rounded-full bg-surface-container border border-surface-variant text-on-surface font-chip text-chip">
+<span class="material-symbols-outlined text-[18px] text-secondary leading-none" data-icon="schedule">schedule</span>
+<span>Pending</span>
+</span>
+</div>
+</div>
+<!-- Row 2: AgriSense IoT -->
+<div class="py-4 border-b border-surface-variant flex items-center justify-between min-h-[72px]">
+<div class="flex flex-col pr-2">
+<span class="font-card-title text-card-title text-on-surface">AgriSense IoT</span>
+<span class="font-metadata text-metadata text-secondary mt-0.5">Mobile</span>
+</div>
+<div class="flex-shrink-0">
+<!-- Chip Accepted -->
+<span class="inline-flex items-center gap-1.5 h-8 px-3 rounded-full bg-[#D6F0DD] border border-[#1B6B3C] text-[#07301A] font-chip text-chip">
+<span class="material-symbols-outlined text-[18px] text-[#1B6B3C] leading-none" data-icon="check">check</span>
+<span>Accepted</span>
+</span>
+</div>
+</div>
+<!-- Row 3: EduQuest AR -->
+<div class="py-4 border-b border-surface-variant flex items-center justify-between min-h-[72px]">
+<div class="flex flex-col pr-2">
+<span class="font-card-title text-card-title text-on-surface">EduQuest AR</span>
+<span class="font-metadata text-metadata text-secondary mt-0.5">AI</span>
+</div>
+<div class="flex-shrink-0">
+<!-- Chip Declined -->
+<span class="inline-flex items-center gap-1.5 h-8 px-3 rounded-full bg-error-container border border-error text-on-error-container font-chip text-chip">
+<span class="material-symbols-outlined text-[18px] text-error leading-none" data-icon="close">close</span>
+<span>Declined</span>
+</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Snackbar Layer (Docked directly above the bottom navigation bar) -->
+<aside class="absolute left-margin right-margin bottom-[72px] z-40">
+<div class="h-12 bg-inverse-surface rounded-lg px-4 flex items-center justify-between shadow-none">
+<span class="font-metadata text-metadata text-on-error">Sent</span>
+<button class="font-button text-button text-primary-fixed-dim hover:text-primary-fixed active:opacity-80 transition-opacity" type="button">
+          Undo
+        </button>
+</div>
+</aside>
+<!-- Bottom Navigation Bar (Fixed 64dp, 4 Destinations) -->
+<nav class="h-16 w-full bg-surface-container-lowest border-t border-surface-variant flex items-center justify-around px-margin z-50 flex-shrink-0">
+<!-- Tab 1: Discover (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 font-metadata text-metadata hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined mb-0.5 leading-none" data-icon="explore">explore</span>
+<span>Discover</span>
+</a>
+<!-- Tab 2: Team (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 font-metadata text-metadata hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined mb-0.5 leading-none" data-icon="groups">groups</span>
+<span>Team</span>
+</a>
+<!-- Tab 3: Invitations (Active Pill) -->
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-primary-fixed rounded-full px-4 py-1 font-metadata text-metadata" href="#">
+<span class="material-symbols-outlined mb-0.5 leading-none text-on-primary-fixed" data-icon="mail">mail</span>
+<span class="font-semibold text-on-primary-fixed">Invitations</span>
+</a>
+<!-- Tab 4: Profile (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 font-metadata text-metadata hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined mb-0.5 leading-none" data-icon="person">person</span>
+<span>Profile</span>
+</a>
+</nav>
+</main>
+</body></html>

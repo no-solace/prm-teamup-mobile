@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TeamUp EXE - My classes</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-surface-variant": "#584239",
+            "error-container": "#ffdad6",
+            "outline": "#8c7168",
+            "surface-container": "#f2ede8",
+            "primary-fixed-dim": "#ffb59a",
+            "primary-fixed": "#ffdbce",
+            "error": "#ba1a1a",
+            "on-tertiary-container": "#a5f4b8",
+            "surface-container-highest": "#e6e2dd",
+            "on-secondary-fixed-variant": "#564337",
+            "on-error-container": "#93000a",
+            "on-tertiary-fixed-variant": "#005229",
+            "on-tertiary-fixed": "#00210d",
+            "on-primary-container": "#ffdbcf",
+            "tertiary": "#00592d",
+            "surface-tint": "#a73a00",
+            "outline-variant": "#e0c0b4",
+            "tertiary-fixed": "#a5f4b8",
+            "inverse-surface": "#32302d",
+            "inverse-on-surface": "#f5f0eb",
+            "on-background": "#1c1b18",
+            "on-secondary-container": "#756053",
+            "inverse-primary": "#ffb59a",
+            "on-surface": "#1c1b18",
+            "surface-container-high": "#ece7e2",
+            "on-secondary": "#ffffff",
+            "on-primary-fixed": "#370e00",
+            "tertiary-fixed-dim": "#8ad79e",
+            "on-error": "#ffffff",
+            "secondary-fixed": "#faddcd",
+            "surface-dim": "#ded9d4",
+            "surface-variant": "#e6e2dd",
+            "surface-container-low": "#f8f3ed",
+            "surface-bright": "#fdf9f3",
+            "secondary": "#6f5a4e",
+            "on-tertiary": "#ffffff",
+            "background": "#fdf9f3",
+            "primary-container": "#b23e00",
+            "surface-container-lowest": "#ffffff",
+            "secondary-fixed-dim": "#dcc1b2",
+            "secondary-container": "#faddcd",
+            "primary": "#8a2e00",
+            "surface": "#fdf9f3",
+            "on-primary": "#ffffff",
+            "on-primary-fixed-variant": "#802a00",
+            "tertiary-container": "#247242",
+            "on-secondary-fixed": "#27180f"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-xs": "0.25rem",
+            "gutter": "1rem",
+            "space-xl": "2rem",
+            "margin": "1rem",
+            "space-md": "1rem",
+            "space-sm": "0.5rem",
+            "space-lg": "1.5rem"
+          },
+          "fontFamily": {
+            "button": [
+              "Be Vietnam Pro"
+            ],
+            "body": [
+              "Be Vietnam Pro"
+            ],
+            "chip": [
+              "Be Vietnam Pro"
+            ],
+            "label-field": [
+              "Be Vietnam Pro"
+            ],
+            "title": [
+              "Be Vietnam Pro"
+            ],
+            "card-title": [
+              "Be Vietnam Pro"
+            ],
+            "metadata": [
+              "Be Vietnam Pro"
+            ],
+            "headline": [
+              "Be Vietnam Pro"
+            ]
+          },
+          "fontSize": {
+            "button": [
+              "14px",
+              {
+                "lineHeight": "20px",
+                "letterSpacing": "0.1px",
+                "fontWeight": "600"
+              }
+            ],
+            "body": [
+              "16px",
+              {
+                "lineHeight": "24px",
+                "letterSpacing": "0px",
+                "fontWeight": "400"
+              }
+            ],
+            "chip": [
+              "14px",
+              {
+                "lineHeight": "20px",
+                "letterSpacing": "0.1px",
+                "fontWeight": "600"
+              }
+            ],
+            "label-field": [
+              "14px",
+              {
+                "lineHeight": "20px",
+                "letterSpacing": "0.1px",
+                "fontWeight": "600"
+              }
+            ],
+            "title": [
+              "20px",
+              {
+                "lineHeight": "28px",
+                "letterSpacing": "0px",
+                "fontWeight": "600"
+              }
+            ],
+            "card-title": [
+              "16px",
+              {
+                "lineHeight": "24px",
+                "letterSpacing": "0px",
+                "fontWeight": "600"
+              }
+            ],
+            "metadata": [
+              "14px",
+              {
+                "lineHeight": "20px",
+                "letterSpacing": "0.1px",
+                "fontWeight": "400"
+              }
+            ],
+            "headline": [
+              "24px",
+              {
+                "lineHeight": "32px",
+                "letterSpacing": "0px",
+                "fontWeight": "700"
+              }
+            ]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .material-symbols-outlined.fill-icon {
+      font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+    }
+    body {
+      font-family: 'Be Vietnam Pro', sans-serif;
+      font-feature-settings: "tnum" 1, "cv01" 1;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface antialiased min-h-screen flex justify-center selection:bg-secondary-container selection:text-on-primary-fixed">
+<!-- Mobile Frame Container (Strict 360 x 800 dp reference standard, responsive fluid) -->
+<div class="w-full max-w-[360px] min-h-[800px] h-screen flex flex-col bg-surface relative overflow-hidden">
+<!-- Top App Bar: Left-aligned title only, flat, docked full-width -->
+<header class="w-full h-14 px-margin flex items-center bg-surface-container-lowest shrink-0 z-10 border-b border-surface-variant">
+<h1 class="font-title text-title text-on-surface">My classes</h1>
+</header>
+<!-- Main Content Canvas (Scrollable area, 16dp margins, flat planar structure) -->
+<main class="flex-1 overflow-y-auto px-margin pt-space-md pb-space-xl flex flex-col gap-space-md">
+<!-- Card 1: Class A -->
+<section class="bg-surface-container-lowest border border-[#D6D4CE] rounded-xl p-space-md transition-colors active:bg-surface-container-low cursor-pointer">
+<div class="flex items-baseline justify-between mb-space-md">
+<h2 class="font-card-title text-card-title text-on-surface">Class A</h2>
+<span class="font-metadata text-metadata text-[#55534D] tabular-nums">42 students</span>
+</div>
+<div class="flex flex-col gap-space-sm pt-space-xs border-t border-surface-container">
+<!-- Status Line 1 -->
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-[#55534D] text-[20px]" data-icon="group">group</span>
+<span class="font-metadata text-metadata text-on-surface tabular-nums">12 without team</span>
+</div>
+<!-- Status Line 2 -->
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-[#55534D] text-[20px]" data-icon="group_add">group_add</span>
+<span class="font-metadata text-metadata text-on-surface tabular-nums">5 teams need members</span>
+</div>
+</div>
+</section>
+<!-- Card 2: Class B -->
+<section class="bg-surface-container-lowest border border-[#D6D4CE] rounded-xl p-space-md transition-colors active:bg-surface-container-low cursor-pointer">
+<div class="flex items-baseline justify-between mb-space-md">
+<h2 class="font-card-title text-card-title text-on-surface">Class B</h2>
+<span class="font-metadata text-metadata text-[#55534D] tabular-nums">38 students</span>
+</div>
+<div class="flex flex-col gap-space-sm pt-space-xs border-t border-surface-container">
+<!-- Status Line 1 -->
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-[#55534D] text-[20px]" data-icon="group">group</span>
+<span class="font-metadata text-metadata text-on-surface tabular-nums">0 without team</span>
+</div>
+<!-- Status Line 2 -->
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-[#1B6B3C] text-[20px]" data-icon="check_circle">check_circle</span>
+<span class="font-metadata text-metadata text-[#1B6B3C] font-semibold">All matched</span>
+</div>
+</div>
+</section>
+<!-- Card 3: Class C -->
+<section class="bg-surface-container-lowest border border-[#D6D4CE] rounded-xl p-space-md transition-colors active:bg-surface-container-low cursor-pointer">
+<div class="flex items-baseline justify-between mb-space-md">
+<h2 class="font-card-title text-card-title text-on-surface">Class C</h2>
+<span class="font-metadata text-metadata text-[#55534D] tabular-nums">45 students</span>
+</div>
+<div class="flex flex-col gap-space-sm pt-space-xs border-t border-surface-container">
+<!-- Status Line 1 -->
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-[#55534D] text-[20px]" data-icon="group">group</span>
+<span class="font-metadata text-metadata text-on-surface tabular-nums">9 without team</span>
+</div>
+<!-- Status Line 2 -->
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-[#55534D] text-[20px]" data-icon="group_add">group_add</span>
+<span class="font-metadata text-metadata text-on-surface tabular-nums">3 teams need members</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar: Docked flat, 3 tabs with active pill indicator -->
+<nav class="w-full h-16 bg-surface-container-lowest border-t border-[#D6D4CE] flex items-center justify-around px-margin shrink-0 z-20">
+<!-- Tab 1: Classes (Active) -->
+<a class="flex flex-col items-center justify-center min-w-[64px] min-h-[48px] focus:outline-none" href="#">
+<div class="bg-[#FFE2D2] text-[#3B1400] rounded-full px-5 py-1 flex items-center justify-center transition-transform active:scale-95">
+<span class="material-symbols-outlined fill-icon text-[20px]" data-icon="school" style="font-variation-settings: 'FILL' 1;">school</span>
+</div>
+<span class="font-metadata text-metadata text-[#3B1400] font-semibold mt-0.5">Classes</span>
+</a>
+<!-- Tab 2: Proposals (Inactive) -->
+<a class="flex flex-col items-center justify-center min-w-[64px] min-h-[48px] text-[#55534D] focus:outline-none active:scale-95 transition-transform" href="#">
+<div class="px-5 py-1 flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]" data-icon="assignment">assignment</span>
+</div>
+<span class="font-metadata text-metadata text-[#55534D] mt-0.5">Proposals</span>
+</a>
+<!-- Tab 3: Profile (Inactive) -->
+<a class="flex flex-col items-center justify-center min-w-[64px] min-h-[48px] text-[#55534D] focus:outline-none active:scale-95 transition-transform" href="#">
+<div class="px-5 py-1 flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]" data-icon="person">person</span>
+</div>
+<span class="font-metadata text-metadata text-[#55534D] mt-0.5">Profile</span>
+</a>
+</nav>
+</div>
+</body></html>

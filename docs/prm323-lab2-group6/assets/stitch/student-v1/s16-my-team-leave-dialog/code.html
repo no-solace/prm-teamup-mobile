@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TeamUp EXE - Leave Team Confirmation</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "error-container": "#ffdad6",
+            "tertiary": "#00592d",
+            "outline": "#8c7168",
+            "tertiary-fixed": "#a5f4b8",
+            "on-tertiary-container": "#a5f4b8",
+            "surface": "#fdf9f3",
+            "primary": "#8a2e00",
+            "surface-container-low": "#f8f3ed",
+            "secondary": "#6f5a4e",
+            "primary-container": "#b23e00",
+            "tertiary-fixed-dim": "#8ad79e",
+            "on-error": "#ffffff",
+            "on-primary-fixed": "#370e00",
+            "secondary-fixed": "#faddcd",
+            "inverse-surface": "#32302d",
+            "on-primary-fixed-variant": "#802a00",
+            "error": "#ba1a1a",
+            "surface-container-high": "#ece7e2",
+            "surface-bright": "#fdf9f3",
+            "secondary-fixed-dim": "#dcc1b2",
+            "outline-variant": "#e0c0b4",
+            "secondary-container": "#faddcd",
+            "surface-container-highest": "#e6e2dd",
+            "primary-fixed": "#ffdbce",
+            "tertiary-container": "#247242",
+            "on-primary-container": "#ffdbcf",
+            "surface-tint": "#a73a00",
+            "on-tertiary-fixed-variant": "#005229",
+            "on-surface": "#1c1b18",
+            "on-secondary": "#ffffff",
+            "inverse-primary": "#ffb59a",
+            "on-tertiary": "#ffffff",
+            "surface-variant": "#e6e2dd",
+            "on-secondary-fixed-variant": "#564337",
+            "on-tertiary-fixed": "#00210d",
+            "background": "#fdf9f3",
+            "on-secondary-fixed": "#27180f",
+            "inverse-on-surface": "#f5f0eb",
+            "on-primary": "#ffffff",
+            "on-secondary-container": "#756053",
+            "on-error-container": "#93000a",
+            "surface-container": "#f2ede8",
+            "on-surface-variant": "#584239",
+            "on-background": "#1c1b18",
+            "surface-container-lowest": "#ffffff",
+            "surface-dim": "#ded9d4",
+            "primary-fixed-dim": "#ffb59a"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "margin": "1rem",
+            "space-sm": "0.5rem",
+            "gutter": "1rem",
+            "space-lg": "1.5rem",
+            "space-md": "1rem",
+            "space-xs": "0.25rem",
+            "space-xl": "2rem"
+          },
+          "fontFamily": {
+            "headline": ["Be Vietnam Pro"],
+            "label-field": ["Be Vietnam Pro"],
+            "metadata": ["Be Vietnam Pro"],
+            "chip": ["Be Vietnam Pro"],
+            "button": ["Be Vietnam Pro"],
+            "body": ["Be Vietnam Pro"],
+            "card-title": ["Be Vietnam Pro"],
+            "title": ["Be Vietnam Pro"]
+          },
+          "fontSize": {
+            "headline": ["24px", { "lineHeight": "32px", "letterSpacing": "0px", "fontWeight": "700" }],
+            "label-field": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "metadata": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "400" }],
+            "chip": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "button": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "body": ["16px", { "lineHeight": "24px", "letterSpacing": "0px", "fontWeight": "400" }],
+            "card-title": ["16px", { "lineHeight": "24px", "letterSpacing": "0px", "fontWeight": "600" }],
+            "title": ["20px", { "lineHeight": "28px", "letterSpacing": "0px", "fontWeight": "600" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface flex justify-center items-center min-h-screen p-0 select-none antialiased">
+<!-- Mobile Frame Container (360 x 800 dp) -->
+<div class="relative w-[360px] h-[800px] bg-background overflow-hidden flex flex-col border border-surface-variant">
+<!-- Dimmed Screen Background Content ("My team" / Tutor Match) -->
+<div aria-hidden="true" class="flex-1 flex flex-col w-full h-full overflow-hidden">
+<!-- Top App Bar from Shared Components JSON (docked full-width top-0) -->
+<header class="bg-surface-container-lowest border-b border-surface-variant flex items-center justify-between h-14 px-margin w-full shrink-0">
+<div class="flex items-center gap-space-sm">
+<button class="w-12 h-12 flex items-center justify-center text-primary-container active:opacity-80 transition-opacity duration-150" type="button">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<span class="font-title text-title text-on-surface">TeamUp EXE</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="w-12 h-12 flex items-center justify-center text-on-surface-variant hover:bg-surface-container rounded-full transition-colors" type="button">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</header>
+<!-- Scrollable Base Viewport Content: My team -->
+<main class="flex-1 overflow-y-auto px-margin pt-space-md pb-space-xl flex flex-col gap-space-lg">
+<!-- Team Header Section -->
+<section class="flex flex-col gap-space-xs">
+<span class="font-metadata text-metadata text-on-surface-variant">Active Project</span>
+<h1 class="font-headline text-headline text-on-surface">Tutor Match</h1>
+<p class="font-body text-body text-on-surface-variant">Peer learning coordination platform for computer science cohorts.</p>
+</section>
+<!-- Role Provisioning Overview (Bento Grid Style) -->
+<section class="flex flex-col gap-space-sm">
+<div class="flex justify-between items-center">
+<h2 class="font-card-title text-card-title text-on-surface">Project roles</h2>
+<span class="font-metadata text-metadata text-on-surface-variant">3 of 4 filled</span>
+</div>
+<div class="grid grid-cols-2 gap-space-sm">
+<!-- Role 1: Filled -->
+<div class="bg-[#D6F0DD] border border-[#1B6B3C] rounded-xl p-space-sm flex flex-col justify-between h-24">
+<div class="flex items-center justify-between">
+<span class="w-7 h-7 rounded-full bg-surface-container-lowest flex items-center justify-center font-button text-button text-[#07301A]">AL</span>
+<span class="material-symbols-outlined text-[#1B6B3C] text-[18px]" data-icon="check_circle">check_circle</span>
+</div>
+<div>
+<p class="font-button text-button text-[#07301A] truncate">Alex Lin</p>
+<p class="font-metadata text-metadata text-[#07301A] opacity-80 text-xs">Lead dev</p>
+</div>
+</div>
+<!-- Role 2: Filled (Current User) -->
+<div class="bg-[#D6F0DD] border border-[#1B6B3C] rounded-xl p-space-sm flex flex-col justify-between h-24">
+<div class="flex items-center justify-between">
+<span class="w-7 h-7 rounded-full bg-surface-container-lowest flex items-center justify-center font-button text-button text-[#07301A]">ME</span>
+<span class="material-symbols-outlined text-[#1B6B3C] text-[18px]" data-icon="check_circle">check_circle</span>
+</div>
+<div>
+<p class="font-button text-button text-[#07301A] truncate">Jordan K.</p>
+<p class="font-metadata text-metadata text-[#07301A] opacity-80 text-xs">UI designer</p>
+</div>
+</div>
+<!-- Role 3: Filled -->
+<div class="bg-[#D6F0DD] border border-[#1B6B3C] rounded-xl p-space-sm flex flex-col justify-between h-24">
+<div class="flex items-center justify-between">
+<span class="w-7 h-7 rounded-full bg-surface-container-lowest flex items-center justify-center font-button text-button text-[#07301A]">SV</span>
+<span class="material-symbols-outlined text-[#1B6B3C] text-[18px]" data-icon="check_circle">check_circle</span>
+</div>
+<div>
+<p class="font-button text-button text-[#07301A] truncate">Sara V.</p>
+<p class="font-metadata text-metadata text-[#07301A] opacity-80 text-xs">Backend engineer</p>
+</div>
+</div>
+<!-- Role 4: Open Slot -->
+<div class="bg-surface-container-lowest border-2 border-dashed border-[#77756F] rounded-xl p-space-sm flex flex-col justify-center items-center h-24 text-center">
+<span class="material-symbols-outlined text-[#77756F] mb-1" data-icon="add_circle">add_circle</span>
+<span class="font-metadata text-metadata text-[#77756F]">Open Slot</span>
+<span class="font-metadata text-metadata text-[#77756F] text-xs">QA tester</span>
+</div>
+</div>
+</section>
+<!-- Members Detailed List Card -->
+<section class="bg-surface-container-lowest border border-[#D6D4CE] rounded-xl p-space-md flex flex-col gap-space-md">
+<div class="flex justify-between items-center pb-space-xs border-b border-[#D6D4CE]">
+<h3 class="font-card-title text-card-title text-on-surface">Assigned team</h3>
+<span class="font-chip text-chip text-primary-container">Edit</span>
+</div>
+<div class="flex flex-col divide-y divide-[#D6D4CE]">
+<div class="py-space-xs flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center font-button text-button text-on-surface">AL</span>
+<div>
+<p class="font-button text-button text-on-surface">Alex Lin</p>
+<p class="font-metadata text-metadata text-on-surface-variant">Owner · Joined Sep 12</p>
+</div>
+</div>
+<span class="font-chip text-chip text-on-surface-variant text-xs">Admin</span>
+</div>
+<div class="py-space-xs flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center font-button text-button text-on-primary-fixed">ME</span>
+<div>
+<p class="font-button text-button text-on-surface">Jordan K. (You)</p>
+<p class="font-metadata text-metadata text-on-surface-variant">Member · Joined Sep 18</p>
+</div>
+</div>
+<span class="font-chip text-chip text-primary-container text-xs">Active</span>
+</div>
+<div class="py-space-xs flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center font-button text-button text-on-surface">SV</span>
+<div>
+<p class="font-button text-button text-on-surface">Sara V.</p>
+<p class="font-metadata text-metadata text-on-surface-variant">Member · Joined Oct 02</p>
+</div>
+</div>
+<span class="font-chip text-chip text-on-surface-variant text-xs">Active</span>
+</div>
+</div>
+</section>
+<!-- Danger Zone Action -->
+<div class="pt-space-xs pb-space-lg flex justify-center">
+<button class="h-12 w-full rounded-full border border-[#D6D4CE] bg-surface-container-high text-[#BA1A1A] font-button text-button flex items-center justify-center gap-space-xs active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="logout">logout</span>
+            Leave team
+          </button>
+</div>
+</main>
+</div>
+<!-- Scrim / Dimmed Overlay Behind Dialog (rgba(0,0,0,0.5)) -->
+<div aria-describedby="dialog-description" aria-labelledby="dialog-title" aria-modal="true" class="absolute inset-0 bg-black/50 z-40 flex items-center justify-center px-margin" role="dialog">
+<!-- Material 3 Centered Dialog Box -->
+<!-- White #FFFFFF, 1 dp border #D6D4CE, border radius 12dp (rounded-xl), flat no shadow -->
+<div class="w-full max-w-[328px] bg-[#FFFFFF] border border-[#D6D4CE] rounded-xl p-space-lg flex flex-col z-50">
+<!-- Dialog Header / Title -->
+<h2 class="font-title text-[20px] leading-[28px] font-bold text-[#1C1B18] tracking-[0px]" id="dialog-title">
+          Leave team?
+        </h2>
+<!-- Dialog Body Description -->
+<p class="font-body text-[16px] leading-[24px] text-[#55534D] mt-space-sm" id="dialog-description">
+          You can request again later.
+        </p>
+<!-- Dialog Action Buttons Aligned Bottom Right -->
+<div class="flex items-center justify-end gap-space-sm mt-space-lg pt-space-xs">
+<!-- Text Button "Stay" (#55534D, 48dp touch target) -->
+<button class="h-12 min-w-[64px] px-space-md flex items-center justify-center rounded-full text-[#55534D] font-button text-button hover:bg-surface-container-low active:opacity-80 transition-opacity" type="button">
+            Stay
+          </button>
+<!-- Filled Button "Leave" in Error Color (Fill #B3261E, Text #FFFFFF, 48dp height, Pill shape) -->
+<button class="h-12 min-w-[80px] px-space-md flex items-center justify-center rounded-full bg-[#B3261E] text-[#FFFFFF] font-button text-button hover:opacity-95 active:scale-95 transition-all" type="button">
+            Leave
+          </button>
+</div>
+</div>
+</div>
+</div>
+</body></html>

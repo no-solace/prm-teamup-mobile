@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Team Detail - Join Dialog</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "outline-variant": "#e0c0b4",
+            "surface-container-lowest": "#ffffff",
+            "secondary-fixed-dim": "#dcc1b2",
+            "surface-container-low": "#f8f3ed",
+            "surface-container": "#f2ede8",
+            "tertiary-container": "#247242",
+            "on-surface-variant": "#584239",
+            "tertiary-fixed": "#a5f4b8",
+            "primary": "#8a2e00",
+            "tertiary-fixed-dim": "#8ad79e",
+            "on-tertiary-fixed": "#00210d",
+            "background": "#fdf9f3",
+            "on-error-container": "#93000a",
+            "error-container": "#ffdad6",
+            "on-error": "#ffffff",
+            "surface-variant": "#e6e2dd",
+            "primary-container": "#b23e00",
+            "on-secondary-container": "#756053",
+            "on-background": "#1c1b18",
+            "on-primary": "#ffffff",
+            "secondary": "#6f5a4e",
+            "surface-dim": "#ded9d4",
+            "inverse-primary": "#ffb59a",
+            "primary-fixed-dim": "#ffb59a",
+            "on-secondary-fixed": "#27180f",
+            "surface": "#fdf9f3",
+            "surface-container-highest": "#e6e2dd",
+            "on-tertiary-container": "#a5f4b8",
+            "on-primary-fixed": "#370e00",
+            "on-primary-fixed-variant": "#802a00",
+            "error": "#ba1a1a",
+            "on-surface": "#1c1b18",
+            "secondary-container": "#faddcd",
+            "on-secondary-fixed-variant": "#564337",
+            "surface-bright": "#fdf9f3",
+            "inverse-surface": "#32302d",
+            "inverse-on-surface": "#f5f0eb",
+            "on-tertiary-fixed-variant": "#005229",
+            "on-secondary": "#ffffff",
+            "primary-fixed": "#ffdbce",
+            "surface-tint": "#a73a00",
+            "secondary-fixed": "#faddcd",
+            "on-tertiary": "#ffffff",
+            "on-primary-container": "#ffdbcf",
+            "surface-container-high": "#ece7e2",
+            "outline": "#8c7168",
+            "tertiary": "#00592d",
+            "border-neutral": "#D6D4CE",
+            "neutral-subtle": "#55534D",
+            "slot-vacant": "#77756F",
+            "slot-filled-bg": "#D6F0DD",
+            "slot-filled-border": "#1B6B3C",
+            "slot-filled-text": "#07301A"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-xs": "0.25rem",
+            "space-sm": "0.5rem",
+            "space-md": "1rem",
+            "space-lg": "1.5rem",
+            "space-xl": "2rem",
+            "margin": "1rem",
+            "gutter": "1rem"
+          },
+          "fontFamily": {
+            "label-field": ["Be Vietnam Pro"],
+            "card-title": ["Be Vietnam Pro"],
+            "title": ["Be Vietnam Pro"],
+            "headline": ["Be Vietnam Pro"],
+            "metadata": ["Be Vietnam Pro"],
+            "button": ["Be Vietnam Pro"],
+            "body": ["Be Vietnam Pro"],
+            "chip": ["Be Vietnam Pro"]
+          },
+          "fontSize": {
+            "label-field": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "card-title": ["16px", { "lineHeight": "24px", "letterSpacing": "0px", "fontWeight": "600" }],
+            "title": ["20px", { "lineHeight": "28px", "letterSpacing": "0px", "fontWeight": "600" }],
+            "headline": ["24px", { "lineHeight": "32px", "letterSpacing": "0px", "fontWeight": "700" }],
+            "metadata": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "400" }],
+            "button": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "body": ["16px", { "lineHeight": "24px", "letterSpacing": "0px", "fontWeight": "400" }],
+            "chip": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface antialiased flex items-center justify-center min-h-screen p-0 m-0">
+<!-- Mobile Frame Container (360x800) -->
+<div class="relative w-[360px] h-[800px] bg-surface-container-lowest overflow-hidden flex flex-col select-none">
+<!-- UNDERLYING SCREEN: Frame 7 (Team detail) - Visual Backdrop -->
+<div aria-hidden="true" class="w-full h-full flex flex-col pointer-events-none">
+<!-- TopAppBar (from shared anchors) -->
+<header class="flex items-center justify-between h-16 w-full px-margin max-w-[360px] mx-auto bg-surface-container-lowest border-b border-surface-dim top-0 shrink-0">
+<button class="w-12 h-12 flex items-center justify-center text-primary" tabindex="-1" type="button">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<span class="font-headline text-headline text-on-surface">TeamUp EXE</span>
+<button class="w-12 h-12 flex items-center justify-center text-secondary" tabindex="-1" type="button">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</header>
+<!-- Scrollable Team Detail Canvas -->
+<main class="flex-1 overflow-y-auto px-margin pt-space-md space-y-space-lg">
+<!-- Team Identity Header -->
+<div class="space-y-space-xs">
+<div class="flex items-center space-x-space-xs">
+<span class="inline-flex items-center px-space-sm py-0.5 rounded-full bg-surface-container text-on-surface-variant font-metadata text-metadata">
+              Logistics cohort 04
+            </span>
+</div>
+<h1 class="font-headline text-headline text-on-surface">Alpha site deployment</h1>
+<p class="font-body text-body text-neutral-subtle">Primary emergency dispatch and technical load coordination team.</p>
+</div>
+<!-- Meta Specification Grid -->
+<div class="grid grid-cols-2 gap-gutter">
+<div class="bg-surface-container-low p-space-md rounded-xl border border-border-neutral">
+<span class="font-metadata text-metadata text-neutral-subtle block">Assembly status</span>
+<span class="font-card-title text-card-title text-on-surface mt-space-xs block">3 of 4 active</span>
+</div>
+<div class="bg-surface-container-low p-space-md rounded-xl border border-border-neutral">
+<span class="font-metadata text-metadata text-neutral-subtle block">Timeframe</span>
+<span class="font-card-title text-card-title text-on-surface mt-space-xs block">48 hours remaining</span>
+</div>
+</div>
+<!-- Role Provisioning Overview -->
+<div class="space-y-space-sm">
+<h2 class="font-card-title text-card-title text-on-surface">Allocated operational roster</h2>
+<div class="space-y-space-sm">
+<!-- Slot 1: Filled -->
+<div class="p-space-md rounded-xl bg-slot-filled-bg border border-slot-filled-border flex items-center space-x-space-md">
+<div class="w-8 h-8 rounded-full bg-tertiary-fixed flex items-center justify-center font-button text-button text-slot-filled-text">
+                RH
+              </div>
+<div class="flex-1">
+<span class="font-card-title text-card-title text-slot-filled-text block">Raymon Hall</span>
+<span class="font-metadata text-metadata text-slot-filled-text opacity-90 block">Incident lead</span>
+</div>
+<span class="material-symbols-outlined text-slot-filled-text" data-icon="check_circle">check_circle</span>
+</div>
+<!-- Slot 2: Filled -->
+<div class="p-space-md rounded-xl bg-slot-filled-bg border border-slot-filled-border flex items-center space-x-space-md">
+<div class="w-8 h-8 rounded-full bg-tertiary-fixed flex items-center justify-center font-button text-button text-slot-filled-text">
+                EL
+              </div>
+<div class="flex-1">
+<span class="font-card-title text-card-title text-slot-filled-text block">Elena Lin</span>
+<span class="font-metadata text-metadata text-slot-filled-text opacity-90 block">Comms specialist</span>
+</div>
+<span class="material-symbols-outlined text-slot-filled-text" data-icon="check_circle">check_circle</span>
+</div>
+<!-- Slot 3: Open Slot (Target for request) -->
+<div class="p-space-md rounded-xl bg-surface-container-lowest border-2 border-dashed border-slot-vacant flex items-center space-x-space-md">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-slot-vacant">
+<span class="material-symbols-outlined" data-icon="person_add">person_add</span>
+</div>
+<div class="flex-1">
+<span class="font-card-title text-card-title text-on-surface block">Systems engineer</span>
+<span class="font-metadata text-metadata text-neutral-subtle block">Open slot</span>
+</div>
+<span class="inline-block px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-fixed font-metadata text-metadata">Vacant</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Persistent Bottom Action Area (Blocked by Dialog Flow) -->
+<footer class="p-margin bg-surface-container-lowest border-t border-border-neutral shrink-0">
+<button class="w-full h-12 rounded-full bg-primary-container text-on-primary font-button text-button flex items-center justify-center" tabindex="-1" type="button">
+          Join team
+        </button>
+</footer>
+</div>
+<!-- SCRIM / OVERLAY (Dimmed & Blurred Backdrop) -->
+<div class="absolute inset-0 bg-[#000000]/60 backdrop-blur-sm z-40 transition-opacity"></div>
+<!-- MODAL DIALOG CONTAINER -->
+<div aria-labelledby="dialog-title" aria-modal="true" class="absolute inset-0 z-50 flex items-center justify-center px-margin" role="dialog">
+<!-- Material 3 Dialog Card -->
+<div class="w-full bg-[#FFFFFF] rounded-xl border border-border-neutral p-space-lg flex flex-col space-y-space-md">
+<!-- Dialog Title -->
+<h2 class="font-title text-title text-on-surface" id="dialog-title">
+          Send request?
+        </h2>
+<!-- Dialog Body -->
+<p class="font-body text-body text-neutral-subtle">
+          They will see your profile.
+        </p>
+<!-- Dialog Actions -->
+<div class="pt-space-sm flex items-center justify-end space-x-space-sm">
+<!-- Text Button: Cancel -->
+<button class="min-w-[48px] h-12 px-space-md rounded-full text-on-surface font-button text-button flex items-center justify-center hover:bg-surface-container-low active:opacity-80 active:scale-95 transition-all" type="button">
+            Cancel
+          </button>
+<!-- Primary Filled Button: Send -->
+<button class="min-w-[88px] h-12 px-space-lg rounded-full bg-primary-container text-on-primary font-button text-button flex items-center justify-center active:opacity-80 active:scale-95 transition-all" type="button">
+            Send
+          </button>
+</div>
+</div>
+</div>
+</div>
+</body></html>

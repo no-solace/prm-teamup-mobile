@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Student detail - Mai Pham</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "outline-variant": "#e0c0b4",
+            "surface-container-lowest": "#ffffff",
+            "secondary-fixed-dim": "#dcc1b2",
+            "surface-container-low": "#f8f3ed",
+            "surface-container": "#f2ede8",
+            "tertiary-container": "#247242",
+            "on-surface-variant": "#584239",
+            "tertiary-fixed": "#a5f4b8",
+            "primary": "#8a2e00",
+            "tertiary-fixed-dim": "#8ad79e",
+            "on-tertiary-fixed": "#00210d",
+            "background": "#fdf9f3",
+            "on-error-container": "#93000a",
+            "error-container": "#ffdad6",
+            "on-error": "#ffffff",
+            "surface-variant": "#e6e2dd",
+            "primary-container": "#b23e00",
+            "on-secondary-container": "#756053",
+            "on-background": "#1c1b18",
+            "on-primary": "#ffffff",
+            "secondary": "#6f5a4e",
+            "surface-dim": "#ded9d4",
+            "inverse-primary": "#ffb59a",
+            "primary-fixed-dim": "#ffb59a",
+            "on-secondary-fixed": "#27180f",
+            "surface": "#fdf9f3",
+            "surface-container-highest": "#e6e2dd",
+            "on-tertiary-container": "#a5f4b8",
+            "on-primary-fixed": "#370e00",
+            "on-primary-fixed-variant": "#802a00",
+            "error": "#ba1a1a",
+            "on-surface": "#1c1b18",
+            "secondary-container": "#faddcd",
+            "on-secondary-fixed-variant": "#564337",
+            "surface-bright": "#fdf9f3",
+            "inverse-surface": "#32302d",
+            "inverse-on-surface": "#f5f0eb",
+            "on-tertiary-fixed-variant": "#005229",
+            "on-secondary": "#ffffff",
+            "primary-fixed": "#ffdbce",
+            "surface-tint": "#a73a00",
+            "secondary-fixed": "#faddcd",
+            "on-tertiary": "#ffffff",
+            "on-primary-container": "#ffdbcf",
+            "surface-container-high": "#ece7e2",
+            "outline": "#8c7168",
+            "tertiary": "#00592d"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-sm": "0.5rem",
+            "space-xl": "2rem",
+            "space-xs": "0.25rem",
+            "gutter": "1rem",
+            "space-lg": "1.5rem",
+            "space-md": "1rem",
+            "margin": "1rem"
+          },
+          "fontFamily": {
+            "label-field": ["Be Vietnam Pro"],
+            "card-title": ["Be Vietnam Pro"],
+            "title": ["Be Vietnam Pro"],
+            "headline": ["Be Vietnam Pro"],
+            "metadata": ["Be Vietnam Pro"],
+            "button": ["Be Vietnam Pro"],
+            "body": ["Be Vietnam Pro"],
+            "chip": ["Be Vietnam Pro"]
+          },
+          "fontSize": {
+            "label-field": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "card-title": ["16px", { "lineHeight": "24px", "letterSpacing": "0px", "fontWeight": "600" }],
+            "title": ["20px", { "lineHeight": "28px", "letterSpacing": "0px", "fontWeight": "600" }],
+            "headline": ["24px", { "lineHeight": "32px", "letterSpacing": "0px", "fontWeight": "700" }],
+            "metadata": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "400" }],
+            "button": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "body": ["16px", { "lineHeight": "24px", "letterSpacing": "0px", "fontWeight": "400" }],
+            "chip": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    body {
+      background-color: #f2ede8;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen text-on-surface antialiased flex justify-center items-start sm:py-6">
+<!-- Mobile Viewport Frame (360x800 base standard) -->
+<main class="w-full max-w-[360px] min-h-screen sm:min-h-[800px] bg-surface-container-lowest flex flex-col justify-between border-x border-surface-dim relative">
+<!-- Top App Bar (Shared Component Executed: small, leading arrow_back, title) -->
+<header class="docked full-width top-0 bg-surface-container-lowest border-b border-surface-dim flat no shadows flex items-center justify-between h-16 w-full px-margin z-10">
+<div class="flex items-center gap-space-sm">
+<button aria-label="Back" class="w-12 h-12 -ml-2 flex items-center justify-center rounded-full hover:bg-surface-container-low active:opacity-80 active:scale-95 duration-100 ease-in-out" type="button">
+<span class="material-symbols-outlined text-on-surface text-[24px]" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-title text-title text-on-surface font-semibold tracking-tight">Mai Pham</h1>
+</div>
+<div class="w-12 h-12 flex items-center justify-end">
+<button aria-label="More options" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low active:opacity-80" type="button">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</header>
+<!-- Scrollable Profile Content -->
+<div class="flex-1 overflow-y-auto px-margin py-space-md space-y-space-md">
+<!-- Primary Profile Identity Panel -->
+<section class="bg-surface-container-lowest border border-surface-dim rounded-xl p-space-md flex items-center gap-space-md">
+<!-- Initials Avatar -->
+<div class="w-16 h-16 rounded-full bg-surface-container-high border border-surface-dim flex items-center justify-center shrink-0">
+<span class="font-headline text-headline text-on-surface font-bold">MP</span>
+</div>
+<!-- Identity Metadata -->
+<div class="flex flex-col">
+<h2 class="font-card-title text-card-title text-on-surface">Mai Pham</h2>
+<p class="font-metadata text-metadata text-secondary mt-0.5">MKT, S5</p>
+<div class="flex items-center gap-1 mt-1 text-tertiary">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span class="font-chip text-chip text-tertiary font-semibold text-xs">Active candidate</span>
+</div>
+</div>
+</section>
+<!-- Role Assignment Section -->
+<section class="bg-surface-container-lowest border border-surface-dim rounded-xl p-space-md">
+<span class="font-metadata text-metadata text-secondary block mb-1">Target role</span>
+<h3 class="font-card-title text-card-title text-on-surface mb-space-sm">Role</h3>
+<!-- Role Slot representation -->
+<div class="bg-surface-container-lowest border border-surface-dim rounded-lg p-space-sm flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-9 h-9 rounded-lg bg-surface-container-low border border-surface-dim flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="campaign">campaign</span>
+</div>
+<div>
+<p class="font-label-field text-label-field text-on-surface font-semibold">Marketing Lead</p>
+<p class="font-metadata text-metadata text-secondary text-xs">Primary applicant</p>
+</div>
+</div>
+<span class="font-chip text-chip text-primary bg-secondary-container px-2 py-0.5 rounded-full text-xs">Assigned</span>
+</div>
+</section>
+<!-- Availability Section -->
+<section class="bg-surface-container-lowest border border-surface-dim rounded-xl p-space-md">
+<h3 class="font-card-title text-card-title text-on-surface mb-space-sm">Availability</h3>
+<div class="bg-surface-container-low border border-surface-dim rounded-lg p-space-sm flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="schedule">schedule</span>
+<span class="font-body text-body text-on-surface font-medium">12 h/week</span>
+</div>
+<span class="font-metadata text-metadata text-secondary text-xs">Flexible schedule</span>
+</div>
+</section>
+<!-- Skills Section -->
+<section class="bg-surface-container-lowest border border-surface-dim rounded-xl p-space-md">
+<h3 class="font-card-title text-card-title text-on-surface mb-space-sm">Skills</h3>
+<div class="flex flex-wrap gap-2">
+<!-- Tonal Chip 1 -->
+<div class="inline-flex items-center h-8 px-3 rounded-full bg-surface-variant border border-surface-dim">
+<span class="font-chip text-chip text-on-surface">Social media</span>
+</div>
+<!-- Tonal Chip 2 -->
+<div class="inline-flex items-center h-8 px-3 rounded-full bg-surface-variant border border-surface-dim">
+<span class="font-chip text-chip text-on-surface">Branding</span>
+</div>
+<!-- Tonal Chip 3 -->
+<div class="inline-flex items-center h-8 px-3 rounded-full bg-surface-variant border border-surface-dim">
+<span class="font-chip text-chip text-on-surface">Writing</span>
+</div>
+</div>
+</section>
+<!-- Operational Context Panel -->
+<section class="bg-surface-container-lowest border border-surface-dim rounded-xl p-space-md">
+<h3 class="font-card-title text-card-title text-on-surface mb-space-sm">Team fit note</h3>
+<p class="font-metadata text-metadata text-secondary leading-relaxed">
+          Completed core marketing audit during Semester 4. Strong portfolio in visual branding and content distribution pipelines.
+        </p>
+</section>
+</div>
+<!-- Sticky Bottom Bar with Primary Action Button -->
+<footer class="sticky bottom-0 w-full bg-surface-container-lowest border-t border-surface-dim p-margin z-20">
+<button class="w-full h-12 rounded-full bg-primary-container text-on-primary font-button text-button flex items-center justify-center transition-transform active:scale-[0.98] duration-100 ease-in-out" type="button">
+        Invite
+      </button>
+</footer>
+</main>
+</body></html>

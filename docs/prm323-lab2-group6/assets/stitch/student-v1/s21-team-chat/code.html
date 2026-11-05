@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>21. Team chat</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-primary-fixed": "#370e00",
+            "error-container": "#ffdad6",
+            "surface-bright": "#fdf9f3",
+            "surface-container-low": "#f8f3ed",
+            "on-primary-fixed-variant": "#802a00",
+            "on-secondary-fixed": "#27180f",
+            "surface-container-highest": "#e6e2dd",
+            "surface-dim": "#ded9d4",
+            "on-background": "#1c1b18",
+            "background": "#fdf9f3",
+            "on-tertiary-fixed": "#00210d",
+            "surface-variant": "#e6e2dd",
+            "outline-variant": "#e0c0b4",
+            "tertiary-fixed-dim": "#8ad79e",
+            "primary-fixed": "#ffdbce",
+            "on-surface-variant": "#584239",
+            "secondary-container": "#faddcd",
+            "error": "#ba1a1a",
+            "primary": "#8a2e00",
+            "on-primary-container": "#ffdbcf",
+            "on-secondary-container": "#756053",
+            "surface-container": "#f2ede8",
+            "surface-container-lowest": "#ffffff",
+            "tertiary-fixed": "#a5f4b8",
+            "secondary-fixed": "#faddcd",
+            "on-tertiary-fixed-variant": "#005229",
+            "tertiary": "#00592d",
+            "on-secondary": "#ffffff",
+            "on-error-container": "#93000a",
+            "on-tertiary-container": "#a5f4b8",
+            "surface-tint": "#a73a00",
+            "outline": "#8c7168",
+            "tertiary-container": "#247242",
+            "on-surface": "#1c1b18",
+            "on-secondary-fixed-variant": "#564337",
+            "inverse-primary": "#ffb59a",
+            "surface-container-high": "#ece7e2",
+            "on-primary": "#ffffff",
+            "primary-fixed-dim": "#ffb59a",
+            "on-tertiary": "#ffffff",
+            "inverse-on-surface": "#f5f0eb",
+            "inverse-surface": "#32302d",
+            "secondary": "#6f5a4e",
+            "primary-container": "#b23e00",
+            "surface": "#fdf9f3",
+            "on-error": "#ffffff",
+            "secondary-fixed-dim": "#dcc1b2"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "margin": "1rem",
+            "space-md": "1rem",
+            "space-lg": "1.5rem",
+            "space-xs": "0.25rem",
+            "gutter": "1rem",
+            "space-xl": "2rem",
+            "space-sm": "0.5rem"
+          },
+          "fontFamily": {
+            "title": ["Be Vietnam Pro"],
+            "body": ["Be Vietnam Pro"],
+            "button": ["Be Vietnam Pro"],
+            "label-field": ["Be Vietnam Pro"],
+            "chip": ["Be Vietnam Pro"],
+            "headline": ["Be Vietnam Pro"],
+            "card-title": ["Be Vietnam Pro"],
+            "metadata": ["Be Vietnam Pro"]
+          },
+          "fontSize": {
+            "title": [
+              "20px",
+              {
+                "lineHeight": "28px",
+                "letterSpacing": "0px",
+                "fontWeight": "600"
+              }
+            ],
+            "body": [
+              "16px",
+              {
+                "lineHeight": "24px",
+                "letterSpacing": "0px",
+                "fontWeight": "400"
+              }
+            ],
+            "button": [
+              "14px",
+              {
+                "lineHeight": "20px",
+                "letterSpacing": "0.1px",
+                "fontWeight": "600"
+              }
+            ],
+            "label-field": [
+              "14px",
+              {
+                "lineHeight": "20px",
+                "letterSpacing": "0.1px",
+                "fontWeight": "600"
+              }
+            ],
+            "chip": [
+              "14px",
+              {
+                "lineHeight": "20px",
+                "letterSpacing": "0.1px",
+                "fontWeight": "600"
+              }
+            ],
+            "headline": [
+              "24px",
+              {
+                "lineHeight": "32px",
+                "letterSpacing": "0px",
+                "fontWeight": "700"
+              }
+            ],
+            "card-title": [
+              "16px",
+              {
+                "lineHeight": "24px",
+                "letterSpacing": "0px",
+                "fontWeight": "600"
+              }
+            ],
+            "metadata": [
+              "14px",
+              {
+                "lineHeight": "20px",
+                "letterSpacing": "0.1px",
+                "fontWeight": "400"
+              }
+            ]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-container-high flex justify-center items-center min-h-screen m-0 p-0 antialiased selection:bg-secondary-container">
+<!-- Mobile Frame: 360 x 800 dp -->
+<div class="relative w-[360px] h-[800px] bg-surface-container-lowest flex flex-col overflow-hidden border border-surface-dim">
+<!-- Top App Bar -->
+<header class="bg-surface-container-lowest border-b border-surface-dim h-16 w-full px-margin flex items-center justify-between shrink-0 z-10">
+<div class="flex items-center gap-space-sm">
+<button aria-label="Back" class="w-12 h-12 flex items-center justify-center -ml-2 rounded-full hover:bg-surface-container-low transition-colors duration-150 active:opacity-80 active:scale-95 text-on-surface" type="button">
+<span class="material-symbols-outlined text-[24px]">arrow_back</span>
+</button>
+<h1 class="font-title text-title text-on-surface">Tutor Match chat</h1>
+</div>
+</header>
+<!-- Chat Canvas / Message Content -->
+<main class="flex-1 overflow-y-auto px-margin py-space-lg flex flex-col space-y-space-md">
+<!-- Date Indicator -->
+<div class="flex justify-center my-space-xs">
+<span class="font-metadata text-metadata text-secondary">Today</span>
+</div>
+<!-- Bubble 1: Incoming -->
+<div class="flex flex-col items-start max-w-[85%] self-start">
+<div class="bg-surface-container text-on-surface font-body text-body px-space-md py-space-sm rounded-xl rounded-tl-none border border-surface-dim">
+          Welcome to the team, Mai!
+        </div>
+<span class="font-metadata text-metadata text-secondary mt-1 px-1">10:14 am</span>
+</div>
+<!-- Bubble 2: Outgoing -->
+<div class="flex flex-col items-end max-w-[85%] self-end">
+<div class="bg-primary-container text-on-primary font-body text-body px-space-md py-space-sm rounded-xl rounded-tr-none">
+          Thanks! I can start this week.
+        </div>
+<span class="font-metadata text-metadata text-secondary mt-1 px-1">10:15 am</span>
+</div>
+<!-- Bubble 3: Incoming -->
+<div class="flex flex-col items-start max-w-[85%] self-start">
+<div class="bg-surface-container text-on-surface font-body text-body px-space-md py-space-sm rounded-xl rounded-tl-none border border-surface-dim">
+          Great, let's meet Thursday.
+        </div>
+<span class="font-metadata text-metadata text-secondary mt-1 px-1">10:16 am</span>
+</div>
+</main>
+<!-- Bottom Input Area Docked at Bottom -->
+<footer class="bg-surface-container-lowest border-t border-surface-dim p-margin shrink-0 z-10">
+<form class="flex items-center gap-space-sm" onsubmit="event.preventDefault()">
+<div class="relative flex-1">
+<input class="w-full h-12 bg-surface-container border border-outline rounded-lg px-space-md font-body text-body text-on-surface placeholder:text-secondary focus:outline-none focus:border-primary transition-colors" placeholder="Message" type="text"/>
+</div>
+<button aria-label="Send message" class="w-12 h-12 shrink-0 flex items-center justify-center rounded-full border border-surface-dim hover:bg-surface-container-low transition-colors duration-150 active:opacity-80 active:scale-95 text-on-surface" type="submit">
+<span class="material-symbols-outlined text-[24px]">send</span>
+</button>
+</form>
+</footer>
+</div>
+</body></html>

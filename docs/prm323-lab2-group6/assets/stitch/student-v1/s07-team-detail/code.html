@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tutor Match - Team detail</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "outline-variant": "#e0c0b4",
+            "surface-container-lowest": "#ffffff",
+            "secondary-fixed-dim": "#dcc1b2",
+            "surface-container-low": "#f8f3ed",
+            "surface-container": "#f2ede8",
+            "tertiary-container": "#247242",
+            "on-surface-variant": "#584239",
+            "tertiary-fixed": "#a5f4b8",
+            "primary": "#8a2e00",
+            "tertiary-fixed-dim": "#8ad79e",
+            "on-tertiary-fixed": "#00210d",
+            "background": "#ffffff",
+            "on-error-container": "#93000a",
+            "error-container": "#ffdad6",
+            "on-error": "#ffffff",
+            "surface-variant": "#e6e2dd",
+            "primary-container": "#b23e00",
+            "on-secondary-container": "#756053",
+            "on-background": "#1c1b18",
+            "on-primary": "#ffffff",
+            "secondary": "#55534d",
+            "surface-dim": "#d6d4ce",
+            "inverse-primary": "#ffb59a",
+            "primary-fixed-dim": "#ffb59a",
+            "on-secondary-fixed": "#27180f",
+            "surface": "#ffffff",
+            "surface-container-highest": "#e6e2dd",
+            "on-tertiary-container": "#a5f4b8",
+            "on-primary-fixed": "#370e00",
+            "on-primary-fixed-variant": "#802a00",
+            "error": "#ba1a1a",
+            "on-surface": "#1c1b18",
+            "secondary-container": "#faddcd",
+            "on-secondary-fixed-variant": "#564337",
+            "surface-bright": "#ffffff",
+            "inverse-surface": "#32302d",
+            "inverse-on-surface": "#f5f0eb",
+            "on-tertiary-fixed-variant": "#005229",
+            "on-secondary": "#ffffff",
+            "primary-fixed": "#ffdbce",
+            "surface-tint": "#a73a00",
+            "secondary-fixed": "#faddcd",
+            "on-tertiary": "#ffffff",
+            "on-primary-container": "#ffdbcf",
+            "surface-container-high": "#ece7e2",
+            "outline": "#77756f",
+            "tertiary": "#1b6b3c",
+            "tertiary-slot": "#d6f0dd",
+            "on-tertiary-slot": "#07301a"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-xs": "0.25rem",
+            "space-sm": "0.5rem",
+            "space-md": "1rem",
+            "space-lg": "1.5rem",
+            "space-xl": "2rem",
+            "margin": "1rem",
+            "gutter": "1rem"
+          },
+          "fontFamily": {
+            "headline": ["Be Vietnam Pro"],
+            "title": ["Be Vietnam Pro"],
+            "card-title": ["Be Vietnam Pro"],
+            "body": ["Be Vietnam Pro"],
+            "metadata": ["Be Vietnam Pro"],
+            "label-field": ["Be Vietnam Pro"],
+            "button": ["Be Vietnam Pro"],
+            "chip": ["Be Vietnam Pro"]
+          },
+          "fontSize": {
+            "headline": ["24px", { "lineHeight": "32px", "letterSpacing": "0px", "fontWeight": "700" }],
+            "title": ["20px", { "lineHeight": "28px", "letterSpacing": "0px", "fontWeight": "600" }],
+            "card-title": ["16px", { "lineHeight": "24px", "letterSpacing": "0px", "fontWeight": "600" }],
+            "body": ["16px", { "lineHeight": "24px", "letterSpacing": "0px", "fontWeight": "400" }],
+            "metadata": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "400" }],
+            "label-field": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "button": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "chip": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface antialiased flex justify-center min-h-screen">
+<div class="w-full max-w-[360px] min-h-[800px] bg-surface flex flex-col relative border-x border-surface-dim">
+<!-- TopAppBar from Shared Components Specification -->
+<header class="bg-surface-container-lowest border-b border-surface-dim flat no shadows flex items-center justify-between h-16 w-full px-margin sticky top-0 z-20">
+<div class="flex items-center gap-space-sm">
+<button aria-label="Go back" class="w-12 h-12 flex items-center justify-center -ml-2 rounded-full hover:bg-surface-container-low transition-colors duration-150 active:opacity-80 active:scale-95 duration-100 ease-in-out text-on-surface" type="button">
+<span class="material-symbols-outlined text-[24px]" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-title text-title text-on-surface font-semibold">Tutor Match</h1>
+</div>
+<div class="w-12 h-12 flex items-center justify-center">
+<!-- Spacer / Contextual Slot -->
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col px-margin pt-space-lg pb-24 gap-space-lg">
+<!-- Team Pitch / Overview Card -->
+<section class="border border-surface-dim rounded-xl p-space-md bg-surface flex flex-col gap-space-md">
+<div>
+<div class="font-metadata text-metadata text-secondary mb-1">Operational focus</div>
+<p class="font-body text-body text-on-surface">Peer tutoring where FU students book short sessions</p>
+</div>
+<div class="h-px w-full bg-surface-dim"></div>
+<!-- Role Row: 5 slots at 48dp, no captions -->
+<div>
+<div class="flex items-center justify-between">
+<span class="font-label-field text-label-field text-on-surface">Team occupancy</span>
+<span class="font-metadata text-metadata text-secondary">3 of 5 filled</span>
+</div>
+<div class="flex items-center justify-between pt-space-sm">
+<!-- Slot 1: Filled HN -->
+<div class="w-12 h-12 rounded-xl bg-tertiary-slot border border-tertiary flex items-center justify-center text-on-tertiary-slot font-button text-button" title="Hoang Nguyen">
+              HN
+            </div>
+<!-- Slot 2: Filled QB -->
+<div class="w-12 h-12 rounded-xl bg-tertiary-slot border border-tertiary flex items-center justify-center text-on-tertiary-slot font-button text-button" title="Quoc Bao">
+              QB
+            </div>
+<!-- Slot 3: Filled TL -->
+<div class="w-12 h-12 rounded-xl bg-tertiary-slot border border-tertiary flex items-center justify-center text-on-tertiary-slot font-button text-button" title="Thao Linh">
+              TL
+            </div>
+<!-- Slot 4: Open Marketing Role -->
+<div class="w-12 h-12 rounded-xl bg-surface border-2 border-dashed border-outline flex items-center justify-center text-outline" title="Open marketing slot">
+<span class="material-symbols-outlined text-[20px]" data-icon="campaign">campaign</span>
+</div>
+<!-- Slot 5: Open Graphic Design Role -->
+<div class="w-12 h-12 rounded-xl bg-surface border-2 border-dashed border-outline flex items-center justify-center text-outline" title="Open graphic design slot">
+<span class="material-symbols-outlined text-[20px]" data-icon="palette">palette</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Members -->
+<section class="border border-surface-dim rounded-xl p-space-md bg-surface flex flex-col">
+<h2 class="font-card-title text-card-title text-on-surface pb-space-sm border-b border-surface-dim">Members</h2>
+<div class="divide-y divide-surface-dim">
+<!-- Member 1 -->
+<div class="flex items-center py-space-sm gap-space-md">
+<div class="w-10 h-10 rounded-full bg-tertiary-slot border border-tertiary flex items-center justify-center text-on-tertiary-slot font-button text-button shrink-0">
+              HN
+            </div>
+<div class="flex flex-col">
+<span class="font-label-field text-label-field text-on-surface">Hoang Nguyen</span>
+<span class="font-metadata text-metadata text-secondary">SE</span>
+</div>
+</div>
+<!-- Member 2 -->
+<div class="flex items-center py-space-sm gap-space-md">
+<div class="w-10 h-10 rounded-full bg-tertiary-slot border border-tertiary flex items-center justify-center text-on-tertiary-slot font-button text-button shrink-0">
+              QB
+            </div>
+<div class="flex flex-col">
+<span class="font-label-field text-label-field text-on-surface">Quoc Bao</span>
+<span class="font-metadata text-metadata text-secondary">SE</span>
+</div>
+</div>
+<!-- Member 3 -->
+<div class="flex items-center py-space-sm gap-space-md">
+<div class="w-10 h-10 rounded-full bg-tertiary-slot border border-tertiary flex items-center justify-center text-on-tertiary-slot font-button text-button shrink-0">
+              TL
+            </div>
+<div class="flex flex-col">
+<span class="font-label-field text-label-field text-on-surface">Thao Linh</span>
+<span class="font-metadata text-metadata text-secondary">AI</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Open roles -->
+<section class="border border-surface-dim rounded-xl p-space-md bg-surface flex flex-col">
+<h2 class="font-card-title text-card-title text-on-surface pb-space-sm border-b border-surface-dim">Open roles</h2>
+<div class="divide-y divide-surface-dim">
+<!-- Open Role 1 -->
+<div class="flex items-center py-space-sm gap-space-md">
+<div class="w-10 h-10 rounded-full bg-surface border-2 border-dashed border-outline flex items-center justify-center text-outline shrink-0">
+<span class="material-symbols-outlined text-[20px]" data-icon="campaign">campaign</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-field text-label-field text-on-surface">Marketing</span>
+<span class="font-metadata text-metadata text-secondary">Open slot</span>
+</div>
+</div>
+<!-- Open Role 2 -->
+<div class="flex items-center py-space-sm gap-space-md">
+<div class="w-10 h-10 rounded-full bg-surface border-2 border-dashed border-outline flex items-center justify-center text-outline shrink-0">
+<span class="material-symbols-outlined text-[20px]" data-icon="palette">palette</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-field text-label-field text-on-surface">Graphic Design</span>
+<span class="font-metadata text-metadata text-secondary">Open slot</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Sticky Bottom Action Bar -->
+<div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[360px] p-margin bg-surface border-t border-surface-dim z-30">
+<button class="w-full h-12 bg-primary-container rounded-full flex items-center justify-center text-on-primary font-button text-button hover:opacity-95 active:scale-95 duration-100 ease-in-out transition-all" type="button">
+        Request to join
+      </button>
+</div>
+</div>
+</body></html>

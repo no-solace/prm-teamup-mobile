@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Add member - TeamUp EXE</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-tertiary-container": "#a5f4b8",
+            "inverse-primary": "#ffb59a",
+            "surface-container-lowest": "#ffffff",
+            "on-primary": "#ffffff",
+            "surface-container-low": "#f8f3ed",
+            "surface-container": "#f2ede8",
+            "error": "#ba1a1a",
+            "on-secondary-fixed-variant": "#564337",
+            "inverse-surface": "#32302d",
+            "outline-variant": "#e0c0b4",
+            "tertiary-fixed-dim": "#8ad79e",
+            "outline": "#8c7168",
+            "surface-variant": "#e6e2dd",
+            "on-background": "#1c1b18",
+            "on-tertiary-fixed": "#00210d",
+            "tertiary-fixed": "#a5f4b8",
+            "inverse-on-surface": "#f5f0eb",
+            "secondary-fixed-dim": "#dcc1b2",
+            "surface-container-highest": "#e6e2dd",
+            "secondary-fixed": "#faddcd",
+            "tertiary": "#00592d",
+            "surface-container-high": "#ece7e2",
+            "background": "#ffffff",
+            "on-primary-fixed": "#370e00",
+            "primary-fixed-dim": "#ffb59a",
+            "primary": "#8a2e00",
+            "on-error-container": "#93000a",
+            "on-primary-fixed-variant": "#802a00",
+            "surface-tint": "#a73a00",
+            "on-secondary-container": "#756053",
+            "on-secondary": "#ffffff",
+            "on-tertiary": "#ffffff",
+            "tertiary-container": "#247242",
+            "on-error": "#ffffff",
+            "primary-container": "#b23e00",
+            "on-surface-variant": "#584239",
+            "error-container": "#ffdad6",
+            "on-primary-container": "#ffdbcf",
+            "surface-dim": "#ded9d4",
+            "on-tertiary-fixed-variant": "#005229",
+            "secondary": "#6f5a4e",
+            "on-surface": "#1c1b18",
+            "on-secondary-fixed": "#27180f",
+            "secondary-container": "#faddcd",
+            "surface": "#ffffff",
+            "primary-fixed": "#ffdbce",
+            "surface-bright": "#ffffff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-lg": "1.5rem",
+            "gutter": "1rem",
+            "space-sm": "0.5rem",
+            "space-xl": "2rem",
+            "space-xs": "0.25rem",
+            "space-md": "1rem",
+            "margin": "1rem"
+          },
+          "fontFamily": {
+            "body": ["Be Vietnam Pro"],
+            "metadata": ["Be Vietnam Pro"],
+            "headline": ["Be Vietnam Pro"],
+            "title": ["Be Vietnam Pro"],
+            "button": ["Be Vietnam Pro"],
+            "chip": ["Be Vietnam Pro"],
+            "card-title": ["Be Vietnam Pro"],
+            "label-field": ["Be Vietnam Pro"]
+          },
+          "fontSize": {
+            "body": ["16px", { "lineHeight": "24px", "letterSpacing": "0px", "fontWeight": "400" }],
+            "metadata": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "400" }],
+            "headline": ["24px", { "lineHeight": "32px", "letterSpacing": "0px", "fontWeight": "700" }],
+            "title": ["20px", { "lineHeight": "28px", "letterSpacing": "0px", "fontWeight": "600" }],
+            "button": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "chip": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "card-title": ["16px", { "lineHeight": "24px", "letterSpacing": "0px", "fontWeight": "600" }],
+            "label-field": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    /* Strict styling rules conforming to the operational design spec */
+    * {
+      box-shadow: none !important;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      font-family: 'Be Vietnam Pro', sans-serif;
+      background-color: #f3f2ef;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen flex items-center justify-center p-0 sm:p-4 text-on-surface">
+<!-- Mobile Frame 360 x 800 dp -->
+<main class="w-[360px] h-[800px] max-w-[360px] max-h-[800px] bg-surface flex flex-col justify-between overflow-hidden relative border border-[#D6D4CE]">
+<!-- Top Area (Header, Subline, Filter Chips) -->
+<header class="w-full flex-shrink-0 bg-surface">
+<!-- Top Bar (Back button, left-aligned title) -->
+<div class="h-14 flex items-center px-margin border-b border-[#D6D4CE]">
+<button aria-label="Go back" class="w-12 h-12 -ml-2 flex items-center justify-center text-on-surface active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[24px]">arrow_back</span>
+</button>
+<h1 class="text-title font-title text-on-surface ml-1">Add member</h1>
+</div>
+<!-- Subline Metadata -->
+<div class="px-margin pt-space-md pb-space-xs">
+<p class="text-metadata font-metadata text-[#55534D]">Tutor Match, 5 of 6</p>
+</div>
+<!-- Filter Chips Row -->
+<div class="px-margin pt-space-xs pb-space-md">
+<div class="flex items-center space-x-space-xs overflow-x-auto no-scrollbar py-1">
+<!-- Chip: All -->
+<button class="h-8 px-4 rounded-full border border-[#D6D4CE] bg-[#E9E7E2] text-[#1C1B18] text-chip font-chip flex items-center justify-center min-w-[48px] active:scale-95 transition-transform" type="button">
+            All
+          </button>
+<!-- Chip: GD (Active) -->
+<button class="h-8 px-4 rounded-full bg-[#FFE2D2] text-[#3B1400] text-chip font-chip flex items-center justify-center min-w-[48px] active:scale-95 transition-transform" type="button">
+            GD
+          </button>
+<!-- Chip: MKT -->
+<button class="h-8 px-4 rounded-full border border-[#D6D4CE] bg-[#E9E7E2] text-[#1C1B18] text-chip font-chip flex items-center justify-center min-w-[48px] active:scale-95 transition-transform" type="button">
+            MKT
+          </button>
+<!-- Chip: AI -->
+<button class="h-8 px-4 rounded-full border border-[#D6D4CE] bg-[#E9E7E2] text-[#1C1B18] text-chip font-chip flex items-center justify-center min-w-[48px] active:scale-95 transition-transform" type="button">
+            AI
+          </button>
+</div>
+</div>
+<!-- Separator boundary -->
+<div class="w-full h-[1px] bg-[#D6D4CE]"></div>
+</header>
+<!-- Student List Canvas (Scrollable area) -->
+<section class="flex-1 overflow-y-auto px-margin py-space-xs divide-y divide-[#D6D4CE]">
+<!-- Row 1: Minh Anh (Checked) -->
+<label class="flex items-center justify-between py-space-md cursor-pointer select-none min-h-[56px] group">
+<div class="flex flex-col pr-space-md">
+<span class="text-card-title font-card-title text-on-surface">Minh Anh</span>
+<span class="text-metadata font-metadata text-[#55534D] mt-0.5">GD, S5</span>
+</div>
+<div class="w-12 h-12 flex items-center justify-end">
+<input checked="" class="hidden peer" type="checkbox"/>
+<div class="w-5 h-5 rounded-[4px] bg-[#B23E00] flex items-center justify-center text-white peer-checked:flex peer-hover:ring-2 peer-hover:ring-[#B23E00]/20 transition-all">
+<span class="material-symbols-outlined text-[16px] leading-none" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</div>
+</label>
+<!-- Row 2: Linh Phan (Unchecked) -->
+<label class="flex items-center justify-between py-space-md cursor-pointer select-none min-h-[56px] group">
+<div class="flex flex-col pr-space-md">
+<span class="text-card-title font-card-title text-on-surface">Linh Phan</span>
+<span class="text-metadata font-metadata text-[#55534D] mt-0.5">GD, S5</span>
+</div>
+<div class="w-12 h-12 flex items-center justify-end">
+<input class="hidden peer" type="checkbox"/>
+<div class="w-5 h-5 rounded-[4px] border border-[#77756F] bg-transparent flex items-center justify-center peer-checked:bg-[#B23E00] peer-checked:border-[#B23E00] transition-colors">
+<span class="material-symbols-outlined text-[16px] text-white opacity-0 peer-checked:opacity-100" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</div>
+</label>
+<!-- Row 3: Bao Le (Unchecked) -->
+<label class="flex items-center justify-between py-space-md cursor-pointer select-none min-h-[56px] group">
+<div class="flex flex-col pr-space-md">
+<span class="text-card-title font-card-title text-on-surface">Bao Le</span>
+<span class="text-metadata font-metadata text-[#55534D] mt-0.5">GD, S6</span>
+</div>
+<div class="w-12 h-12 flex items-center justify-end">
+<input class="hidden peer" type="checkbox"/>
+<div class="w-5 h-5 rounded-[4px] border border-[#77756F] bg-transparent flex items-center justify-center peer-checked:bg-[#B23E00] peer-checked:border-[#B23E00] transition-colors">
+<span class="material-symbols-outlined text-[16px] text-white opacity-0 peer-checked:opacity-100" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</div>
+</label>
+<!-- Row 4: Khoa Tran (Unchecked) -->
+<label class="flex items-center justify-between py-space-md cursor-pointer select-none min-h-[56px] group">
+<div class="flex flex-col pr-space-md">
+<span class="text-card-title font-card-title text-on-surface">Khoa Tran</span>
+<span class="text-metadata font-metadata text-[#55534D] mt-0.5">SE, S5</span>
+</div>
+<div class="w-12 h-12 flex items-center justify-end">
+<input class="hidden peer" type="checkbox"/>
+<div class="w-5 h-5 rounded-[4px] border border-[#77756F] bg-transparent flex items-center justify-center peer-checked:bg-[#B23E00] peer-checked:border-[#B23E00] transition-colors">
+<span class="material-symbols-outlined text-[16px] text-white opacity-0 peer-checked:opacity-100" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</div>
+</label>
+</section>
+<!-- Bottom Sticky Action Area -->
+<footer class="w-full flex-shrink-0 bg-surface border-t border-[#D6D4CE] p-margin">
+<!-- Exactly one filled button, burnt orange #B23E00, pill shape, 48dp height -->
+<button class="w-full h-12 rounded-full bg-[#B23E00] text-white text-button font-button flex items-center justify-center active:scale-[0.98] transition-transform" type="button">
+        Add
+      </button>
+</footer>
+</main>
+<script>
+    // Lightweight toggle handler for plain list checkboxes
+    document.querySelectorAll('label.group').forEach(row => {
+      const input = row.querySelector('input[type="checkbox"]');
+      const box = row.querySelector('div.w-5');
+      const checkIcon = row.querySelector('.material-symbols-outlined');
+
+      row.addEventListener('click', (e) => {
+        e.preventDefault();
+        const willBeChecked = !input.checked;
+        input.checked = willBeChecked;
+
+        if (willBeChecked) {
+          box.classList.remove('border', 'border-[#77756F]', 'bg-transparent');
+          box.classList.add('bg-[#B23E00]');
+          if (checkIcon) checkIcon.classList.remove('opacity-0');
+        } else {
+          box.classList.add('border', 'border-[#77756F]', 'bg-transparent');
+          box.classList.remove('bg-[#B23E00]');
+          if (checkIcon) checkIcon.classList.add('opacity-0');
+        }
+      });
+    });
+  </script>
+</body></html>

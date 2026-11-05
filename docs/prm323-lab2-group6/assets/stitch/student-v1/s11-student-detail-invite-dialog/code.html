@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Student detail - Invite dialog</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "outline-variant": "#e0c0b4",
+            "surface-container-lowest": "#ffffff",
+            "secondary-fixed-dim": "#dcc1b2",
+            "surface-container-low": "#f8f3ed",
+            "surface-container": "#f2ede8",
+            "tertiary-container": "#247242",
+            "on-surface-variant": "#584239",
+            "tertiary-fixed": "#a5f4b8",
+            "primary": "#8a2e00",
+            "tertiary-fixed-dim": "#8ad79e",
+            "on-tertiary-fixed": "#00210d",
+            "background": "#fdf9f3",
+            "on-error-container": "#93000a",
+            "error-container": "#ffdad6",
+            "on-error": "#ffffff",
+            "surface-variant": "#e6e2dd",
+            "primary-container": "#b23e00",
+            "on-secondary-container": "#756053",
+            "on-background": "#1c1b18",
+            "on-primary": "#ffffff",
+            "secondary": "#6f5a4e",
+            "surface-dim": "#ded9d4",
+            "inverse-primary": "#ffb59a",
+            "primary-fixed-dim": "#ffb59a",
+            "on-secondary-fixed": "#27180f",
+            "surface": "#fdf9f3",
+            "surface-container-highest": "#e6e2dd",
+            "on-tertiary-container": "#a5f4b8",
+            "on-primary-fixed": "#370e00",
+            "on-primary-fixed-variant": "#802a00",
+            "error": "#ba1a1a",
+            "on-surface": "#1c1b18",
+            "secondary-container": "#faddcd",
+            "on-secondary-fixed-variant": "#564337",
+            "surface-bright": "#fdf9f3",
+            "inverse-surface": "#32302d",
+            "inverse-on-surface": "#f5f0eb",
+            "on-tertiary-fixed-variant": "#005229",
+            "on-secondary": "#ffffff",
+            "primary-fixed": "#ffdbce",
+            "surface-tint": "#a73a00",
+            "secondary-fixed": "#faddcd",
+            "on-tertiary": "#ffffff",
+            "on-primary-container": "#ffdbcf",
+            "surface-container-high": "#ece7e2",
+            "outline": "#8c7168",
+            "tertiary": "#00592d"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-sm": "0.5rem",
+            "space-xl": "2rem",
+            "space-xs": "0.25rem",
+            "gutter": "1rem",
+            "space-lg": "1.5rem",
+            "space-md": "1rem",
+            "margin": "1rem"
+          },
+          "fontFamily": {
+            "label-field": ["Be Vietnam Pro"],
+            "card-title": ["Be Vietnam Pro"],
+            "title": ["Be Vietnam Pro"],
+            "headline": ["Be Vietnam Pro"],
+            "metadata": ["Be Vietnam Pro"],
+            "button": ["Be Vietnam Pro"],
+            "body": ["Be Vietnam Pro"],
+            "chip": ["Be Vietnam Pro"]
+          },
+          "fontSize": {
+            "label-field": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "card-title": ["16px", { "lineHeight": "24px", "letterSpacing": "0px", "fontWeight": "600" }],
+            "title": ["20px", { "lineHeight": "28px", "letterSpacing": "0px", "fontWeight": "600" }],
+            "headline": ["24px", { "lineHeight": "32px", "letterSpacing": "0px", "fontWeight": "700" }],
+            "metadata": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "400" }],
+            "button": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "body": ["16px", { "lineHeight": "24px", "letterSpacing": "0px", "fontWeight": "400" }],
+            "chip": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body antialiased min-h-screen flex justify-center items-center p-0 m-0">
+<div class="relative w-full max-w-[360px] h-[800px] bg-surface-container-lowest overflow-hidden border border-surface-dim flex flex-col justify-between select-none">
+<div class="absolute inset-0 flex flex-col pointer-events-none filter blur-[2px] opacity-40">
+<header class="bg-surface-container-lowest border-b border-surface-dim h-16 w-full px-margin flex items-center justify-between shrink-0">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[24px]">arrow_back</span>
+<span class="font-headline text-headline text-on-surface">TeamUp EXE</span>
+</div>
+<div class="w-10 h-10 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary text-[20px]">more_vert</span>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto px-margin py-space-md space-y-space-md">
+<div class="flex items-center gap-space-md p-space-md border border-surface-dim rounded-xl bg-surface-container-lowest">
+<div class="w-16 h-16 rounded-xl bg-surface-container flex items-center justify-center border border-surface-dim shrink-0">
+<span class="font-headline text-headline text-on-surface">MR</span>
+</div>
+<div class="flex flex-col">
+<h1 class="font-card-title text-card-title text-on-surface">Marcus Rodriguez</h1>
+<p class="font-metadata text-metadata text-secondary">Systems architect &amp; lead</p>
+<div class="mt-space-xs inline-flex items-center gap-1">
+<span class="inline-block w-2 h-2 rounded-full bg-tertiary"></span>
+<span class="font-metadata text-metadata text-tertiary">Available for assignment</span>
+</div>
+</div>
+</div>
+<div class="p-space-md border border-surface-dim rounded-xl bg-surface-container-lowest space-y-space-sm">
+<h2 class="font-label-field text-label-field text-on-surface">Technical credentials</h2>
+<div class="flex flex-wrap gap-space-xs">
+<span class="h-8 px-3 rounded-full bg-secondary-container text-on-secondary-fixed font-chip text-chip inline-flex items-center">
+              Distributed systems
+            </span>
+<span class="h-8 px-3 rounded-full bg-surface-container text-on-surface font-chip text-chip border border-surface-dim inline-flex items-center">
+              Rust runtime
+            </span>
+<span class="h-8 px-3 rounded-full bg-surface-container text-on-surface font-chip text-chip border border-surface-dim inline-flex items-center">
+              Network protocols
+            </span>
+</div>
+</div>
+<div class="p-space-md border border-surface-dim rounded-xl bg-surface-container-lowest space-y-space-sm">
+<h2 class="font-label-field text-label-field text-on-surface">Operational availability</h2>
+<div class="grid grid-cols-2 gap-space-sm">
+<div class="bg-surface-container-low p-space-sm rounded-lg border border-surface-dim">
+<p class="font-metadata text-metadata text-secondary">Workload cap</p>
+<p class="font-card-title text-card-title text-on-surface">20 hrs / week</p>
+</div>
+<div class="bg-surface-container-low p-space-sm rounded-lg border border-surface-dim">
+<p class="font-metadata text-metadata text-secondary">Timezone</p>
+<p class="font-card-title text-card-title text-on-surface">UTC -5</p>
+</div>
+</div>
+</div>
+<div class="p-space-md border border-surface-dim rounded-xl bg-surface-container-lowest space-y-space-sm">
+<h2 class="font-label-field text-label-field text-on-surface">Project match logic</h2>
+<p class="font-body text-body text-secondary">
+            Candidate profile aligns with current structural vacancies in core platform engineering.
+          </p>
+</div>
+</div>
+<div class="p-margin border-t border-surface-dim bg-surface-container-lowest flex items-center justify-between">
+<button class="w-full h-12 rounded-full bg-primary-container text-on-primary font-button text-button flex items-center justify-center" type="button">
+          Invite candidate
+        </button>
+</div>
+</div>
+<div class="absolute inset-0 bg-[#1C1B18]/60 z-20 flex items-center justify-center px-margin">
+<div aria-describedby="dialog-description" aria-labelledby="dialog-title" aria-modal="true" class="w-full max-w-[328px] bg-surface-container-lowest rounded-xl border border-surface-dim p-space-lg flex flex-col gap-space-md" role="dialog">
+<div class="flex flex-col gap-space-sm">
+<h3 class="font-title text-title text-on-surface" id="dialog-title">
+            Send invite?
+          </h3>
+<p class="font-body text-body text-secondary" id="dialog-description">
+            They will see your team.
+          </p>
+</div>
+<div class="flex items-center justify-end gap-space-sm pt-space-xs">
+<button class="h-12 min-w-[72px] px-space-md rounded-full text-secondary hover:bg-surface-container-low active:opacity-80 active:scale-95 duration-100 ease-in-out font-button text-button flex items-center justify-center" type="button">
+            Cancel
+          </button>
+<button class="h-12 min-w-[96px] px-space-md rounded-full bg-primary-container text-on-primary active:opacity-80 active:scale-95 duration-100 ease-in-out font-button text-button flex items-center justify-center" type="button">
+            Send
+          </button>
+</div>
+</div>
+</div>
+</div>
+</body></html>

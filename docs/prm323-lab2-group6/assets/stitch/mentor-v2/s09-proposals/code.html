@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TeamUp EXE - Proposals</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "on-tertiary-container": "#a5f4b8",
+            "inverse-primary": "#ffb59a",
+            "surface-container-lowest": "#ffffff",
+            "on-primary": "#ffffff",
+            "surface-container-low": "#f8f3ed",
+            "surface-container": "#f2ede8",
+            "error": "#ba1a1a",
+            "on-secondary-fixed-variant": "#564337",
+            "inverse-surface": "#32302d",
+            "outline-variant": "#e0c0b4",
+            "tertiary-fixed-dim": "#8ad79e",
+            "outline": "#8c7168",
+            "surface-variant": "#e6e2dd",
+            "on-background": "#1c1b18",
+            "on-tertiary-fixed": "#00210d",
+            "tertiary-fixed": "#a5f4b8",
+            "inverse-on-surface": "#f5f0eb",
+            "secondary-fixed-dim": "#dcc1b2",
+            "surface-container-highest": "#e6e2dd",
+            "secondary-fixed": "#faddcd",
+            "tertiary": "#00592d",
+            "surface-container-high": "#ece7e2",
+            "background": "#fdf9f3",
+            "on-primary-fixed": "#370e00",
+            "primary-fixed-dim": "#ffb59a",
+            "primary": "#8a2e00",
+            "on-error-container": "#93000a",
+            "on-primary-fixed-variant": "#802a00",
+            "surface-tint": "#a73a00",
+            "on-secondary-container": "#756053",
+            "on-secondary": "#ffffff",
+            "on-tertiary": "#ffffff",
+            "tertiary-container": "#247242",
+            "on-error": "#ffffff",
+            "primary-container": "#b23e00",
+            "on-surface-variant": "#584239",
+            "error-container": "#ffdad6",
+            "on-primary-container": "#ffdbcf",
+            "surface-dim": "#ded9d4",
+            "on-tertiary-fixed-variant": "#005229",
+            "secondary": "#6f5a4e",
+            "on-surface": "#1c1b18",
+            "on-secondary-fixed": "#27180f",
+            "secondary-container": "#faddcd",
+            "surface": "#fdf9f3",
+            "primary-fixed": "#ffdbce",
+            "surface-bright": "#fdf9f3",
+            // Custom tokens from style guide
+            "brand-border": "#D6D4CE",
+            "brand-slot-fill": "#D6F0DD",
+            "brand-slot-border": "#1B6B3C",
+            "brand-slot-text": "#07301A",
+            "brand-proposed-fill": "#FFE2D2",
+            "brand-proposed-border": "#B23E00",
+            "brand-proposed-text": "#3B1400",
+            "brand-stone-text": "#55534D",
+            "brand-chip-bg": "#E9E7E2"
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          spacing: {
+            "space-lg": "1.5rem",
+            "gutter": "1rem",
+            "space-sm": "0.5rem",
+            "space-xl": "2rem",
+            "space-xs": "0.25rem",
+            "space-md": "1rem",
+            "margin": "1rem"
+          },
+          fontFamily: {
+            body: ["Be Vietnam Pro"],
+            metadata: ["Be Vietnam Pro"],
+            headline: ["Be Vietnam Pro"],
+            title: ["Be Vietnam Pro"],
+            button: ["Be Vietnam Pro"],
+            chip: ["Be Vietnam Pro"],
+            "card-title": ["Be Vietnam Pro"],
+            "label-field": ["Be Vietnam Pro"]
+          },
+          fontSize: {
+            body: ["16px", { lineHeight: "24px", letterSpacing: "0px", fontWeight: "400" }],
+            metadata: ["14px", { lineHeight: "20px", letterSpacing: "0.1px", fontWeight: "400" }],
+            headline: ["24px", { lineHeight: "32px", letterSpacing: "0px", fontWeight: "700" }],
+            title: ["20px", { lineHeight: "28px", letterSpacing: "0px", fontWeight: "600" }],
+            button: ["14px", { lineHeight: "20px", letterSpacing: "0.1px", fontWeight: "600" }],
+            chip: ["14px", { lineHeight: "20px", letterSpacing: "0.1px", fontWeight: "600" }],
+            "card-title": ["16px", { lineHeight: "24px", letterSpacing: "0px", fontWeight: "600" }],
+            "label-field": ["14px", { lineHeight: "20px", letterSpacing: "0.1px", fontWeight: "600" }]
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 20px;
+      line-height: 1;
+      display: inline-block;
+      text-transform: none;
+      letter-spacing: normal;
+      word-wrap: normal;
+      white-space: nowrap;
+      direction: ltr;
+      -webkit-font-smoothing: antialiased;
+      vertical-align: middle;
+    }
+    * {
+      box-shadow: none !important;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface antialiased flex justify-center items-center min-h-screen p-0 m-0 select-none">
+<!-- Mobile Viewport Canvas: 360 x 800 dp frame -->
+<div class="relative w-[360px] h-[800px] bg-surface-container-lowest flex flex-col justify-between overflow-hidden">
+<!-- Top App Bar -->
+<header class="w-full h-14 bg-surface-container-lowest border-b border-brand-border px-margin flex items-center justify-between z-10 shrink-0">
+<div class="flex items-center space-x-2">
+<h1 class="text-title font-title text-on-surface">Proposals</h1>
+</div>
+<button aria-label="More options" class="w-12 h-12 flex items-center justify-center text-on-surface hover:bg-surface-container-low transition-colors duration-150 rounded-full" type="button">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</header>
+<!-- Main Content Area: Exactly 3 tappable cards -->
+<main class="flex-1 overflow-y-auto px-margin py-space-md space-y-space-md">
+<!-- Card 1: Tutor Match -->
+<article class="w-full bg-[#FFFFFF] border border-brand-border rounded-xl p-space-md cursor-pointer hover:bg-surface-container-low active:scale-[0.99] transition-all duration-150" tabindex="0">
+<!-- Title and Status Chip -->
+<div class="flex items-center justify-between mb-space-md">
+<h2 class="text-card-title font-card-title text-on-surface">Tutor Match</h2>
+<!-- Status Chip: Strong fit -->
+<div class="inline-flex items-center h-8 px-space-sm rounded-full bg-brand-slot-fill text-brand-slot-border gap-1 text-chip font-chip">
+<span class="material-symbols-outlined text-[16px]" data-icon="check" style="font-variation-settings: 'FILL' 1;">check</span>
+<span>Strong fit</span>
+</div>
+</div>
+<!-- Major row of 5 slots: 4 filled, 1 proposed -->
+<div class="flex items-center justify-between gap-2 pt-space-xs">
+<!-- Filled slot 1: SE -->
+<div class="w-10 h-10 rounded-xl bg-brand-slot-fill border border-brand-slot-border flex items-center justify-center shrink-0">
+<span class="text-metadata font-bold text-brand-slot-text">SE</span>
+</div>
+<!-- Filled slot 2: SE -->
+<div class="w-10 h-10 rounded-xl bg-brand-slot-fill border border-brand-slot-border flex items-center justify-center shrink-0">
+<span class="text-metadata font-bold text-brand-slot-text">SE</span>
+</div>
+<!-- Filled slot 3: AI -->
+<div class="w-10 h-10 rounded-xl bg-brand-slot-fill border border-brand-slot-border flex items-center justify-center shrink-0">
+<span class="text-metadata font-bold text-brand-slot-text">AI</span>
+</div>
+<!-- Filled slot 4: SE -->
+<div class="w-10 h-10 rounded-xl bg-brand-slot-fill border border-brand-slot-border flex items-center justify-center shrink-0">
+<span class="text-metadata font-bold text-brand-slot-text">SE</span>
+</div>
+<!-- Proposed slot: GD with plus mark -->
+<div class="relative w-10 h-10 rounded-xl bg-brand-proposed-fill border-2 border-brand-proposed-border flex items-center justify-center shrink-0">
+<span class="text-metadata font-bold text-brand-proposed-text">GD</span>
+<span class="material-symbols-outlined absolute -top-1 -right-1 text-[12px] bg-brand-proposed-border text-on-primary rounded-full p-0.5 leading-none" data-icon="add">add</span>
+</div>
+</div>
+</article>
+<!-- Card 2: GreenLoop -->
+<article class="w-full bg-[#FFFFFF] border border-brand-border rounded-xl p-space-md cursor-pointer hover:bg-surface-container-low active:scale-[0.99] transition-all duration-150" tabindex="0">
+<!-- Title and Status Chip -->
+<div class="flex items-center justify-between mb-space-md">
+<h2 class="text-card-title font-card-title text-on-surface">GreenLoop</h2>
+<!-- Status Chip: Good fit -->
+<div class="inline-flex items-center h-8 px-space-sm rounded-full bg-brand-chip-bg border border-brand-border text-brand-stone-text gap-1 text-chip font-chip">
+<span class="material-symbols-outlined text-[16px]" data-icon="contrast">contrast</span>
+<span>Good fit</span>
+</div>
+</div>
+<!-- Major row: 3 filled slots, 2 proposed slots -->
+<div class="flex items-center justify-between gap-2 pt-space-xs">
+<!-- Filled slot 1: SE -->
+<div class="w-10 h-10 rounded-xl bg-brand-slot-fill border border-brand-slot-border flex items-center justify-center shrink-0">
+<span class="text-metadata font-bold text-brand-slot-text">SE</span>
+</div>
+<!-- Filled slot 2: AI -->
+<div class="w-10 h-10 rounded-xl bg-brand-slot-fill border border-brand-slot-border flex items-center justify-center shrink-0">
+<span class="text-metadata font-bold text-brand-slot-text">AI</span>
+</div>
+<!-- Filled slot 3: GD -->
+<div class="w-10 h-10 rounded-xl bg-brand-slot-fill border border-brand-slot-border flex items-center justify-center shrink-0">
+<span class="text-metadata font-bold text-brand-slot-text">GD</span>
+</div>
+<!-- Proposed slot 1: MKT -->
+<div class="relative w-10 h-10 rounded-xl bg-brand-proposed-fill border-2 border-brand-proposed-border flex items-center justify-center shrink-0">
+<span class="text-metadata font-bold text-brand-proposed-text">MKT</span>
+<span class="material-symbols-outlined absolute -top-1 -right-1 text-[12px] bg-brand-proposed-border text-on-primary rounded-full p-0.5 leading-none" data-icon="add">add</span>
+</div>
+<!-- Proposed slot 2: SE -->
+<div class="relative w-10 h-10 rounded-xl bg-brand-proposed-fill border-2 border-brand-proposed-border flex items-center justify-center shrink-0">
+<span class="text-metadata font-bold text-brand-proposed-text">SE</span>
+<span class="material-symbols-outlined absolute -top-1 -right-1 text-[12px] bg-brand-proposed-border text-on-primary rounded-full p-0.5 leading-none" data-icon="add">add</span>
+</div>
+</div>
+</article>
+<!-- Card 3: FinLite -->
+<article class="w-full bg-[#FFFFFF] border border-brand-border rounded-xl p-space-md cursor-pointer hover:bg-surface-container-low active:scale-[0.99] transition-all duration-150" tabindex="0">
+<!-- Title and Status Chip -->
+<div class="flex items-center justify-between mb-space-md">
+<h2 class="text-card-title font-card-title text-on-surface">FinLite</h2>
+<!-- Status Chip: Strong fit -->
+<div class="inline-flex items-center h-8 px-space-sm rounded-full bg-brand-slot-fill text-brand-slot-border gap-1 text-chip font-chip">
+<span class="material-symbols-outlined text-[16px]" data-icon="check" style="font-variation-settings: 'FILL' 1;">check</span>
+<span>Strong fit</span>
+</div>
+</div>
+<!-- Major row: 4 filled slots, 1 proposed slot -->
+<div class="flex items-center justify-between gap-2 pt-space-xs">
+<!-- Filled slot 1: SE -->
+<div class="w-10 h-10 rounded-xl bg-brand-slot-fill border border-brand-slot-border flex items-center justify-center shrink-0">
+<span class="text-metadata font-bold text-brand-slot-text">SE</span>
+</div>
+<!-- Filled slot 2: SE -->
+<div class="w-10 h-10 rounded-xl bg-brand-slot-fill border border-brand-slot-border flex items-center justify-center shrink-0">
+<span class="text-metadata font-bold text-brand-slot-text">SE</span>
+</div>
+<!-- Filled slot 3: MKT -->
+<div class="w-10 h-10 rounded-xl bg-brand-slot-fill border border-brand-slot-border flex items-center justify-center shrink-0">
+<span class="text-metadata font-bold text-brand-slot-text">MKT</span>
+</div>
+<!-- Filled slot 4: GD -->
+<div class="w-10 h-10 rounded-xl bg-brand-slot-fill border border-brand-slot-border flex items-center justify-center shrink-0">
+<span class="text-metadata font-bold text-brand-slot-text">GD</span>
+</div>
+<!-- Proposed slot: AI -->
+<div class="relative w-10 h-10 rounded-xl bg-brand-proposed-fill border-2 border-brand-proposed-border flex items-center justify-center shrink-0">
+<span class="text-metadata font-bold text-brand-proposed-text">AI</span>
+<span class="material-symbols-outlined absolute -top-1 -right-1 text-[12px] bg-brand-proposed-border text-on-primary rounded-full p-0.5 leading-none" data-icon="add">add</span>
+</div>
+</div>
+</article>
+</main>
+<!-- Bottom Navigation Bar: Docked full-width bottom with 3 tabs -->
+<nav class="w-full bg-surface-container-lowest border-t border-brand-border h-16 flex items-center justify-around px-gutter z-20 shrink-0">
+<!-- Tab 1: Classes -->
+<a class="flex flex-col items-center justify-center min-w-[64px] min-h-[48px] text-brand-stone-text hover:bg-surface-container-low transition-colors duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+<span class="text-button font-button text-[12px] leading-tight mt-0.5">Classes</span>
+</a>
+<!-- Tab 2: Proposals (Active Tab with pill indicator #FFE2D2, bold label, and badge '3') -->
+<a class="relative flex flex-col items-center justify-center min-w-[72px] min-h-[48px]" href="#">
+<div class="relative flex flex-col items-center justify-center bg-brand-proposed-fill text-brand-proposed-text rounded-full px-4 py-1">
+<span class="material-symbols-outlined" data-icon="assignment" style="font-variation-settings: 'FILL' 1;">assignment</span>
+<span class="text-button font-button font-bold text-[12px] leading-tight">Proposals</span>
+<!-- Badge 3 -->
+<span class="absolute -top-1 -right-1 w-4 h-4 bg-primary-container text-on-primary text-[10px] font-bold rounded-full flex items-center justify-center">3</span>
+</div>
+</a>
+<!-- Tab 3: Profile -->
+<a class="flex flex-col items-center justify-center min-w-[64px] min-h-[48px] text-brand-stone-text hover:bg-surface-container-low transition-colors duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="text-button font-button text-[12px] leading-tight mt-0.5">Profile</span>
+</a>
+</nav>
+</div>
+</body></html>

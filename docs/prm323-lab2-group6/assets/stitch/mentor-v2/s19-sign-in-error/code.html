@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sign in - TeamUp EXE</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-tertiary-container": "#a5f4b8",
+            "on-background": "#1c1b18",
+            "surface-dim": "#ded9d4",
+            "on-tertiary-fixed": "#00210d",
+            "surface-tint": "#a73a00",
+            "outline-variant": "#e0c0b4",
+            "tertiary": "#00592d",
+            "primary-container": "#b23e00",
+            "primary": "#8a2e00",
+            "on-surface-variant": "#584239",
+            "surface-container-low": "#f8f3ed",
+            "on-secondary-fixed-variant": "#564337",
+            "primary-fixed": "#ffdbce",
+            "surface": "#fdf9f3",
+            "inverse-primary": "#ffb59a",
+            "surface-variant": "#e6e2dd",
+            "on-tertiary": "#ffffff",
+            "error-container": "#ffdad6",
+            "error": "#ba1a1a",
+            "on-primary-fixed": "#370e00",
+            "secondary-fixed-dim": "#dcc1b2",
+            "on-surface": "#1c1b18",
+            "surface-container-lowest": "#ffffff",
+            "secondary-container": "#faddcd",
+            "on-secondary": "#ffffff",
+            "on-primary-container": "#ffdbcf",
+            "on-primary": "#ffffff",
+            "background": "#fdf9f3",
+            "secondary-fixed": "#faddcd",
+            "inverse-on-surface": "#f5f0eb",
+            "inverse-surface": "#32302d",
+            "secondary": "#6f5a4e",
+            "tertiary-fixed-dim": "#8ad79e",
+            "tertiary-fixed": "#a5f4b8",
+            "on-secondary-fixed": "#27180f",
+            "primary-fixed-dim": "#ffb59a",
+            "surface-container": "#f2ede8",
+            "tertiary-container": "#247242",
+            "on-error-container": "#93000a",
+            "on-primary-fixed-variant": "#802a00",
+            "surface-bright": "#fdf9f3",
+            "surface-container-high": "#ece7e2",
+            "on-secondary-container": "#756053",
+            "on-error": "#ffffff",
+            "on-tertiary-fixed-variant": "#005229",
+            "outline": "#8c7168",
+            "surface-container-highest": "#e6e2dd"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-xl": "2rem",
+            "gutter": "1rem",
+            "margin": "1rem",
+            "space-md": "1rem",
+            "space-lg": "1.5rem",
+            "space-sm": "0.5rem",
+            "space-xs": "0.25rem"
+          },
+          "fontFamily": {
+            "metadata": ["Be Vietnam Pro"],
+            "card-title": ["Be Vietnam Pro"],
+            "chip": ["Be Vietnam Pro"],
+            "label-field": ["Be Vietnam Pro"],
+            "title": ["Be Vietnam Pro"],
+            "button": ["Be Vietnam Pro"],
+            "body": ["Be Vietnam Pro"],
+            "headline": ["Be Vietnam Pro"]
+          },
+          "fontSize": {
+            "metadata": [
+              "14px",
+              {
+                "lineHeight": "20px",
+                "letterSpacing": "0.1px",
+                "fontWeight": "400"
+              }
+            ],
+            "card-title": [
+              "16px",
+              {
+                "lineHeight": "24px",
+                "letterSpacing": "0px",
+                "fontWeight": "600"
+              }
+            ],
+            "chip": [
+              "14px",
+              {
+                "lineHeight": "20px",
+                "letterSpacing": "0.1px",
+                "fontWeight": "600"
+              }
+            ],
+            "label-field": [
+              "14px",
+              {
+                "lineHeight": "20px",
+                "letterSpacing": "0.1px",
+                "fontWeight": "600"
+              }
+            ],
+            "title": [
+              "20px",
+              {
+                "lineHeight": "28px",
+                "letterSpacing": "0px",
+                "fontWeight": "600"
+              }
+            ],
+            "button": [
+              "14px",
+              {
+                "lineHeight": "20px",
+                "letterSpacing": "0.1px",
+                "fontWeight": "600"
+              }
+            ],
+            "body": [
+              "16px",
+              {
+                "lineHeight": "24px",
+                "letterSpacing": "0px",
+                "fontWeight": "400"
+              }
+            ],
+            "headline": [
+              "24px",
+              {
+                "lineHeight": "32px",
+                "letterSpacing": "0px",
+                "fontWeight": "700"
+              }
+            ]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    * {
+      box-shadow: none !important;
+    }
+  </style>
+</head>
+<body class="bg-[#FFFFFF] text-[#1C1B18] antialiased min-h-screen flex justify-center selection:bg-secondary-container selection:text-on-primary-fixed">
+<!-- Mobile Viewport Shell (360 x 800 dp) -->
+<main class="w-[360px] h-[800px] bg-[#FFFFFF] relative flex flex-col justify-between overflow-hidden">
+<!-- Top Content Area -->
+<div class="px-margin pt-12 flex flex-col">
+<!-- Screen Header -->
+<header class="flex flex-col">
+<h1 class="text-headline font-headline text-[#1C1B18]">
+          Sign in
+        </h1>
+<p class="text-body font-body text-[#55534D] mt-1">
+          Build balanced teams
+        </p>
+</header>
+<!-- Spacing 32 dp -->
+<div class="h-space-xl"></div>
+<!-- Form Field Module -->
+<div class="flex flex-col">
+<!-- Field Label -->
+<label class="text-label-field font-label-field text-[#1C1B18] mb-space-sm block" for="email-input">
+          Email
+        </label>
+<!-- Input Container -->
+<div class="relative w-full h-[56px] bg-[#F3F2EF] rounded-lg border-2 border-[#B3261E] flex items-center px-space-md">
+<input aria-describedby="email-error-text" aria-invalid="true" class="w-full bg-transparent border-0 p-0 text-body font-body text-[#1C1B18] focus:ring-0 focus:outline-none pr-space-lg" id="email-input" type="email" value="lan@gmail"/>
+<!-- Trailing Error Icon Inside Input -->
+<div aria-hidden="true" class="absolute right-margin flex items-center justify-center text-[#B3261E] pointer-events-none">
+<span class="material-symbols-outlined text-[24px]">error</span>
+</div>
+</div>
+<!-- Error Row -->
+<div class="flex items-center gap-space-xs mt-space-sm text-[#B3261E]" id="email-error-text" role="alert">
+<span class="material-symbols-outlined text-[16px]">error</span>
+<span class="text-label-field font-label-field text-[#B3261E]">
+            Enter a valid email
+          </span>
+</div>
+</div>
+</div>
+<!-- Sticky Bottom Module -->
+<footer class="p-margin pb-margin w-full bg-[#FFFFFF]">
+<button class="w-full h-[48px] bg-[#B23E00] text-[#FFFFFF] rounded-full text-button font-button flex items-center justify-center cursor-pointer active:scale-[0.98] transition-transform duration-150" type="button">
+        Continue
+      </button>
+</footer>
+</main>
+</body></html>

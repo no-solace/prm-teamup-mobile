@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TeamUp EXE - Sign in</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-surface-variant": "#584239",
+            "error-container": "#ffdad6",
+            "outline": "#8c7168",
+            "surface-container": "#f2ede8",
+            "primary-fixed-dim": "#ffb59a",
+            "primary-fixed": "#ffdbce",
+            "error": "#ba1a1a",
+            "on-tertiary-container": "#a5f4b8",
+            "surface-container-highest": "#e6e2dd",
+            "on-secondary-fixed-variant": "#564337",
+            "on-error-container": "#93000a",
+            "on-tertiary-fixed-variant": "#005229",
+            "on-tertiary-fixed": "#00210d",
+            "on-primary-container": "#ffdbcf",
+            "tertiary": "#00592d",
+            "surface-tint": "#a73a00",
+            "outline-variant": "#e0c0b4",
+            "tertiary-fixed": "#a5f4b8",
+            "inverse-surface": "#32302d",
+            "inverse-on-surface": "#f5f0eb",
+            "on-background": "#1c1b18",
+            "on-secondary-container": "#756053",
+            "inverse-primary": "#ffb59a",
+            "on-surface": "#1c1b18",
+            "surface-container-high": "#ece7e2",
+            "on-secondary": "#ffffff",
+            "on-primary-fixed": "#370e00",
+            "tertiary-fixed-dim": "#8ad79e",
+            "on-error": "#ffffff",
+            "secondary-fixed": "#faddcd",
+            "surface-dim": "#ded9d4",
+            "surface-variant": "#e6e2dd",
+            "surface-container-low": "#f8f3ed",
+            "surface-bright": "#fdf9f3",
+            "secondary": "#6f5a4e",
+            "on-tertiary": "#ffffff",
+            "background": "#fdf9f3",
+            "primary-container": "#b23e00",
+            "surface-container-lowest": "#ffffff",
+            "secondary-fixed-dim": "#dcc1b2",
+            "secondary-container": "#faddcd",
+            "primary": "#8a2e00",
+            "surface": "#fdf9f3",
+            "on-primary": "#ffffff",
+            "on-primary-fixed-variant": "#802a00",
+            "tertiary-container": "#247242",
+            "on-secondary-fixed": "#27180f"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-xs": "0.25rem",
+            "gutter": "1rem",
+            "space-xl": "2rem",
+            "margin": "1rem",
+            "space-md": "1rem",
+            "space-sm": "0.5rem",
+            "space-lg": "1.5rem"
+          },
+          "fontFamily": {
+            "button": ["Be Vietnam Pro"],
+            "body": ["Be Vietnam Pro"],
+            "chip": ["Be Vietnam Pro"],
+            "label-field": ["Be Vietnam Pro"],
+            "title": ["Be Vietnam Pro"],
+            "card-title": ["Be Vietnam Pro"],
+            "metadata": ["Be Vietnam Pro"],
+            "headline": ["Be Vietnam Pro"]
+          },
+          "fontSize": {
+            "button": [
+              "14px",
+              {
+                "lineHeight": "20px",
+                "letterSpacing": "0.1px",
+                "fontWeight": "600"
+              }
+            ],
+            "body": [
+              "16px",
+              {
+                "lineHeight": "24px",
+                "letterSpacing": "0px",
+                "fontWeight": "400"
+              }
+            ],
+            "chip": [
+              "14px",
+              {
+                "lineHeight": "20px",
+                "letterSpacing": "0.1px",
+                "fontWeight": "600"
+              }
+            ],
+            "label-field": [
+              "14px",
+              {
+                "lineHeight": "20px",
+                "letterSpacing": "0.1px",
+                "fontWeight": "600"
+              }
+            ],
+            "title": [
+              "20px",
+              {
+                "lineHeight": "28px",
+                "letterSpacing": "0px",
+                "fontWeight": "600"
+              }
+            ],
+            "card-title": [
+              "16px",
+              {
+                "lineHeight": "24px",
+                "letterSpacing": "0px",
+                "fontWeight": "600"
+              }
+            ],
+            "metadata": [
+              "14px",
+              {
+                "lineHeight": "20px",
+                "letterSpacing": "0.1px",
+                "fontWeight": "400"
+              }
+            ],
+            "headline": [
+              "24px",
+              {
+                "lineHeight": "32px",
+                "letterSpacing": "0px",
+                "fontWeight": "700"
+              }
+            ]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-container-lowest text-on-surface flex justify-center items-center min-h-full m-0 p-0 selection:bg-secondary-container selection:text-on-primary-fixed">
+<!-- Mobile Viewport Frame (360 x 800 dp) -->
+<main class="w-[360px] h-[800px] bg-surface-container-lowest flex flex-col justify-between px-margin pt-14 pb-8 box-border relative overflow-hidden">
+<!-- Top Content Area -->
+<div class="flex flex-col w-full">
+<!-- Title & Subtext Header -->
+<div class="flex flex-col gap-space-sm mb-space-xl">
+<h1 class="font-headline text-headline text-on-surface m-0 text-left">Sign in</h1>
+<p class="font-body text-body text-secondary m-0 text-left">Build balanced teams</p>
+</div>
+<!-- Input Field Group -->
+<div class="flex flex-col gap-space-sm w-full">
+<label class="font-label-field text-label-field text-on-surface" for="email-field">Email</label>
+<input class="h-12 w-full bg-surface-container-low border border-secondary rounded-lg px-4 font-body text-body text-on-surface placeholder:text-secondary focus:outline-none focus:border-primary-container focus:ring-0 transition-colors" id="email-field" placeholder="you@gmail.com" type="email"/>
+</div>
+</div>
+<!-- Bottom Action Button Area -->
+<div class="w-full flex flex-col">
+<button class="h-12 w-full bg-primary-container text-on-primary rounded-full font-button text-button flex items-center justify-center border-none cursor-pointer active:opacity-90 transition-opacity" type="button">
+        Continue
+      </button>
+</div>
+</main>
+</body></html>

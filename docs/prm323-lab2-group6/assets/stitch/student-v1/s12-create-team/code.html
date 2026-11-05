@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Create team</title>
+<!-- Google Fonts: Be Vietnam Pro -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "outline-variant": "#e0c0b4",
+            "surface-container-lowest": "#ffffff",
+            "secondary-fixed-dim": "#dcc1b2",
+            "surface-container-low": "#f8f3ed",
+            "surface-container": "#f2ede8",
+            "tertiary-container": "#247242",
+            "on-surface-variant": "#584239",
+            "tertiary-fixed": "#a5f4b8",
+            "primary": "#8a2e00",
+            "tertiary-fixed-dim": "#8ad79e",
+            "on-tertiary-fixed": "#00210d",
+            "background": "#fdf9f3",
+            "on-error-container": "#93000a",
+            "error-container": "#ffdad6",
+            "on-error": "#ffffff",
+            "surface-variant": "#e6e2dd",
+            "primary-container": "#b23e00",
+            "on-secondary-container": "#756053",
+            "on-background": "#1c1b18",
+            "on-primary": "#ffffff",
+            "secondary": "#6f5a4e",
+            "surface-dim": "#ded9d4",
+            "inverse-primary": "#ffb59a",
+            "primary-fixed-dim": "#ffb59a",
+            "on-secondary-fixed": "#27180f",
+            "surface": "#fdf9f3",
+            "surface-container-highest": "#e6e2dd",
+            "on-tertiary-container": "#a5f4b8",
+            "on-primary-fixed": "#370e00",
+            "on-primary-fixed-variant": "#802a00",
+            "error": "#ba1a1a",
+            "on-surface": "#1c1b18",
+            "secondary-container": "#faddcd",
+            "on-secondary-fixed-variant": "#564337",
+            "surface-bright": "#fdf9f3",
+            "inverse-surface": "#32302d",
+            "inverse-on-surface": "#f5f0eb",
+            "on-tertiary-fixed-variant": "#005229",
+            "on-secondary": "#ffffff",
+            "primary-fixed": "#ffdbce",
+            "surface-tint": "#a73a00",
+            "secondary-fixed": "#faddcd",
+            "on-tertiary": "#ffffff",
+            "on-primary-container": "#ffdbcf",
+            "surface-container-high": "#ece7e2",
+            "outline": "#8c7168",
+            "tertiary": "#00592d"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-sm": "0.5rem",
+            "space-xl": "2rem",
+            "space-xs": "0.25rem",
+            "gutter": "1rem",
+            "space-lg": "1.5rem",
+            "space-md": "1rem",
+            "margin": "1rem"
+          },
+          "fontFamily": {
+            "label-field": ["Be Vietnam Pro"],
+            "card-title": ["Be Vietnam Pro"],
+            "title": ["Be Vietnam Pro"],
+            "headline": ["Be Vietnam Pro"],
+            "metadata": ["Be Vietnam Pro"],
+            "button": ["Be Vietnam Pro"],
+            "body": ["Be Vietnam Pro"],
+            "chip": ["Be Vietnam Pro"]
+          },
+          "fontSize": {
+            "label-field": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "card-title": ["16px", { "lineHeight": "24px", "letterSpacing": "0px", "fontWeight": "600" }],
+            "title": ["20px", { "lineHeight": "28px", "letterSpacing": "0px", "fontWeight": "600" }],
+            "headline": ["24px", { "lineHeight": "32px", "letterSpacing": "0px", "fontWeight": "700" }],
+            "metadata": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "400" }],
+            "button": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "body": ["16px", { "lineHeight": "24px", "letterSpacing": "0px", "fontWeight": "400" }],
+            "chip": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-container-high min-h-screen flex justify-center items-start text-on-surface font-body antialiased">
+<!-- Mobile Viewport 360 x 800 constraint container -->
+<main class="w-full max-w-[360px] min-h-[800px] bg-surface-container-lowest flex flex-col justify-between relative border-x border-[#D6D4CE]">
+<!-- Top Bar Component -->
+<header class="bg-surface-container-lowest border-b border-surface-dim docked full-width top-0 z-10">
+<div class="flex items-center justify-between h-16 w-full px-margin max-w-[360px] mx-auto">
+<div class="flex items-center space-x-2">
+<button aria-label="Back" class="w-12 h-12 -ml-2 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors duration-150 active:opacity-80 active:scale-95 duration-100 ease-in-out text-on-surface" type="button">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-title text-title text-on-surface">Create team</h1>
+</div>
+</div>
+</header>
+<!-- Scrollable Content Canvas -->
+<div class="flex-1 px-margin pt-space-lg pb- space-y-space-lg overflow-y-auto">
+<!-- Field Group: Team Name -->
+<div class="flex flex-col space-y-space-sm">
+<label class="font-label-field text-label-field text-on-surface" for="team-name">
+          Team name
+        </label>
+<div class="relative">
+<input class="w-full h-12 px-space-md bg-[#F3F2EF] border border-[#77756F] rounded-lg text-body font-body text-on-surface placeholder-[#55534D] focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container" id="team-name" name="team-name" placeholder="e.g. Project Orion" type="text"/>
+</div>
+</div>
+<!-- Field Group: One-line idea -->
+<div class="flex flex-col space-y-space-sm">
+<div class="flex justify-between items-center">
+<label class="font-label-field text-label-field text-on-surface" for="idea-desc">
+            One-line idea
+          </label>
+<span class="font-metadata text-metadata text-[#55534D]">
+            0 / 140
+          </span>
+</div>
+<textarea class="w-full min-h-[96px] p-space-md bg-[#F3F2EF] border border-[#77756F] rounded-lg text-body font-body text-on-surface placeholder-[#55534D] focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container resize-none" id="idea-desc" name="idea-desc" placeholder="Brief operational objective or project summary" rows="3"></textarea>
+</div>
+<!-- Section: Roles needed -->
+<div class="flex flex-col space-y-space-sm pt-space-xs">
+<div class="flex flex-col">
+<h2 class="font-card-title text-card-title text-on-surface">
+            Roles needed
+          </h2>
+<p class="font-metadata text-metadata text-[#55534D]">
+            Select target specializations to assemble your squad
+          </p>
+</div>
+<!-- Filter Chips Container -->
+<div aria-label="Roles needed selection" class="flex flex-wrap gap-2 pt-space-xs" role="group">
+<!-- Unselected Chip: Marketing -->
+<button class="h-8 px-space-md inline-flex items-center justify-center rounded-full bg-[#E9E7E2] border border-[#D6D4CE] font-chip text-chip text-on-surface hover:bg-surface-container-high transition-colors" type="button">
+            Marketing
+          </button>
+<!-- Unselected Chip: Design -->
+<button class="h-8 px-space-md inline-flex items-center justify-center rounded-full bg-[#E9E7E2] border border-[#D6D4CE] font-chip text-chip text-on-surface hover:bg-surface-container-high transition-colors" type="button">
+            Design
+          </button>
+<!-- Unselected Chip: AI -->
+<button class="h-8 px-space-md inline-flex items-center justify-center rounded-full bg-[#E9E7E2] border border-[#D6D4CE] font-chip text-chip text-on-surface hover:bg-surface-container-high transition-colors" type="button">
+            AI
+          </button>
+<!-- Unselected Chip: Mobile -->
+<button class="h-8 px-space-md inline-flex items-center justify-center rounded-full bg-[#E9E7E2] border border-[#D6D4CE] font-chip text-chip text-on-surface hover:bg-surface-container-high transition-colors" type="button">
+            Mobile
+          </button>
+<!-- Unselected Chip: Backend -->
+<button class="h-8 px-space-md inline-flex items-center justify-center rounded-full bg-[#E9E7E2] border border-[#D6D4CE] font-chip text-chip text-on-surface hover:bg-surface-container-high transition-colors" type="button">
+            Backend
+          </button>
+</div>
+<!-- Error State Banner under chips -->
+<div class="mt-space-sm flex items-center space-x-2 px-space-md py-2.5 bg-[#F9DEDC] rounded-lg" role="alert">
+<span class="material-symbols-outlined text-[#B3261E] text-[20px] select-none" data-icon="error">error</span>
+<span class="font-button text-button text-[#B3261E]">Pick a role</span>
+</div>
+</div>
+<!-- Informational Utility Card (Bento/Card styling per guidance) -->
+<div class="bg-surface-container-lowest border border-[#D6D4CE] rounded-xl p-space-md flex flex-col space-y-space-xs mt-space-sm">
+<div class="flex items-center space-x-2 text-on-surface">
+<span class="material-symbols-outlined text-[20px] text-secondary" data-icon="group_add">group_add</span>
+<h3 class="font-card-title text-card-title text-on-surface">Assembly guidelines</h3>
+</div>
+<p class="font-metadata text-metadata text-[#55534D]">
+          Teams publish immediately to the operational directory. Vacant slots remain open for peer applications.
+        </p>
+</div>
+</div>
+<!-- Sticky Bottom Action Bar -->
+<div class="sticky bottom-0 w-full bg-surface-container-lowest border-t border-[#D6D4CE] p-margin z-20">
+<button class="w-full h-12 bg-primary-container text-on-primary rounded-full font-button text-button flex items-center justify-center transition-opacity hover:opacity-95 active:scale-[0.99] duration-100" type="button">
+        Post team
+      </button>
+</div>
+</main>
+</body></html>

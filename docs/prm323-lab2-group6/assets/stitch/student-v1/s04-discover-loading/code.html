@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TeamUp EXE - Find a team</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Be Vietnam Pro -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-container-lowest": "#ffffff",
+            "error": "#ba1a1a",
+            "surface-container-high": "#ece7e2",
+            "inverse-surface": "#32302d",
+            "surface-container-low": "#f8f3ed",
+            "surface-variant": "#e6e2dd",
+            "inverse-on-surface": "#f5f0eb",
+            "on-surface-variant": "#584239",
+            "surface-container-highest": "#e6e2dd",
+            "on-secondary-fixed": "#27180f",
+            "tertiary-container": "#247242",
+            "on-surface": "#1c1b18",
+            "on-secondary-container": "#756053",
+            "on-tertiary-container": "#a5f4b8",
+            "on-tertiary": "#ffffff",
+            "surface": "#fdf9f3",
+            "inverse-primary": "#ffb59a",
+            "surface-bright": "#fdf9f3",
+            "surface-container": "#f2ede8",
+            "error-container": "#ffdad6",
+            "background": "#fdf9f3",
+            "primary-fixed-dim": "#ffb59a",
+            "primary-container": "#b23e00",
+            "on-primary-container": "#ffdbcf",
+            "surface-dim": "#ded9d4",
+            "on-primary-fixed-variant": "#802a00",
+            "on-tertiary-fixed-variant": "#005229",
+            "tertiary": "#00592d",
+            "on-error": "#ffffff",
+            "secondary-container": "#faddcd",
+            "secondary-fixed-dim": "#dcc1b2",
+            "outline": "#8c7168",
+            "secondary-fixed": "#faddcd",
+            "outline-variant": "#e0c0b4",
+            "primary": "#8a2e00",
+            "on-tertiary-fixed": "#00210d",
+            "on-background": "#1c1b18",
+            "secondary": "#6f5a4e",
+            "on-secondary-fixed-variant": "#564337",
+            "on-primary-fixed": "#370e00",
+            "on-primary": "#ffffff",
+            "on-secondary": "#ffffff",
+            "on-error-container": "#93000a",
+            "tertiary-fixed": "#a5f4b8",
+            "surface-tint": "#a73a00",
+            "primary-fixed": "#ffdbce",
+            "tertiary-fixed-dim": "#8ad79e"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-lg": "1.5rem",
+            "space-sm": "0.5rem",
+            "space-xl": "2rem",
+            "margin": "1rem",
+            "gutter": "1rem",
+            "space-xs": "0.25rem",
+            "space-md": "1rem"
+          },
+          "fontFamily": {
+            "body": ["Be Vietnam Pro"],
+            "metadata": ["Be Vietnam Pro"],
+            "button": ["Be Vietnam Pro"],
+            "headline": ["Be Vietnam Pro"],
+            "card-title": ["Be Vietnam Pro"],
+            "label-field": ["Be Vietnam Pro"],
+            "chip": ["Be Vietnam Pro"],
+            "title": ["Be Vietnam Pro"]
+          },
+          "fontSize": {
+            "body": ["16px", { "lineHeight": "24px", "letterSpacing": "0px", "fontWeight": "400" }],
+            "metadata": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "400" }],
+            "button": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "headline": ["24px", { "lineHeight": "32px", "letterSpacing": "0px", "fontWeight": "700" }],
+            "card-title": ["16px", { "lineHeight": "24px", "letterSpacing": "0px", "fontWeight": "600" }],
+            "label-field": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "chip": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "title": ["20px", { "lineHeight": "28px", "letterSpacing": "0px", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    @keyframes pulse-subtle {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.55; }
+    }
+    .skeleton-shimmer {
+      animation: pulse-subtle 1.8s ease-in-out infinite;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface antialiased min-h-screen flex justify-center items-start">
+<!-- Mobile Viewport Shell (360 x 800 dp frame) -->
+<div class="w-full max-w-[360px] min-h-[800px] h-screen bg-surface flex flex-col relative overflow-hidden">
+<!-- Top App Bar -->
+<header class="bg-surface-container-lowest text-on-surface docked full-width top-0 z-40 flex items-center justify-between h-14 px-margin w-full shrink-0 border-b border-surface-variant">
+<div class="flex items-center space-x-space-sm">
+<h1 class="font-title text-title font-bold text-on-surface tracking-tight">Find a team</h1>
+</div>
+<button aria-label="Search" class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-container active:opacity-80 transition-opacity duration-150 text-on-surface" type="button">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+</header>
+<!-- Main Content Area: Scrollable Canvas -->
+<main class="flex-1 overflow-y-auto px-margin pt-space-md pb-24 space-y-space-md">
+<!-- Search Input Field Container -->
+<section aria-label="Search and filters" class="space-y-space-sm">
+<div class="relative flex items-center w-full h-12 bg-[#F3F2EF] rounded-lg border border-[#77756F] px-space-md">
+<span class="material-symbols-outlined text-[#55534D] mr-space-sm select-none" data-icon="search">search</span>
+<input aria-label="Search teams" class="w-full bg-transparent border-none p-0 font-body text-body text-on-surface placeholder-[#55534D] focus:ring-0 focus:outline-none" placeholder="Search teams" type="text"/>
+</div>
+<!-- Filter Chips Row -->
+<div class="flex items-center space-x-space-sm pt-space-xs overflow-x-auto no-scrollbar">
+<!-- Filter Chip: Major -->
+<button class="h-8 min-w-[48px] px-space-md bg-[#E9E7E2] border border-[#D6D4CE] rounded-full flex items-center justify-center space-x-space-xs font-chip text-chip text-[#1C1B18] active:scale-95 transition-transform duration-150" type="button">
+<span>Major</span>
+<span class="material-symbols-outlined text-sm leading-none" data-icon="expand_more">expand_more</span>
+</button>
+<!-- Filter Chip: Role -->
+<button class="h-8 min-w-[48px] px-space-md bg-[#E9E7E2] border border-[#D6D4CE] rounded-full flex items-center justify-center space-x-space-xs font-chip text-chip text-[#1C1B18] active:scale-95 transition-transform duration-150" type="button">
+<span>Role</span>
+<span class="material-symbols-outlined text-sm leading-none" data-icon="expand_more">expand_more</span>
+</button>
+</div>
+</section>
+<!-- Skeleton Content Section: Bento/Modern Structural Assembly -->
+<section aria-label="Loading teams list" class="space-y-space-md">
+<!-- Skeleton Card 1 -->
+<article class="bg-[#FFFFFF] border border-[#D6D4CE] rounded-xl p-space-md space-y-space-md">
+<!-- Header block: Team Title & Tag -->
+<div class="flex items-start justify-between">
+<div class="space-y-space-xs w-2/3">
+<div class="h-5 w-40 bg-[#F3F2EF] rounded skeleton-shimmer"></div>
+<div class="h-3.5 w-24 bg-[#F3F2EF] rounded skeleton-shimmer"></div>
+</div>
+<div class="h-6 w-16 bg-[#F3F2EF] rounded-full skeleton-shimmer"></div>
+</div>
+<!-- Idea Line -->
+<div class="space-y-space-xs pt-space-xs">
+<div class="h-4 w-full bg-[#F3F2EF] rounded skeleton-shimmer"></div>
+<div class="h-4 w-4/5 bg-[#F3F2EF] rounded skeleton-shimmer"></div>
+</div>
+<!-- Role Row (Slot Grid Indicators) -->
+<div class="flex items-center space-x-space-sm pt-space-xs">
+<div class="h-8 w-24 bg-[#F3F2EF] rounded-lg skeleton-shimmer"></div>
+<div class="h-8 w-24 bg-[#F3F2EF] rounded-lg skeleton-shimmer"></div>
+<div class="h-8 w-8 bg-[#F3F2EF] rounded-full skeleton-shimmer"></div>
+</div>
+<!-- Status Line & Metadata Divider -->
+<div class="pt-space-sm border-t border-[#D6D4CE] flex items-center justify-between">
+<div class="h-3.5 w-28 bg-[#F3F2EF] rounded skeleton-shimmer"></div>
+<div class="h-3.5 w-16 bg-[#F3F2EF] rounded skeleton-shimmer"></div>
+</div>
+</article>
+<!-- Skeleton Card 2 -->
+<article class="bg-[#FFFFFF] border border-[#D6D4CE] rounded-xl p-space-md space-y-space-md">
+<!-- Header block: Team Title & Tag -->
+<div class="flex items-start justify-between">
+<div class="space-y-space-xs w-3/4">
+<div class="h-5 w-48 bg-[#F3F2EF] rounded skeleton-shimmer"></div>
+<div class="h-3.5 w-28 bg-[#F3F2EF] rounded skeleton-shimmer"></div>
+</div>
+<div class="h-6 w-14 bg-[#F3F2EF] rounded-full skeleton-shimmer"></div>
+</div>
+<!-- Idea Line -->
+<div class="space-y-space-xs pt-space-xs">
+<div class="h-4 w-11/12 bg-[#F3F2EF] rounded skeleton-shimmer"></div>
+<div class="h-4 w-3/4 bg-[#F3F2EF] rounded skeleton-shimmer"></div>
+</div>
+<!-- Role Row (Slot Grid Indicators) -->
+<div class="flex items-center space-x-space-sm pt-space-xs">
+<div class="h-8 w-28 bg-[#F3F2EF] rounded-lg skeleton-shimmer"></div>
+<div class="h-8 w-20 bg-[#F3F2EF] rounded-lg skeleton-shimmer"></div>
+<div class="h-8 w-8 bg-[#F3F2EF] rounded-full skeleton-shimmer"></div>
+</div>
+<!-- Status Line & Metadata Divider -->
+<div class="pt-space-sm border-t border-[#D6D4CE] flex items-center justify-between">
+<div class="h-3.5 w-32 bg-[#F3F2EF] rounded skeleton-shimmer"></div>
+<div class="h-3.5 w-12 bg-[#F3F2EF] rounded skeleton-shimmer"></div>
+</div>
+</article>
+<!-- Skeleton Card 3 -->
+<article class="bg-[#FFFFFF] border border-[#D6D4CE] rounded-xl p-space-md space-y-space-md">
+<!-- Header block: Team Title & Tag -->
+<div class="flex items-start justify-between">
+<div class="space-y-space-xs w-2/3">
+<div class="h-5 w-36 bg-[#F3F2EF] rounded skeleton-shimmer"></div>
+<div class="h-3.5 w-20 bg-[#F3F2EF] rounded skeleton-shimmer"></div>
+</div>
+<div class="h-6 w-16 bg-[#F3F2EF] rounded-full skeleton-shimmer"></div>
+</div>
+<!-- Idea Line -->
+<div class="space-y-space-xs pt-space-xs">
+<div class="h-4 w-full bg-[#F3F2EF] rounded skeleton-shimmer"></div>
+<div class="h-4 w-2/3 bg-[#F3F2EF] rounded skeleton-shimmer"></div>
+</div>
+<!-- Role Row (Slot Grid Indicators) -->
+<div class="flex items-center space-x-space-sm pt-space-xs">
+<div class="h-8 w-24 bg-[#F3F2EF] rounded-lg skeleton-shimmer"></div>
+<div class="h-8 w-24 bg-[#F3F2EF] rounded-lg skeleton-shimmer"></div>
+<div class="h-8 w-8 bg-[#F3F2EF] rounded-full skeleton-shimmer"></div>
+</div>
+<!-- Status Line & Metadata Divider -->
+<div class="pt-space-sm border-t border-[#D6D4CE] flex items-center justify-between">
+<div class="h-3.5 w-24 bg-[#F3F2EF] rounded skeleton-shimmer"></div>
+<div class="h-3.5 w-20 bg-[#F3F2EF] rounded skeleton-shimmer"></div>
+</div>
+</article>
+</section>
+</main>
+<!-- Bottom Navigation Bar (Docked Full-width, 4 destinations, Discover Active) -->
+<nav aria-label="Main Navigation" class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 px-margin bg-surface-container-lowest dark:bg-surface-container-lowest border-t border-surface-variant dark:border-surface-variant max-w-[360px] mx-auto right-0">
+<!-- Destination 1: Discover (ACTIVE) -->
+<a class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary-container text-on-primary-fixed dark:text-on-primary-fixed rounded-full px-4 py-1 font-metadata text-metadata active:scale-95 transition-transform duration-150" href="#discover">
+<span class="material-symbols-outlined leading-none" data-icon="explore">explore</span>
+<span class="mt-0.5">Discover</span>
+</a>
+<!-- Destination 2: Team (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-4 py-1 font-metadata text-metadata hover:bg-surface-container-low dark:hover:bg-surface-container-low rounded-full active:scale-95 transition-transform duration-150" href="#team">
+<span class="material-symbols-outlined leading-none" data-icon="groups">groups</span>
+<span class="mt-0.5">Team</span>
+</a>
+<!-- Destination 3: Invitations (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-4 py-1 font-metadata text-metadata hover:bg-surface-container-low dark:hover:bg-surface-container-low rounded-full active:scale-95 transition-transform duration-150" href="#invitations">
+<span class="material-symbols-outlined leading-none" data-icon="mail">mail</span>
+<span class="mt-0.5">Invitations</span>
+</a>
+<!-- Destination 4: Profile (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-4 py-1 font-metadata text-metadata hover:bg-surface-container-low dark:hover:bg-surface-container-low rounded-full active:scale-95 transition-transform duration-150" href="#profile">
+<span class="material-symbols-outlined leading-none" data-icon="person">person</span>
+<span class="mt-0.5">Profile</span>
+</a>
+</nav>
+</div>
+</body></html>

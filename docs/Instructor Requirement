@@ -1,0 +1,7 @@
+Lưu ý:
+
+- Phần upload, team có thể sử dụng cloudinary hoặc AWS S3... thay thế
+- Chấm bài phải chay trên device thật
+- Crashlytics demo bằng cách tạo 1 nút nhấn trên app, nhấn vào nút thì app crash, chờ một thời gian thì firebase cập nhật, admin sẽ dùng web để xem các kết quả này
+- Team Dev xem trên firebase, admin phải dùng web; Web chỉ cần phục vụ cho Admin
+- Chấm Lab3 ưu tiên công nghệ và giải thích, cần chuẩn bị slide minh họa các nguyên lý (được dùng công cụ đẻ soạn nhưng phải giải thích được). Ví dụ: FCM token là gì ? ở đâu cấp? client có lưu không ? làm sao để gửi được message, code nằm chỗ nào ở server? client dùng ra sao...

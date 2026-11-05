@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>22. Profile - TeamUp EXE</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-primary-fixed": "#370e00",
+            "error-container": "#ffdad6",
+            "surface-bright": "#fdf9f3",
+            "surface-container-low": "#f8f3ed",
+            "on-primary-fixed-variant": "#802a00",
+            "on-secondary-fixed": "#27180f",
+            "surface-container-highest": "#e6e2dd",
+            "surface-dim": "#ded9d4",
+            "on-background": "#1c1b18",
+            "background": "#fdf9f3",
+            "on-tertiary-fixed": "#00210d",
+            "surface-variant": "#e6e2dd",
+            "outline-variant": "#e0c0b4",
+            "tertiary-fixed-dim": "#8ad79e",
+            "primary-fixed": "#ffdbce",
+            "on-surface-variant": "#584239",
+            "secondary-container": "#faddcd",
+            "error": "#ba1a1a",
+            "primary": "#8a2e00",
+            "on-primary-container": "#ffdbcf",
+            "on-secondary-container": "#756053",
+            "surface-container": "#f2ede8",
+            "surface-container-lowest": "#ffffff",
+            "tertiary-fixed": "#a5f4b8",
+            "secondary-fixed": "#faddcd",
+            "on-tertiary-fixed-variant": "#005229",
+            "tertiary": "#00592d",
+            "on-secondary": "#ffffff",
+            "on-error-container": "#93000a",
+            "on-tertiary-container": "#a5f4b8",
+            "surface-tint": "#a73a00",
+            "outline": "#8c7168",
+            "tertiary-container": "#247242",
+            "on-surface": "#1c1b18",
+            "on-secondary-fixed-variant": "#564337",
+            "inverse-primary": "#ffb59a",
+            "surface-container-high": "#ece7e2",
+            "on-primary": "#ffffff",
+            "primary-fixed-dim": "#ffb59a",
+            "on-tertiary": "#ffffff",
+            "inverse-on-surface": "#f5f0eb",
+            "inverse-surface": "#32302d",
+            "secondary": "#6f5a4e",
+            "primary-container": "#b23e00",
+            "surface": "#fdf9f3",
+            "on-error": "#ffffff",
+            "secondary-fixed-dim": "#dcc1b2",
+            "custom-border": "#D6D4CE",
+            "custom-text": "#1C1B18",
+            "custom-muted": "#55534D",
+            "custom-pill-bg": "#FFE2D2",
+            "custom-pill-text": "#3B1400",
+            "custom-tonal-chip": "#E9E7E2"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "margin": "1rem",
+            "space-md": "1rem",
+            "space-lg": "1.5rem",
+            "space-xs": "0.25rem",
+            "gutter": "1rem",
+            "space-xl": "2rem",
+            "space-sm": "0.5rem"
+          },
+          "fontFamily": {
+            "title": ["Be Vietnam Pro", "sans-serif"],
+            "body": ["Be Vietnam Pro", "sans-serif"],
+            "button": ["Be Vietnam Pro", "sans-serif"],
+            "label-field": ["Be Vietnam Pro", "sans-serif"],
+            "chip": ["Be Vietnam Pro", "sans-serif"],
+            "headline": ["Be Vietnam Pro", "sans-serif"],
+            "card-title": ["Be Vietnam Pro", "sans-serif"],
+            "metadata": ["Be Vietnam Pro", "sans-serif"]
+          },
+          "fontSize": {
+            "title": ["20px", { "lineHeight": "28px", "letterSpacing": "0px", "fontWeight": "600" }],
+            "body": ["16px", { "lineHeight": "24px", "letterSpacing": "0px", "fontWeight": "400" }],
+            "button": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "label-field": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "chip": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "headline": ["24px", { "lineHeight": "32px", "letterSpacing": "0px", "fontWeight": "700" }],
+            "card-title": ["16px", { "lineHeight": "24px", "letterSpacing": "0px", "fontWeight": "600" }],
+            "metadata": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      background-color: #f2ede8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      font-family: 'Be Vietnam Pro', sans-serif;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-container">
+<!-- Mobile Frame Android 360 x 800 dp -->
+<main class="w-[360px] h-[800px] bg-surface-container-lowest flex flex-col relative overflow-hidden select-none border border-surface-dim">
+<!-- Top App Bar -->
+<header class="w-full h-16 px-margin flex items-center bg-surface-container-lowest border-b border-surface-dim shrink-0 z-10">
+<h1 class="font-title text-title text-on-surface">Profile</h1>
+</header>
+<!-- Scrollable Canvas Area -->
+<div class="flex-1 overflow-y-auto px-margin pt-space-lg pb-space-lg flex flex-col gap-space-lg">
+<!-- Profile Overview Card -->
+<section class="bg-surface-container-lowest border border-[#D6D4CE] rounded-xl p-space-md flex flex-col gap-space-md">
+<div class="flex items-center gap-space-md">
+<!-- Initials Avatar -->
+<div class="w-16 h-16 rounded-full bg-[#E9E7E2] flex items-center justify-center shrink-0">
+<span class="font-title text-title text-custom-text">MN</span>
+</div>
+<!-- Name & Designation -->
+<div class="flex flex-col">
+<span class="font-title text-title text-custom-text">Minh Nguyen</span>
+<span class="font-metadata text-metadata text-custom-muted">SE, S5</span>
+</div>
+</div>
+<div class="h-[1px] bg-[#D6D4CE] w-full"></div>
+<!-- Technical Competencies Chips -->
+<div class="flex flex-col gap-space-xs">
+<span class="font-metadata text-metadata text-custom-muted">Key skills</span>
+<div class="flex flex-wrap gap-space-sm pt-space-xs">
+<div class="h-8 px-space-md rounded-full bg-[#E9E7E2] border border-[#D6D4CE] flex items-center justify-center">
+<span class="font-chip text-chip text-custom-text">Flutter</span>
+</div>
+<div class="h-8 px-space-md rounded-full bg-[#E9E7E2] border border-[#D6D4CE] flex items-center justify-center">
+<span class="font-chip text-chip text-custom-text">Figma</span>
+</div>
+<div class="h-8 px-space-md rounded-full bg-[#E9E7E2] border border-[#D6D4CE] flex items-center justify-center">
+<span class="font-chip text-chip text-custom-text">Python</span>
+</div>
+</div>
+</div>
+<div class="h-[1px] bg-[#D6D4CE] w-full"></div>
+<!-- Weekly Availability -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs text-custom-muted">
+<span class="material-symbols-outlined text-[20px]" data-icon="schedule">schedule</span>
+<span class="font-metadata text-metadata text-custom-muted">Committed availability</span>
+</div>
+<span class="font-card-title text-card-title text-custom-text">15 h/week</span>
+</div>
+</section>
+<!-- Preferences & Administrative Module -->
+<section class="bg-surface-container-lowest border border-[#D6D4CE] rounded-xl p-space-md flex flex-col gap-space-md">
+<h2 class="font-card-title text-card-title text-custom-text">Team preferences</h2>
+<div class="flex flex-col gap-space-sm">
+<div class="flex justify-between items-center text-custom-text py-space-xs">
+<span class="font-metadata text-metadata text-custom-muted">Target project scope</span>
+<span class="font-metadata text-metadata text-custom-text">Mobile &amp; Web systems</span>
+</div>
+<div class="h-[1px] bg-[#D6D4CE] w-full"></div>
+<div class="flex justify-between items-center text-custom-text py-space-xs">
+<span class="font-metadata text-metadata text-custom-muted">Primary role preference</span>
+<span class="font-metadata text-metadata text-custom-text">Frontend developer</span>
+</div>
+</div>
+</section>
+<!-- Action Button -->
+<div class="pt-space-xs">
+<button class="w-full h-12 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-button text-button transition-opacity active:opacity-90" type="button">
+          Edit
+        </button>
+</div>
+</div>
+<!-- Persistent Bottom Navigation Bar -->
+<nav class="w-full h-16 bg-surface-container-lowest border-t border-[#D6D4CE] flex items-center justify-around px-space-xs shrink-0 z-10">
+<!-- Tab 1: Discover -->
+<button class="flex flex-col items-center justify-center flex-1 h-full py-1 text-custom-muted" type="button">
+<span class="material-symbols-outlined text-[24px]" data-icon="explore">explore</span>
+<span class="font-metadata text-metadata text-[12px] leading-tight text-custom-muted mt-1">Discover</span>
+</button>
+<!-- Tab 2: Team -->
+<button class="flex flex-col items-center justify-center flex-1 h-full py-1 text-custom-muted" type="button">
+<span class="material-symbols-outlined text-[24px]" data-icon="groups">groups</span>
+<span class="font-metadata text-metadata text-[12px] leading-tight text-custom-muted mt-1">Team</span>
+</button>
+<!-- Tab 3: Invitations -->
+<button class="flex flex-col items-center justify-center flex-1 h-full py-1 text-custom-muted" type="button">
+<span class="material-symbols-outlined text-[24px]" data-icon="mail">mail</span>
+<span class="font-metadata text-metadata text-[12px] leading-tight text-custom-muted mt-1">Invitations</span>
+</button>
+<!-- Tab 4: Profile (ACTIVE) -->
+<button class="flex flex-col items-center justify-center flex-1 h-full py-1" type="button">
+<div class="w-16 h-8 bg-custom-pill-bg rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[24px] text-custom-pill-text" data-icon="person" data-weight="fill" style="font-variation-settings: 'FILL' 1;">person</span>
+</div>
+<span class="font-button text-button text-[12px] leading-tight text-custom-pill-text mt-0.5">Profile</span>
+</button>
+</nav>
+</main>
+</body></html>

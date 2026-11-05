@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TeamUp EXE - My team</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "error-container": "#ffdad6",
+            "tertiary": "#00592d",
+            "outline": "#8c7168",
+            "tertiary-fixed": "#a5f4b8",
+            "on-tertiary-container": "#a5f4b8",
+            "surface": "#fdf9f3",
+            "primary": "#8a2e00",
+            "surface-container-low": "#f8f3ed",
+            "secondary": "#6f5a4e",
+            "primary-container": "#b23e00",
+            "tertiary-fixed-dim": "#8ad79e",
+            "on-error": "#ffffff",
+            "on-primary-fixed": "#370e00",
+            "secondary-fixed": "#faddcd",
+            "inverse-surface": "#32302d",
+            "on-primary-fixed-variant": "#802a00",
+            "error": "#ba1a1a",
+            "surface-container-high": "#ece7e2",
+            "surface-bright": "#fdf9f3",
+            "secondary-fixed-dim": "#dcc1b2",
+            "outline-variant": "#e0c0b4",
+            "secondary-container": "#faddcd",
+            "surface-container-highest": "#e6e2dd",
+            "primary-fixed": "#ffdbce",
+            "tertiary-container": "#247242",
+            "on-primary-container": "#ffdbcf",
+            "surface-tint": "#a73a00",
+            "on-tertiary-fixed-variant": "#005229",
+            "on-surface": "#1c1b18",
+            "on-secondary": "#ffffff",
+            "inverse-primary": "#ffb59a",
+            "on-tertiary": "#ffffff",
+            "surface-variant": "#e6e2dd",
+            "on-secondary-fixed-variant": "#564337",
+            "on-tertiary-fixed": "#00210d",
+            "background": "#fdf9f3",
+            "on-secondary-fixed": "#27180f",
+            "inverse-on-surface": "#f5f0eb",
+            "on-primary": "#ffffff",
+            "on-secondary-container": "#756053",
+            "on-error-container": "#93000a",
+            "surface-container": "#f2ede8",
+            "on-surface-variant": "#584239",
+            "on-background": "#1c1b18",
+            "surface-container-lowest": "#ffffff",
+            "surface-dim": "#ded9d4",
+            "primary-fixed-dim": "#ffb59a"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "margin": "1rem",
+            "space-sm": "0.5rem",
+            "gutter": "1rem",
+            "space-lg": "1.5rem",
+            "space-md": "1rem",
+            "space-xs": "0.25rem",
+            "space-xl": "2rem"
+          },
+          "fontFamily": {
+            "headline": ["Be Vietnam Pro"],
+            "label-field": ["Be Vietnam Pro"],
+            "metadata": ["Be Vietnam Pro"],
+            "chip": ["Be Vietnam Pro"],
+            "button": ["Be Vietnam Pro"],
+            "body": ["Be Vietnam Pro"],
+            "card-title": ["Be Vietnam Pro"],
+            "title": ["Be Vietnam Pro"]
+          },
+          "fontSize": {
+            "headline": ["24px", {"lineHeight": "32px", "letterSpacing": "0px", "fontWeight": "700"}],
+            "label-field": ["14px", {"lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600"}],
+            "metadata": ["14px", {"lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "400"}],
+            "chip": ["14px", {"lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600"}],
+            "button": ["14px", {"lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600"}],
+            "body": ["16px", {"lineHeight": "24px", "letterSpacing": "0px", "fontWeight": "400"}],
+            "card-title": ["16px", {"lineHeight": "24px", "letterSpacing": "0px", "fontWeight": "600"}],
+            "title": ["20px", {"lineHeight": "28px", "letterSpacing": "0px", "fontWeight": "600"}]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-[#FFFFFF] text-on-surface antialiased flex justify-center min-h-screen">
+<!-- Mobile Container (360 x 800 standard) -->
+<div class="w-full max-w-[360px] min-h-[800px] bg-[#FFFFFF] flex flex-col justify-between relative pb-16">
+<!-- Main Content Area -->
+<div class="w-full flex flex-col">
+<!-- Top App Bar -->
+<header class="w-full h-14 px-margin flex items-center bg-[#FFFFFF]">
+<h1 class="font-headline text-headline text-on-surface tracking-tight">My team</h1>
+</header>
+<!-- Content Canvas -->
+<main class="px-margin flex flex-col gap-space-lg pt-space-xs">
+<!-- Team Status Card -->
+<section class="bg-[#FFFFFF] border border-[#D6D4CE] rounded-xl p-space-md flex flex-col gap-space-md">
+<!-- Card Header -->
+<div class="flex items-center justify-between">
+<h2 class="font-card-title text-card-title text-on-surface">Tutor Match</h2>
+<span class="font-metadata text-metadata text-[#55534D]">3 of 5</span>
+</div>
+<!-- Role Slots Row: 5 slots strictly 48dp x 48dp -->
+<div class="flex items-center justify-between gap-space-xs">
+<!-- Slot 1: Filled HN -->
+<div class="w-12 h-12 rounded-xl bg-[#D6F0DD] border border-[#1B6B3C] flex items-center justify-center shrink-0">
+<span class="font-button text-button text-[#07301A]">HN</span>
+</div>
+<!-- Slot 2: Filled QB -->
+<div class="w-12 h-12 rounded-xl bg-[#D6F0DD] border border-[#1B6B3C] flex items-center justify-center shrink-0">
+<span class="font-button text-button text-[#07301A]">QB</span>
+</div>
+<!-- Slot 3: Filled TL -->
+<div class="w-12 h-12 rounded-xl bg-[#D6F0DD] border border-[#1B6B3C] flex items-center justify-center shrink-0">
+<span class="font-button text-button text-[#07301A]">TL</span>
+</div>
+<!-- Slot 4: Open Marketing -->
+<div class="w-12 h-12 rounded-xl bg-[#FFFFFF] border-2 border-dashed border-[#77756F] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[#77756F] text-[20px]" data-icon="campaign">campaign</span>
+</div>
+<!-- Slot 5: Open Design -->
+<div class="w-12 h-12 rounded-xl bg-[#FFFFFF] border-2 border-dashed border-[#77756F] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[#77756F] text-[20px]" data-icon="palette">palette</span>
+</div>
+</div>
+</section>
+<!-- Members Section -->
+<section class="flex flex-col gap-space-sm">
+<h3 class="font-card-title text-card-title text-on-surface">Members</h3>
+<div class="bg-[#FFFFFF] border border-[#D6D4CE] rounded-xl divide-y divide-[#D6D4CE]">
+<!-- Member 1: Hoang Nguyen, SE -->
+<div class="p-space-md flex items-center justify-between min-h-[48px]">
+<span class="font-body text-body text-on-surface">Hoang Nguyen, SE</span>
+<span class="h-8 px-3 rounded-full bg-[#FFE2D2] text-[#3B1400] font-chip text-chip flex items-center justify-center">Leader</span>
+</div>
+<!-- Member 2: Quoc Bao, SE -->
+<div class="p-space-md flex items-center justify-between min-h-[48px]">
+<span class="font-body text-body text-on-surface">Quoc Bao, SE</span>
+</div>
+<!-- Member 3: Thao Linh, AI -->
+<div class="p-space-md flex items-center justify-between min-h-[48px]">
+<span class="font-body text-body text-on-surface">Thao Linh, AI</span>
+</div>
+</div>
+</section>
+<!-- Action Section -->
+<div class="flex flex-col gap-space-sm pt-space-xs">
+<!-- Filled Primary Button -->
+<button class="w-full h-12 rounded-full bg-[#B23E00] text-[#FFFFFF] font-button text-button flex items-center justify-center active:opacity-90 transition-opacity" type="button">
+            Find Marketing
+          </button>
+<!-- Leave Team Button (Text button in error color, min 48dp target) -->
+<button class="w-full h-12 rounded-full text-[#B3261E] font-button text-button flex items-center justify-center active:bg-[#F9DEDC] transition-colors" type="button">
+            Leave team
+          </button>
+</div>
+</main>
+</div>
+<!-- Bottom Navigation Bar (Docked full-width, 1dp top divider #D6D4CE) -->
+<nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[360px] h-16 bg-[#FFFFFF] border-t border-[#D6D4CE] flex items-center justify-around z-50">
+<!-- Tab 1: Discover -->
+<button class="flex flex-col items-center justify-center w-16 h-12 text-[#55534D] active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="explore">explore</span>
+<span class="font-metadata text-[12px] leading-tight">Discover</span>
+</button>
+<!-- Tab 2: Team (Active) -->
+<button class="flex flex-col items-center justify-center w-16 h-12 text-[#3B1400] active:scale-95 transition-transform" type="button">
+<div class="bg-[#FFE2D2] px-4 py-0.5 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]" data-icon="groups">groups</span>
+</div>
+<span class="font-label-field text-[12px] leading-tight font-semibold mt-0.5">Team</span>
+</button>
+<!-- Tab 3: Invitations -->
+<button class="flex flex-col items-center justify-center w-16 h-12 text-[#55534D] active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="mail">mail</span>
+<span class="font-metadata text-[12px] leading-tight">Invitations</span>
+</button>
+<!-- Tab 4: Profile -->
+<button class="flex flex-col items-center justify-center w-16 h-12 text-[#55534D] active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="person">person</span>
+<span class="font-metadata text-[12px] leading-tight">Profile</span>
+</button>
+</nav>
+</div>
+</body></html>
