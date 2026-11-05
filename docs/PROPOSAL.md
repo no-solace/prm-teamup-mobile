@@ -136,7 +136,7 @@ Quy tắc nghiệp vụ lấy nguyên từ Lab 2 (`ux/persona.md` mục 0, `ux/u
 - **AI mức 2:** S8 gọi Gemini qua Firebase AI Logic, trả JSON đề xuất (Dart model), mentor xác nhận và chỉnh sửa; S15/S18 là đường dự phòng; model, prompt và cờ bật/tắt lấy từ Remote Config.
 - **Lưu ý:** Final để Cloud Storage và Cloud Functions ngoài phạm vi. PDF ở Final lưu trên máy, metadata lưu Firestore.
 
-## 9. Mở rộng (chỉ làm khi giảng viên đồng ý)
+## 9. Mở rộng (không làm ở Lab 3: chỉ còn 7 ngày)
 
 Các luồng của bản 31/10 không có trong Lab 2. Nếu làm thì phải thêm vai sinh viên, thiết kế mới trên Figma và ghi là "mở rộng ở Lab 3":
 
@@ -151,7 +151,7 @@ Các luồng của bản 31/10 không có trong Lab 2. Nếu làm thì phải th
 | Rủi ro | Mức | Xử lý |
 |---|---|---|
 | Giảng viên muốn giữ D/E/F làm trọng tâm | Trung bình | Hỏi ngay (mục 11); nếu có thì chia lại việc, A/B/C vẫn phải đủ |
-| 25 màn nhiều so với thời gian | Cao | Chia đều theo flow; component dùng chung xong ở tuần 0; nhiều màn là trạng thái của cùng một màn (S13/S11, S19/S1, S21/S16, S25/S10) |
+| 25 màn trong 7 ngày | Cao | Chia đều theo flow, làm song song từ ngày 1; widget dùng chung xong trưa ngày 2; nhiều màn là trạng thái của cùng một màn (S13/S11, S19/S1, S21/S16, S25/S10); hạn chót tính năng cuối ngày 4; thứ tự cắt khi trễ ở `PHAN_CONG.md` mục 5 |
 | Google Sign-In lỗi trên máy thành viên khác | Trung bình | Thêm SHA-1 debug của cả 4 máy vào Firebase ở tuần 0 |
 | Phát sinh phí trên gói Blaze | Thấp | Bucket `us-central1` (trong hạn mức miễn phí), budget alert 1 USD (chỉ cảnh báo, không tự ngắt), chỉ upload PDF nhỏ; gỡ thẻ hoặc hạ về Spark sau khi chấm. Đã cân nhắc Cloudinary (giảng viên cho phép) nhưng không chọn vì không giới hạn được quyền theo `uid` khi không có server |
 | Crashlytics chậm hiện trên Console | Thấp | Demo trước buổi chấm; mở lại app sau crash để báo cáo được gửi |

@@ -1,120 +1,115 @@
 # Phân công Lab 3: TeamUp EXE
 
-> Sửa lần 2: 05/11/2026, theo `PROPOSAL.md` bản mới. Phạm vi là 3 flow A/B/C, gồm 25 màn của Lab 2 (`docs/prm323-lab2-group6/ux/user-flow.md`). Các luồng D/E/F cũ chỉ làm khi giảng viên đồng ý (PROPOSAL mục 9).
+> Sửa lần 3: 05/11/2026. **Còn 7 ngày.** Phạm vi: 3 flow A/B/C, 25 màn của Lab 2 (`docs/prm323-lab2-group6/ux/user-flow.md`). D/E/F **không làm** ở Lab 3.
+
+## 0. Nguyên tắc khi chỉ có 7 ngày
+
+1. **Ưu tiên theo điểm.** Slide + video là 2 điểm, ARTEMIS là 1.5 điểm: hai phần này cần app chạy được từ **cuối ngày 4**. Vì vậy ngày 4 là hạn chót cho tính năng.
+2. **Làm song song từ ngày 1.** Không ai chờ ai. Trong lúc Ken dựng khung, những người khác viết model, interface Service và bản fake.
+3. **Merge vào `main` mỗi tối.** Không để tích hợp dồn vào cuối.
+4. **Mỗi màn chỉ làm đúng nội dung Figma.** Không thêm gì ngoài thiết kế. Thứ tự cắt khi trễ ghi ở mục 5.
 
 ## 1. Bảng phân công
 
-Màn được chia theo flow. Mỗi người sở hữu màn của mình từ UI đến ViewModel, Service, dữ liệu Firestore, analytics, ARTEMIS và phần báo cáo/slide tương ứng.
-
-| # | Thành viên | Màn sở hữu | Dịch vụ Firebase phụ trách | Việc chung |
+| # | Thành viên | Màn sở hữu | Dịch vụ Firebase | Việc chung |
 |---|---|---|---|---|
-| **1** | `Ken` | **Khung + đăng nhập**: S1, S19 (Google Sign-In), S6 Profile (phần hồ sơ, Sign out) | **Authentication**; `firebase/firestore.rules` (gộp và review rule của mọi người) | Cấu trúc MVVM + Riverpod, `go_router` 3 tab, `lib/theme/` (Bảng 1 handoff), `lib/widgets/` (Bảng 2: button, card, chip, ô ngành, `StatusView`, dialog), `flutterfire configure`, `docs/architecture.md`, `docs/data-model.md` (chủ trì) |
-| **2** | `Dan` | **Flow A**: S2, S22, S23, S3, S4, S7, S8, S18 | **Remote Config** (`ai_matching_enabled`, `max_proposals_shown`), **Cloud Messaging** | `ClassService` (import xlsx/csv), `MatchingService` (ghép theo ngành, R1-R3), `NotificationService` và trung tâm thông báo, quyền Android 13+, payload `route` mở đúng màn |
-| **3** | `Cuong` | **Flow B**: S9, S10, S11, S12, S13, S14, S24, S25 | **Crashlytics** (non-fatal, crash thử, user ID, khóa `role` / `class_id`), **Cloud Storage** (`reports/{uid}`, `storage.rules`) | `ProposalService` (duyệt, Undo, quy tắc 5-6), `ReportService` (PDF danh sách nhóm đã duyệt), mục **Firebase demo** ở S6 (thông báo, xuất PDF, giá trị Remote Config, nút crash) |
-| **4** | `Khang` | **Flow C**: S5, S15, S16, S21, S20, S17 | **Analytics** (`docs/analytics-plan.md`, DebugView) | **QA lead**: `docs/test-plan.md`, `e2e_test/` (`conftest.py`, `pyproject.toml`), điều phối ARTEMIS và phiên khám phá; `docs/code-review.md`; tổng hợp báo cáo |
+| **1** | `Ken` | **Khung + đăng nhập**: S1, S19 (Google Sign-In), S6 (hồ sơ, Sign out) | **Authentication**; `firebase/firestore.rules` | MVVM + Riverpod, `go_router` 3 tab, `lib/theme/`, `lib/widgets/` dùng chung, `flutterfire configure`, `docs/architecture.md`, `docs/data-model.md`, README |
+| **2** | `Dan` | **Flow A**: S2, S22, S23, S3, S4, S7, S8, S18 | **Remote Config**, **Cloud Messaging** | `ClassService` (import **CSV**), `MatchingService` (ghép theo ngành), `NotificationService`, trung tâm thông báo, script seed dữ liệu; dựng video |
+| **3** | `Cuong` | **Flow B**: S9, S10, S11, S12, S13, S14, S24, S25 | **Crashlytics**, **Cloud Storage** (gói Blaze, `storage.rules`) | `ProposalService`, `ReportService` (PDF), mục **Firebase demo** ở S6 |
+| **4** | `Khang` | **Flow C**: S5, S15, S16, S21, S20, S17 | **Analytics** | **QA lead**: `docs/test-plan.md`, `e2e_test/`, điều phối ARTEMIS, `docs/code-review.md`, `docs/design-traceability.md` (khung), tổng hợp báo cáo và slide |
 
-**Lý do chia như vậy**
-- Mỗi người phụ trách một khối màn liền mạch và ít nhất một dịch vụ Firebase. Như vậy ai cũng có phần để trình bày ở slide "một slide cho mỗi dịch vụ".
-- Khang có ít màn nhất (6) vì còn làm QA lead. Ken có ít màn (3) nhưng làm khung dự án và component dùng chung, là phần mọi người phụ thuộc vào.
-- Nhiều màn thực chất là **trạng thái của cùng một màn**: S19/S1, S13/S11, S25/S10, S21/S16, S20/S10. Viết thành một widget nhận nhiều state, không tạo màn riêng.
+Nhiều màn là **trạng thái của cùng một màn**: S19/S1, S13/S11, S25/S10, S21/S16, S20/S10. Mỗi nhóm như vậy viết thành **một widget có nhiều state**, không làm thành màn riêng.
 
-**Sản phẩm dùng chung có người phụ trách**
+**Sản phẩm dùng chung**
 
-| Sản phẩm | Người chính | Mọi người đóng góp |
+| Sản phẩm | Người chính | Ngày xong |
 |---|---|---|
-| `docs/design-traceability.md` | Khang (khung bảng) | Mỗi người điền dòng của màn mình, viết **trước khi code** |
-| `docs/architecture.md`, `docs/data-model.md` | Ken | Mỗi người thêm ViewModel/Service của mình vào bảng |
-| `docs/analytics-plan.md` | Khang | Mỗi người đề xuất sự kiện của flow mình ở tuần 0 |
-| `firebase/remote-config-defaults.json` | Dan | — |
-| `firebase/storage.rules` | Cuong | — |
-| `docs/test-plan.md`, `e2e_test/` | Khang | Mỗi người viết ≥ 3 ca cho màn của mình |
-| `docs/code-review.md` | Khang | Chủ PR được review sửa và commit |
-| `README.md` (phiên bản ghim, commit ARTEMIS, công cụ AI, link video, bản đồ sản phẩm) | Ken | Mỗi người ghi công cụ AI mình đã dùng |
-| `evidence/` (ảnh Console, DebugView, Crashlytics, trace ARTEMIS) | Người phụ trách từng dịch vụ | — |
-| Báo cáo, slide, video | Khang tổng hợp; video do Dan dựng | Mỗi người: ~2 trang báo cáo, 3 slide, quay phần của mình |
+| `docs/design-traceability.md` | Khang (khung); mỗi người điền màn mình | Ngày 1 |
+| `docs/analytics-plan.md` | Khang; mỗi người góp sự kiện của flow mình | Ngày 1 |
+| `docs/architecture.md`, `docs/data-model.md` | Ken; mỗi người thêm ViewModel/Service của mình | Ngày 1 (bản đầu), ngày 6 (bản cuối) |
+| `firebase/remote-config-defaults.json` | Dan | Ngày 3 |
+| `firebase/storage.rules` | Cuong | Ngày 3 |
+| `docs/test-plan.md`, `e2e_test/` | Khang; mỗi người viết ≥ 3 ca cho màn mình | Ngày 3 (plan), ngày 5 (chạy) |
+| `docs/code-review.md` | Khang; chủ PR sửa | Ngày 5 |
+| `evidence/` | Người phụ trách từng dịch vụ | Ngày 5 |
+| `README.md` | Ken | Ngày 6 |
+| Báo cáo, slide | Khang tổng hợp; mỗi người ~2 trang báo cáo, 3 slide | Ngày 6 |
+| Video | Dan dựng; mỗi người quay phần mình | Ngày 7 |
 
 ## 2. Quy tắc chung
 
-- **Thiết kế:** bám Figma Lab 2. Chỗ nào khác (ví dụ S1/S19 đổi sang Google Sign-In, mục demo ở S6, trạng thái lỗi ở S22) thì ghi vào `design-traceability.md` kèm lý do **và** cập nhật Figma trong cùng tuần.
+- **Thiết kế:** bám Figma Lab 2. Chỗ nào khác thì ghi vào `design-traceability.md` kèm lý do, rồi cập nhật Figma ở ngày 5. Các chỗ khác đã biết: S1/S19 đổi sang Google Sign-In, mục demo ở S6, trạng thái lỗi ở S22, empty ở S2.
 - **Kiến trúc:**
-  - View không gọi Firebase SDK. Logic lọc, xếp hạng, kiểm tra không viết trong `build()`.
-  - Mỗi ViewModel có state model rõ (loading / data / empty / error). Mỗi Service có interface và bản fake.
-  - Không hard-code màu, cỡ chữ, padding. Mọi giá trị lấy từ `lib/theme/`.
-- **Truy cập:** vùng chạm ≥ 48 dp, chữ ≥ 14 sp, không truyền thông tin chỉ bằng màu, kiểm ở 360 và 412 dp. Thêm `Semantics` cho nút và hàng danh sách để ARTEMIS đọc được.
-- **Dữ liệu:** bản nộp không có dữ liệu cứng. Bản fake chỉ dùng cho test.
+  - View không gọi Firebase SDK. Logic không viết trong `build()`.
+  - Mỗi ViewModel có state model (loading / data / empty / error). Mỗi Service có interface và bản fake.
+  - Không hard-code màu, cỡ chữ, padding.
+- **Truy cập:** vùng chạm ≥ 48 dp, chữ ≥ 14 sp, không truyền thông tin chỉ bằng màu. Thêm `Semantics` cho nút và hàng danh sách ngay khi code, để ngày 5 chạy ARTEMIS ổn định.
 - **Git:**
-  - Mỗi người làm trên nhánh `feature/<flow>`, mở PR, cần 1 người khác review rồi mới merge. Bật branch protection cho `main`.
-  - Merge vào `main` ít nhất mỗi tuần một lần, không dồn đến tuần tích hợp.
-  - Commit đều đặn: đề Lab 3 và Final đều kiểm lịch sử Git của từng thành viên.
+  - Mỗi người làm trên nhánh `feature/<flow>`. PR cần 1 người review, nhưng **review trong ngày**, không để PR nằm chờ.
+  - Merge vào `main` mỗi tối. Commit nhỏ và đều mỗi ngày: đề chấm lịch sử Git của từng người.
 - **Bí mật:** không commit key ARTEMIS, service account, keystore. Được commit `google-services.json`.
-- **Buổi kiểm tra 5 phút (cá nhân):** **mỗi người** phải tự làm được 4 việc sau:
-  - chạy 1 ca ARTEMIS;
-  - đổi 1 giá trị Remote Config trực tiếp;
-  - giải thích 1 ViewModel của mình;
-  - giải thích 1 quyết định code review.
+- **Buổi kiểm tra 5 phút (cá nhân):** mỗi người tự chạy được 1 ca ARTEMIS, đổi Remote Config trực tiếp, giải thích 1 ViewModel và 1 quyết định code review, và nguyên lý dịch vụ mình phụ trách.
 
-  Ngoài ra, mỗi người phải giải thích được nguyên lý dịch vụ mình phụ trách. Ví dụ với FCM: token là gì, ai cấp, client có lưu không, gửi bằng cách nào.
-
-## 3. Phụ thuộc giữa các phần
+## 3. Phụ thuộc
 
 | Phần cần | Lấy từ | Khi chưa có thì dùng |
 |---|---|---|
-| Theme, widget dùng chung, router, đăng nhập | Ken | Phải xong cuối tuần 0 |
-| Lớp, sinh viên, nhóm trong Firestore | Dan (import S22/S23) | Script seed Firestore từ `class_A.xlsx` mẫu (Dan làm ở tuần 0) |
-| Đề xuất ghép nhóm (S9) | Dan (`MatchingService`) | `FakeMatchingService` trả 3 đề xuất mẫu như Figma |
-| Duyệt đề xuất, S12/S14 (Flow C dùng lại) | Cuong | Gọi interface `ProposalService`; Khang dùng lại widget S10 cho S20 |
-| Thông báo nội bộ | Dan (`NotificationService`) | Gọi interface, triển khai sau |
-| Sự kiện Analytics | Khang (`AnalyticsService` + plan) | Gọi interface ngay khi code màn |
-| Crashlytics | Cuong (`CrashService`) | Gọi interface ở đường lỗi |
+| Theme, widget dùng chung, router | Ken | **Hạn trưa ngày 2**; trước đó viết model, Service và fake |
+| Dữ liệu lớp, SV, nhóm trên Firestore | Dan (script seed) | **Hạn tối ngày 1**; trước đó dùng fake |
+| Đề xuất ghép nhóm (S9) | Dan (`MatchingService`) | `FakeMatchingService` trả 3 đề xuất như Figma |
+| Widget S10, dialog S12, S14 | Cuong | Khang dùng lại cho S20, S17; chốt interface ngày 1 |
+| `NotificationService`, `AnalyticsService`, `CrashService` | Dan, Khang, Cuong | Interface có từ ngày 1; ai cũng gọi được ngay |
 
-## 4. Lịch làm việc
+## 4. Lịch 7 ngày
 
-Lịch theo thứ tự giai đoạn của đề Lab 3: Plan → Architect → Integrate → Instrument → Test → Review → Report. Git history phải thể hiện đúng thứ tự này. Tuần 0 bắt đầu khi giảng viên xác nhận phạm vi.
+| Ngày | Ken | Dan | Cuong | Khang |
+|---|---|---|---|---|
+| **1** | Tạo dự án Firebase, mời cả nhóm, gom **SHA-1 của 4 máy**; dựng khung MVVM, router, theme | Model `Class/Student/Team`; script seed Firestore từ file mẫu; interface `ClassService`, `MatchingService` + fake | Gắn thẻ Blaze, **budget alert 1 USD**, bucket `us-central1`; model `Proposal`; interface `ProposalService`, `ReportService`, `CrashService`, `StorageService` + fake | Khung `design-traceability.md` và `analytics-plan.md`; interface `AnalyticsService`; tạo môi trường ARTEMIS (Python, uv, ADB, API key) |
+| | **Cả 4:** điền traceability cho màn mình; chốt `data-model.md` (họp 30 phút) | | | |
+| **2** | Widget dùng chung (**trưa**); Google Sign-In S1/S19, chặn route | S2, S3, S4, S7 trên fake | S9, S10 (kèm trạng thái S25) trên fake | S5, S16 (kèm S21) trên fake; ARTEMIS chạy thử 1 ca sign-in |
+| **3** | S6 hồ sơ + Sign out; `firestore.rules`; review PR | S22/S23 import CSV; S8/S18; `MatchingService` thật + unit test; Remote Config | S11/S13, S12, S14 (Undo), S24; Crashlytics init + crash thử; `storage.rules` | S15, S20, S17; gắn Analytics vào mọi flow; viết `test-plan.md` (≥ 10 ca) |
+| **4** | Nối Firestore toàn app; sửa lỗi tích hợp; **hạn chót tính năng 20h** | FCM: quyền Android 13+, 3 trạng thái, chạm mở đúng màn, trung tâm thông báo | PDF + upload có tiến độ và URL; non-fatal ở S22 / S8; mục demo S6 | Viết ca ARTEMIS trong `e2e_test/`; **mở PR cho AI code review** |
+| **5** | Ảnh Console Auth; sửa lỗi từ ARTEMIS | Ảnh Remote Config trước/sau, FCM 3 trạng thái | Ảnh Crashlytics (non-fatal, crash, khóa), Storage | **Chạy ARTEMIS ≥ 10 ca × 3 lần**; ảnh DebugView; ghi `code-review.md` |
+| | **Cả 4:** sửa ≥ 3 phát hiện code review (mỗi cái 1 commit); cập nhật Figma các chỗ khác thiết kế | | | |
+| **6** | `architecture.md` bản cuối (sơ đồ, sequence, bảng ViewModel); README | Viết báo cáo và slide phần mình | Viết báo cáo và slide phần mình | Phiên ARTEMIS khám phá 15-30 phút; gộp báo cáo (8-12 trang) và slide (12-15) |
+| **7** | Kiểm repo, báo cáo, slide, video mở được trong cửa sổ ẩn danh | **Quay và dựng video** 5-10 phút trên máy thật | Quay phần mình; tập buổi kiểm tra 5 phút | Kiểm checklist nộp bài; tập buổi kiểm tra 5 phút |
 
-| Giai đoạn | Việc | Người |
-|---|---|---|
-| **Tuần 0: Plan + Architect** | Hỏi giảng viên các câu ở mục 11 `PROPOSAL.md` | Khang |
-| | Tạo dự án Firebase, đăng ký app Android, **thêm SHA-1 debug của cả 4 máy**, mời cả nhóm vào dự án | Ken |
-| | Nâng gói Blaze (Cuong gắn thẻ), đặt budget alert 1 USD, tạo bucket Storage ở `us-central1` | Cuong + Ken |
-| | `design-traceability.md` (25 màn → route, widget, nguồn dữ liệu) và `analytics-plan.md` | Cả 4, Khang gộp |
-| | `architecture.md`, `data-model.md`, khung MVVM, theme, widget dùng chung, router, Google Sign-In | Ken (cả nhóm review) |
-| | Seed dữ liệu lớp mẫu lên Firestore | Dan |
-| | Thử nhanh FCM trên máy thật và Crashlytics lên Console (để chắc cấu hình đúng) | Dan, Cuong |
-| **Tuần 1-2: Integrate** | Code màn của mình trên fake, rồi nối Firestore; đủ 4 trạng thái; unit test ViewModel | Cả 4 song song |
-| | Xuất PDF + upload, `storage.rules` | Cuong |
-| | Gắn sự kiện Analytics ngay khi code màn | Cả 4 |
-| **Tuần 3: Instrument** | FCM 3 trạng thái + chạm mở đúng màn; Remote Config đổi hành vi thấy được; Crashlytics non-fatal + crash thử; DebugView đủ sự kiện; mục demo S6 | Dan, Cuong, Khang |
-| | Rules Firestore cho mọi collection, thử truy cập trái phép | Ken |
-| | Cập nhật Figma theo các chỗ khác thiết kế đã ghi | Mỗi người, màn của mình |
-| **Tuần 4: Test + Review** | `test-plan.md`, ≥ 10 ca ARTEMIS × 3 lần, có ca lỗi và ca tương tác Android gốc, phiên khám phá 15-30 phút | Khang điều phối, cả 4 chạy |
-| | AI code review 1 PR: ≥ 5 phát hiện, ≥ 3 commit sửa | Khang điều phối, chủ PR sửa |
-| **Tuần 5: Report** | `evidence/`, README, báo cáo 8-12 trang, slide 12-15 trang, video 5-10 phút trên máy thật | Cả 4, Khang tổng hợp |
-| | Mỗi người tập buổi kiểm tra 5 phút | Cả 4 |
+**Lưu ý:** Crashlytics thường cần vài phút mới hiện trên Console, và báo cáo crash chỉ được gửi khi **mở lại app**. Vì vậy Cuong làm crash thử từ ngày 3, đừng để đến ngày quay video.
 
-## 5. Checklist bàn giao theo người
+## 5. Nếu trễ: cắt theo thứ tự này
+
+Phần nào đề bắt buộc thì giữ. Chỉ cắt phần làm cho đẹp hơn hoặc chắc ăn hơn:
+
+1. Unit test ngoài `MatchingService` → chỉ giữ test cho `MatchingService` (R1-R3).
+2. Import `.xlsx` → chỉ đọc `.csv`. Ghi lại chỗ khác thiết kế: Figma hiện `class_A.xlsx`.
+3. Skeleton loading → dùng `CircularProgressIndicator`. Vẫn phải có trạng thái loading.
+4. Kéo xuống để làm mới ở S2 → bỏ.
+5. Cập nhật Figma → chỉ sửa S1/S19 và S6, các chỗ khác ghi trong traceability.
+
+**Không được cắt:** bất kỳ màn nào trong 25 màn, đường lỗi của 3 flow, 6 dịch vụ cùng ca lỗi của chúng, ≥ 10 ca ARTEMIS × 3 lần, ≥ 5 phát hiện / ≥ 3 commit sửa, slide và video.
+
+## 6. Checklist bàn giao
 
 **Ken**
-- [ ] Google Sign-In, hủy đăng nhập, mất mạng (S19), đăng xuất xóa state, chặn route khi chưa đăng nhập; ảnh Console → Users
-- [ ] Theme từ token, widget dùng chung có đủ biến thể và trạng thái; không có giá trị hard-code ở màn
-- [ ] `architecture.md`: cây thư mục, sơ đồ lớp (Mermaid), 1 sequence diagram cho cả flow, bảng ViewModel → Service
-- [ ] `firestore.rules` không có `if true`; mentor chỉ đọc/ghi lớp của mình
-- [ ] README đầy đủ theo mục 9 đề Lab 3
+- [ ] Google Sign-In, hủy, mất mạng (S19), đăng xuất xóa state, chặn route; ảnh Console → Users
+- [ ] Theme và widget dùng chung; không có giá trị hard-code ở màn
+- [ ] `architecture.md` (cây thư mục, sơ đồ lớp, sequence diagram, bảng ViewModel → Service), `data-model.md`
+- [ ] `firestore.rules` không có `if true`; README đầy đủ
 
 **Dan**
-- [ ] Import xlsx/csv (S22 có trạng thái lỗi), kết quả lọc (S23); S2-S4, S7 đủ 4 trạng thái
-- [ ] `MatchingService` đúng R1-R3, có unit test; S8 timeout 30 giây → S18, Try again chạy lại
-- [ ] Remote Config: 2 tham số đổi hành vi thấy được; ảnh trước/sau; mất mạng dùng mặc định; `remote-config-defaults.json`
-- [ ] FCM: quyền Android 13+, từ chối quyền, 3 trạng thái app, chạm mở đúng màn, trung tâm thông báo; ghi thiết bị và token
+- [ ] S2, S22, S23, S3, S4, S7, S8, S18 đủ trạng thái; import có trạng thái lỗi
+- [ ] `MatchingService` đúng quy tắc 5-6 người và ngành, có unit test; S8 timeout → S18
+- [ ] Remote Config 2 tham số đổi hành vi thấy được; ảnh trước/sau; `remote-config-defaults.json`
+- [ ] FCM: quyền, từ chối quyền, 3 trạng thái, chạm mở đúng màn, trung tâm thông báo; video
 
 **Cuong**
 - [ ] Gói Blaze: gắn thẻ, budget alert 1 USD, bucket `us-central1`; gỡ thẻ hoặc hạ về Spark sau khi chấm
-- [ ] S9-S14, S24, S25: thêm/bớt thành viên, chặn > 6 (S13) và < 5 (S25), Approve + Undo 5 giây, badge tab Proposals
-- [ ] PDF danh sách nhóm đã duyệt, upload `reports/{uid}/…` có tiến độ và URL; `storage.rules` chỉ chủ sở hữu; thử truy cập trái phép
-- [ ] Crashlytics: non-fatal từ đường lỗi thật (import, AI timeout), crash thử ở S6, user ID, khóa `role`, `class_id`; ảnh dashboard
-- [ ] Mục Firebase demo ở S6
+- [ ] S9-S14, S24, S25: chặn > 6 (S13) và < 5 (S25), Approve + Undo, badge tab
+- [ ] PDF lên `reports/{uid}/…` có tiến độ và URL; `storage.rules` chỉ chủ sở hữu; thử truy cập trái phép
+- [ ] Crashlytics: non-fatal từ đường lỗi thật, crash thử ở S6, user ID, khóa `role`, `class_id`; mục demo S6
 
 **Khang**
-- [ ] S5, S15, S16, S21, S20, S17: ghép tay, khóa "In a team", tìm không ra, Discard
-- [ ] `analytics-plan.md` ≥ 7 sự kiện kèm câu hỏi sản phẩm, gắn với bước flow; ảnh DebugView từng sự kiện; `setUserId`
-- [ ] `test-plan.md`, `e2e_test/`, bảng kết quả (ca, số lần chạy, tỉ lệ đạt, thời gian), giải thích ca flaky, báo cáo phiên khám phá; ≥ 1 ca kiểm sự kiện analytics
-- [ ] `code-review.md` (≥ 5 phát hiện, quyết định có lý do, ≥ 3 commit sửa, khai báo công cụ AI); `design-traceability.md`; báo cáo, slide
+- [ ] S5, S15, S16, S21, S20, S17
+- [ ] `analytics-plan.md` ≥ 7 sự kiện; ảnh DebugView từng sự kiện; `setUserId`
+- [ ] `test-plan.md`, `e2e_test/`, bảng kết quả ≥ 10 ca × 3 lần, giải thích ca flaky, phiên khám phá
+- [ ] `code-review.md`, `design-traceability.md`, báo cáo, slide
