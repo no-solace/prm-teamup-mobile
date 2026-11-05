@@ -53,7 +53,7 @@ Mỗi thành viên kiểm tra lại máy mình bằng `flutter doctor -v` trư�
 
 Đổi sau khi đã đăng ký app trên Firebase thì phải đăng ký lại và tạo lại `google-services.json`, nên **chốt một lần**.
 
-**Đề xuất:** tên Dart package `teamup_exe`, applicationId `com.group6.teamupexe`. Tên hiển thị "TeamUp EXE".
+**Đã chốt (05/11/2026):** tên Dart package `teamup_exe`, applicationId và namespace `com.group6.teamup_exe` (Flutter sinh từ `--org com.group6`). Tên hiển thị "TeamUp EXE".
 
 ### D3. Cách viết Riverpod
 
@@ -228,7 +228,7 @@ Mọi widget bấm được đều bọc `Semantics(label: …)` sẵn (D16).
 | Ô nét đứt | `dotted_border` |
 | Test | `flutter_test`, `mocktail` (nếu cần) |
 
-Cách ghim: chạy `flutter pub add …` để lấy bản mới nhất tương thích, rồi **bỏ dấu `^`** trong `pubspec.yaml` và commit cả `pubspec.lock`. Lưu ý `.gitignore` hiện có dòng `*.lock`: cần thêm `!pubspec.lock` để file này được commit.
+Cách ghim: chạy `flutter pub add …` để lấy bản mới nhất tương thích, rồi **bỏ dấu `^`** trong `pubspec.yaml` và commit cả `pubspec.lock`. (`.gitignore` cũ là bản của repo Flutter framework và bỏ qua `*.lock`; đã thay bằng `.gitignore` cho app.)
 
 ### D14. Lint và kiểm lớp
 
@@ -270,7 +270,7 @@ Cách ghim: chạy `flutter pub add …` để lấy bản mới nhất tương 
 | # | Quyết định | Đề xuất | Đồng ý? |
 |---|---|---|---|
 | D1 | Vị trí app | `lib/` ở gốc repo, chuyển sang `mobile/` ở Final | ☐ |
-| D2 | Package / applicationId | `teamup_exe` / `com.group6.teamupexe` | ☐ |
+| D2 | Package / applicationId | `teamup_exe` / `com.group6.teamup_exe` | ☑ |
 | D3 | Riverpod | `Notifier` viết tay, không code generation | ☐ |
 | D4 | State model | Sealed `ViewState<T>` + `ViewStateBuilder` | ☐ |
 | D5 | Thư mục | Theo lớp (đúng gợi ý đề), chia thư mục con theo màn | ☐ |
@@ -291,17 +291,40 @@ Cách ghim: chạy `flutter pub add …` để lấy bản mới nhất tương 
 
 ## 5. Khung phải có những gì khi bàn giao (hạn trưa ngày 2)
 
-- [ ] `flutter run` chạy được trên máy thật của cả 4 người; đăng nhập Google được trên cả 4 máy
-- [ ] `flutter run -t lib/main_fake.dart` chạy toàn app trên fake
-- [ ] Theme đủ token; 12 widget ở D9 có trang xem thử (một route debug `/_gallery`, chỉ có trong `main_fake.dart`)
-- [ ] Router có đủ route ở D7, mỗi route là một màn trống có tiêu đề và Back đúng; 3 tab giữ stack riêng
-- [ ] `ViewState`, `ViewStateBuilder`, `AppError` có sẵn
-- [ ] Interface + fake cho mọi service trong PROPOSAL mục 4; provider nối sẵn
-- [ ] Firebase khởi tạo: Crashlytics bắt lỗi, handler FCM nền, Analytics debug bật được
-- [ ] `firebase/` có rules mặc định **từ chối tất cả** (sau đó mỗi người mở dần cho collection của mình)
-- [ ] `tool/check_layers.sh`, `analysis_options.yaml`, CI chạy xanh
-- [ ] `docs/architecture.md` bản đầu: cây thư mục, sơ đồ lớp (Mermaid), bảng ViewModel → Service (để trống, mỗi người điền)
-- [ ] README: lệnh chạy, phiên bản Flutter/Dart/JDK, cách thêm SHA-1
+- [ ] `flutter run` chạy được trên máy thật của cả 4 người; đăng nhập Google được trên cả 4 máy *(chờ cấu hình Firebase, xem 5.1)*
+- [x] `flutter run -t lib/main_fake.dart` chạy toàn app trên fake (đã build được APK debug)
+- [x] Theme đủ token; 12 widget ở D9 có trang xem thử (một route debug `/_gallery`, chỉ có trong `main_fake.dart`, mở từ Profile)
+- [x] Router có đủ route ở D7, mỗi route là một màn trống có tiêu đề và Back đúng; 3 tab giữ stack riêng
+- [x] `ViewState`, `ViewStateBuilder`, `AppError` có sẵn
+- [x] Interface + fake cho mọi service trong PROPOSAL mục 4; provider nối sẵn
+- [x] Firebase khởi tạo trong `main.dart`: Crashlytics bắt lỗi, handler FCM nền, Remote Config sau `runApp` *(chưa chạy thật được vì thiếu `firebase_options.dart`)*
+- [x] `firebase/` có rules mặc định **từ chối tất cả** (sau đó mỗi người mở dần cho collection của mình). `firebase.json`, `.firebaserc` đặt ở gốc repo vì Firebase CLI yêu cầu
+- [x] `tool/check_layers.sh`, `analysis_options.yaml` xanh; CI đã viết (`.github/workflows/ci.yml`), chạy lần đầu khi push
+- [x] `docs/architecture.md` bản đầu: cây thư mục, sơ đồ lớp (Mermaid), bảng ViewModel → Service (để trống, mỗi người điền)
+- [x] README: lệnh chạy, phiên bản Flutter/Dart/JDK, cách thêm SHA-1
+
+### 5.1. Trạng thái (cập nhật 05/11/2026)
+
+**Đã kiểm:** `flutter analyze` không lỗi, `flutter test` 3/3 qua, `bash tool/check_layers.sh` báo "Layers OK", `flutter build apk --debug -t lib/main_fake.dart` thành công. Chưa commit.
+
+**Việc còn lại, theo thứ tự:**
+
+| # | Việc | Ai | Ghi chú |
+|---|---|---|---|
+| 1 | Vào console.firebase.google.com, chấp nhận điều khoản Firebase, thêm Firebase vào dự án GCP **`teamup-exe-group6`** có sẵn (số 409603737127) | Ken | `firebase projects:addfirebase` đang báo 403 vì chưa chấp nhận điều khoản |
+| 2 | `flutterfire configure --project teamup-exe-group6 --platforms android --android-package-name com.group6.teamup_exe` | Ken | Ghi đè `lib/firebase_options.dart` (hiện là file tạm, `main.dart` sẽ báo lỗi khi mở) và sinh `google-services.json`; commit cả hai |
+| 3 | Bật Google Sign-In trong Authentication | Ken | |
+| 4 | Thêm SHA-1 debug của 4 máy (`cd android && ./gradlew signingReport`) | Cả nhóm | Tải lại `google-services.json` sau khi thêm |
+| 5 | Nâng Blaze, đặt cảnh báo ngân sách, tạo bucket Storage ở `us-central1` | Cuong | |
+| 6 | Tạo nhánh `feature/skeleton`, commit, mở PR | Ken | |
+
+**Lưu ý môi trường Windows:**
+
+- `android/gradle.properties` có `kotlin.incremental=false`. **Không xóa.** Pub cache ở ổ C: còn dự án ở ổ D: làm Kotlin incremental compile lỗi ("different roots").
+- Dùng Firebase CLI bản npm (`npm i -g firebase-tools`), không dùng bản `.exe` độc lập (lỗi khi chạy trong terminal không tương tác).
+- Nếu Gradle báo lỗi phiên bản Java: `flutter config --jdk-dir <JDK 17 hoặc 21>`.
+
+**Cách thay màn tạm:** mỗi màn chưa làm đang là `PlaceholderScreen` trong `lib/router/app_router.dart` (ghi mã màn + người phụ trách). Làm màn thật theo mẫu S2 (`my_classes_view_model.dart` + `my_classes_screen.dart` + test ở `test/viewmodels/`), rồi thay dòng `PlaceholderScreen` tương ứng.
 
 ## 6. Câu hỏi còn mở cho nhóm
 

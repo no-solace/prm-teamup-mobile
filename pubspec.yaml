@@ -1,0 +1,46 @@
+name: teamup_exe
+description: "TeamUp EXE: app cho mentor EXE ghép nhóm sinh viên (PRM393 Lab 3)."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ">=3.13.0 <4.0.0"
+
+dependencies:
+  cloud_firestore: 7.1.0
+  csv: 8.0.0
+  dotted_border: 3.1.0
+  file_picker: 13.3.2
+  firebase_analytics: 13.0.1
+  firebase_auth: 7.0.1
+  firebase_core: 5.1.0
+  firebase_crashlytics: 6.0.1
+  firebase_messaging: 17.0.1
+  firebase_remote_config: 7.0.1
+  firebase_storage: 14.0.1
+  flutter:
+    sdk: flutter
+  flutter_local_notifications: 22.3.3
+  flutter_riverpod: 3.4.3
+  go_router: 18.1.3
+  google_sign_in: 7.2.0
+  pdf: 3.13.1
+  printing: 5.15.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: 6.0.0
+  mocktail: 1.0.5
+
+flutter:
+  uses-material-design: true
+  fonts:
+    - family: BeVietnamPro
+      fonts:
+        - asset: assets/fonts/BeVietnamPro-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/BeVietnamPro-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/BeVietnamPro-Bold.ttf
+          weight: 700

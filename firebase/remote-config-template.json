@@ -1,0 +1,14 @@
+{
+  "parameters": {
+    "ai_matching_enabled": {
+      "defaultValue": { "value": "true" },
+      "description": "Shows Match with AI on S3, S4, S5",
+      "valueType": "BOOLEAN"
+    },
+    "max_proposals_shown": {
+      "defaultValue": { "value": "3" },
+      "description": "Number of proposal cards on S9",
+      "valueType": "NUMBER"
+    }
+  }
+}

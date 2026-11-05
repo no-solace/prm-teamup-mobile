@@ -1,0 +1,24 @@
+rules_version = '2';
+
+// Skeleton: DENY ALL (skeleton DoD). Each owner opens their collection
+// in their PR, using the helpers below. Deploy: firebase deploy --only firestore:rules
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isSelf(uid) { return signedIn() && request.auth.uid == uid; }
+    function ownsClass(classId) {
+      return signedIn()
+        && get(/databases/$(database)/documents/classes/$(classId)).data.mentorUid == request.auth.uid;
+    }
+
+    // TODO(Ken): users/{uid}: allow read, write: if isSelf(uid);
+    // TODO(Dan): users/{uid}/notifications/{id}: allow read, update: if isSelf(uid);
+    // TODO(Dan): classes/{classId} (+ students, teams): only the mentor (ownsClass / mentorUid).
+    // TODO(Cuong): classes/{classId}/proposals/{id}: if ownsClass(classId); team size 5..6 checked in service + rules.
+    // TODO(Cuong): reports/{id}: allow read, write: if isSelf(resource.data.ownerUid);
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
