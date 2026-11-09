@@ -1,24 +1,65 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/service_providers.dart';
+import '../../services/app_error.dart';
+import '../view_state.dart';
 
-/// S6 Profile actions. Owner: Ken (profile, sign out); Cuong adds the
-/// Firebase demo actions (export + upload) in a demo view model.
-///
-/// Clearing local user data on sign-out (Lab 3 Auth): every per-user ViewModel
-/// is `autoDispose`, so when the router leaves the tab shell for /sign-in they
-/// are disposed and nothing of the previous mentor stays in memory.
-class ProfileViewModel extends Notifier<void> {
+class ProfileState {
+  const ProfileState({this.signingOut = false, this.error});
+  final bool signingOut;
+  final AppError? error;
+}
+
+/// User ViewModels are autoDispose: leaving the shell releases their streams.
+class ProfileViewModel extends Notifier<ProfileState> {
   @override
-  void build() {}
+  ProfileState build() => const ProfileState();
 
   Future<void> signOut() async {
-    await ref.read(analyticsServiceProvider).logLogout();
-    await ref.read(authServiceProvider).signOut();
+    if (state.signingOut) return;
+    state = const ProfileState(signingOut: true);
+    final auth = ref.read(authServiceProvider);
+    final analytics = ref.read(analyticsServiceProvider);
+    final crash = ref.read(crashServiceProvider);
+    try {
+      // Unregister while Firestore still accepts the current user's token.
+      try {
+        await ref.read(notificationServiceProvider).unregisterToken();
+      } catch (_) {
+        // Sign-out must remain available without notification connectivity.
+      }
+      await auth.signOut();
+      if (ref.mounted) state = const ProfileState();
+      // A tracking failure must never keep the user signed in.
+      try {
+        await analytics.logLogout();
+      } catch (_) {
+        /* Best effort. */
+      }
+      try {
+        await analytics.setUser(null);
+      } catch (_) {
+        /* Best effort. */
+      }
+      try {
+        await crash.setUser(uid: '', role: 'signed_out');
+      } catch (_) {
+        /* Best effort. */
+      }
+      try {
+        await crash.setClass(null);
+      } catch (_) {
+        /* Best effort. */
+      }
+    } catch (error) {
+      if (ref.mounted) state = ProfileState(error: toAppError(error));
+    }
   }
 
-  /// Demo area only (owner: Cuong).
   void testCrash() => ref.read(crashServiceProvider).testCrash();
 }
 
-final profileViewModelProvider = NotifierProvider<ProfileViewModel, void>(ProfileViewModel.new);
+final profileViewModelProvider =
+    NotifierProvider.autoDispose<ProfileViewModel, ProfileState>(
+      ProfileViewModel.new,
+    );

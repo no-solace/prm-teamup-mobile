@@ -18,4 +18,13 @@ class AppNotification {
   /// Route to open on tap (D7), for example "/proposals". Only known routes are accepted.
   final String? route;
   final bool read;
+
+  AppNotification copyWith({bool? read}) => AppNotification(
+    id: id,
+    title: title,
+    body: body,
+    receivedAt: receivedAt,
+    route: route,
+    read: read ?? this.read,
+  );
 }

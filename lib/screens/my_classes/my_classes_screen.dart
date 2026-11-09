@@ -6,6 +6,7 @@ import '../../models/class_room.dart';
 import '../../router/routes.dart';
 import '../../theme/app_spacing.dart';
 import '../../viewmodels/classes/my_classes_view_model.dart';
+import '../../widgets/app_button.dart';
 import '../../widgets/app_card.dart';
 import '../../widgets/status_view.dart';
 import '../../widgets/view_state_builder.dart';
@@ -21,11 +22,6 @@ class MyClassesScreen extends ConsumerWidget {
     final state = ref.watch(myClassesViewModelProvider);
     return Scaffold(
       appBar: AppBar(title: const Text('My classes')),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.go(Routes.importClass),
-        icon: const Icon(Icons.upload_file),
-        label: const Text('Import class'),
-      ),
       body: ViewStateBuilder<List<ClassRoom>>(
         state: state,
         onRetry: () => ref.read(myClassesViewModelProvider.notifier).retry(),
@@ -33,14 +29,32 @@ class MyClassesScreen extends ConsumerWidget {
           icon: Icons.school_outlined,
           title: 'No classes yet',
           message: 'Import a class list to get started.',
-          actionLabel: 'Import class',
+          actionLabel: 'Import class list',
           onAction: () => context.go(Routes.importClass),
         ),
-        data: (context, classes) => ListView.separated(
-          padding: kScreenPadding,
-          itemCount: classes.length,
-          separatorBuilder: (_, _) => const SizedBox(height: kSpaceSm),
-          itemBuilder: (context, i) => _ClassCard(classRoom: classes[i]),
+        data: (context, classes) => RefreshIndicator(
+          onRefresh: () async =>
+              ref.read(myClassesViewModelProvider.notifier).retry(),
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: kMaxContentWidth),
+              child: ListView.separated(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: kScreenPadding,
+                itemCount: classes.length + 1,
+                separatorBuilder: (_, _) => const SizedBox(height: kSpaceMd),
+                itemBuilder: (context, i) => i < classes.length
+                    ? _ClassCard(classRoom: classes[i])
+                    : AppButton(
+                        label: 'Import class list',
+                        icon: Icons.upload_file,
+                        variant: AppButtonVariant.tonal,
+                        onPressed: () => context.go(Routes.importClass),
+                      ),
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -60,24 +74,74 @@ class _ClassCard extends StatelessWidget {
         ? 'All matched'
         : '${classRoom.withoutTeamCount} without a team, ${classRoom.teamsNeedingMembers} teams need members';
     return AppCard(
-      semanticsLabel: '${classRoom.name}, ${classRoom.studentCount} students, $status',
+      semanticsLabel:
+          '${classRoom.name}, ${classRoom.studentCount} students, $status',
       onTap: () => context.go(Routes.classDetail(classRoom.id)),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(
+          minHeight: kTouchTarget * 2 - kSpaceXl,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Text(classRoom.name, style: text.titleMedium),
-                const SizedBox(height: kSpaceXs),
-                Text('${classRoom.studentCount} students', style: text.bodyMedium),
-                Text(status, style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
+                Expanded(
+                  child: Text(
+                    classRoom.name,
+                    style: text.titleMedium,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: kSpaceSm),
+                Text(
+                  '${classRoom.studentCount} students',
+                  style: text.bodyMedium,
+                ),
               ],
             ),
-          ),
-          Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
-        ],
+            const SizedBox(height: kSpaceSm),
+            const Divider(),
+            const SizedBox(height: kSpaceSm),
+            _StatusLine(
+              icon: Icons.group_outlined,
+              label: '${classRoom.withoutTeamCount} without team',
+            ),
+            const SizedBox(height: kSpaceSm),
+            _StatusLine(
+              icon: classRoom.allMatched
+                  ? Icons.check_circle_outline
+                  : Icons.group_add_outlined,
+              label: classRoom.allMatched
+                  ? 'All matched'
+                  : '${classRoom.teamsNeedingMembers} teams need members',
+              color: classRoom.allMatched ? scheme.tertiary : null,
+            ),
+          ],
+        ),
       ),
     );
   }
+}
+
+class _StatusLine extends StatelessWidget {
+  const _StatusLine({required this.icon, required this.label, this.color});
+  final IconData icon;
+  final String label;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      Icon(icon, color: color),
+      const SizedBox(width: kSpaceSm),
+      Expanded(
+        child: Text(
+          label,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: color),
+        ),
+      ),
+    ],
+  );
 }

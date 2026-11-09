@@ -1,3 +1,4 @@
+import 'data_validation.dart';
 import 'major.dart';
 
 /// A student row from the imported class list (classes/{classId}/students/{mssv}).
@@ -23,6 +24,27 @@ class Student {
 
   /// For example "S5" on S4/S7.
   final String? semester;
+
+  factory Student.fromMap(String mssv, String classId, Map<String, dynamic> data) {
+    final major = Major.fromCode(DataValidation.text(data, 'major', max: 3));
+    if (major == null) throw const FormatException('Invalid major');
+    final teamId = DataValidation.optionalText(data, 'teamId', max: 64);
+    return Student(
+      mssv: DataValidation.id(mssv),
+      classId: DataValidation.id(classId),
+      fullName: DataValidation.text(data, 'fullName'),
+      major: major,
+      teamId: teamId == null ? null : DataValidation.id(teamId),
+      semester: DataValidation.optionalText(data, 'semester'),
+    );
+  }
+
+  Map<String, dynamic> toMap() => {
+        'fullName': fullName,
+        'major': major.code,
+        'teamId': teamId,
+        if (semester != null) 'semester': semester,
+      };
 
   bool get hasTeam => teamId != null;
 

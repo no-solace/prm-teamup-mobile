@@ -1,3 +1,5 @@
+import 'data_validation.dart';
+
 /// A class imported by a mentor (classes/{classId}).
 /// Counts on S2/S3 are computed from students and teams (D11), not stored.
 class ClassRoom {
@@ -16,6 +18,15 @@ class ClassRoom {
   final int studentCount;
   final int withoutTeamCount;
   final int teamsNeedingMembers;
+
+  factory ClassRoom.fromMap(String id, Map<String, dynamic> data) => ClassRoom(
+        id: DataValidation.id(id),
+        name: DataValidation.text(data, 'name'),
+        mentorUid: DataValidation.text(data, 'mentorUid', max: 128),
+      );
+
+  /// Counts are derived, never persisted.
+  Map<String, dynamic> toMap() => {'name': name, 'mentorUid': mentorUid};
 
   bool get allMatched => withoutTeamCount == 0 && teamsNeedingMembers == 0;
 

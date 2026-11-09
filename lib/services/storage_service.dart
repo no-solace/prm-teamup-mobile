@@ -7,4 +7,7 @@ abstract interface class StorageService {
   Stream<UploadEvent> uploadReport({required String classId, required List<int> bytes});
 
   Stream<List<Report>> watchMyReports();
+
+  /// Retrieves the mentor-owned PDF so it can be shared or printed later.
+  Future<List<int>> downloadReport(Report report);
 }

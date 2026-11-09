@@ -34,9 +34,9 @@ bash tool/check_layers.sh
 
 ## Cấu hình Firebase (làm một lần)
 
-1. Dự án: `teamup-exe-group6`. Cấu hình app Android:
+1. Dự án: `prm-lab3-cc39e` (khớp `.firebaserc`). Cấu hình app Android:
    ```bash
-   flutterfire configure --project teamup-exe-group6 --platforms android \
+   flutterfire configure --project prm-lab3-cc39e --platforms android \
      --android-package-name com.group6.teamup_exe
    ```
    Lệnh này ghi đè `lib/firebase_options.dart` và sinh `android/app/google-services.json`. Commit cả hai file (đây không phải secret).

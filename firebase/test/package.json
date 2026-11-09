@@ -1,0 +1,10 @@
+{
+  "name": "teamup-firestore-rules-tests",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node --test firestore.rules.test.mjs" },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "6.0.0",
+    "firebase": "13.2.0"
+  }
+}

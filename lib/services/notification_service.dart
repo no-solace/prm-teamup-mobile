@@ -21,4 +21,12 @@ abstract interface class NotificationService {
   Stream<List<AppNotification>> watchInbox();
 
   Future<void> markRead(String id);
+
+  /// Recoverable setup / sync failures. Local inbox remains usable.
+  Stream<String?> get issues;
+
+  /// Call before auth sign-out, while the previous user's rules still apply.
+  Future<void> unregisterToken();
+
+  Future<void> dispose();
 }

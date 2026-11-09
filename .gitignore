@@ -73,6 +73,7 @@ ui-debug.log
 database-debug.log
 pubsub-debug.log
 .firebase/
+node_modules/
 
 # ARTEMIS / Python (e2e_test/)
 .venv/

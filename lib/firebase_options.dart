@@ -1,5 +1,5 @@
 // PLACEHOLDER: overwritten by
-//   flutterfire configure --project teamup-exe-group6 --platforms android \
+//   flutterfire configure --project prm-lab3-cc39e --platforms android \
 //     --android-package-name com.group6.teamup_exe
 // Until then main.dart fails at startup with this message; use
 //   flutter run -t lib/main_fake.dart

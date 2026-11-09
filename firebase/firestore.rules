@@ -1,24 +1,353 @@
 rules_version = '2';
 
-// Skeleton: DENY ALL (skeleton DoD). Each owner opens their collection
-// in their PR, using the helpers below. Deploy: firebase deploy --only firestore:rules
+// Prototype schema; docs/data-model.md is the integration contract.
+// users/{uid}: displayName:string<=120, role:'mentor', lastSignInAt:timestamp.
+// classes/{id}: name:string<=120, mentorUid:string<=128 immutable,
+//   createdAt:timestamp immutable. Counts are derived, never stored.
+// students/{mssv}: fullName:string<=120, major:SE|AI|MKT|GD,
+//   teamId:null|safe ID<=64, semester?:string<=32. Class/ID are the path.
+// teams/{id}: name:string<=120, memberIds:unique safe ID[0..6],
+//   majors:major[0..6], parallel to memberIds. Class/ID are the path.
+// proposals/{id}: classId,mentorUid immutable (collection-group query),
+//   teamId,teamName,currentMemberIds,currentMajors,addStudentIds,addMajors,
+//   fit:strong|good,reasons:string[0..6],status:pending|approved|discarded,
+//   source:ai|manual immutable. Approve 5..6; pending may be below 5.
+// reports/{id}: ownerUid,classId,storagePath,downloadUrl,sizeKb,createdAt.
+// notifications/{id}: title,body,receivedAt,route?:null|string,read:bool.
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
     function isSelf(uid) { return signedIn() && request.auth.uid == uid; }
-    function ownsClass(classId) {
+    function isMentor() {
       return signedIn()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'mentor';
+    }
+    function ownsClass(classId) {
+      return isMentor()
         && get(/databases/$(database)/documents/classes/$(classId)).data.mentorUid == request.auth.uid;
     }
-
-    // TODO(Ken): users/{uid}: allow read, write: if isSelf(uid);
-    // TODO(Dan): users/{uid}/notifications/{id}: allow read, update: if isSelf(uid);
-    // TODO(Dan): classes/{classId} (+ students, teams): only the mentor (ownsClass / mentorUid).
-    // TODO(Cuong): classes/{classId}/proposals/{id}: if ownsClass(classId); team size 5..6 checked in service + rules.
-    // TODO(Cuong): reports/{id}: allow read, write: if isSelf(resource.data.ownerUid);
-
-    match /{document=**} {
-      allow read, write: if false;
+    // getAfter permits children created in the same atomic import batch.
+    function ownsClassAfter(classId) {
+      return isMentor()
+        && getAfter(/databases/$(database)/documents/classes/$(classId)).data.mentorUid == request.auth.uid;
     }
+    function text(value, max) {
+      return value is string && value.size() > 0 && value.size() <= max;
+    }
+    function safeId(value) {
+      return value is string && value.matches('^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$');
+    }
+    function stringList(a, max) {
+      return a is list && a.size() <= 6
+        && (a.size() < 1 || text(a[0], max))
+        && (a.size() < 2 || text(a[1], max))
+        && (a.size() < 3 || text(a[2], max))
+        && (a.size() < 4 || text(a[3], max))
+        && (a.size() < 5 || text(a[4], max))
+        && (a.size() < 6 || text(a[5], max));
+    }
+    function ids(a) {
+      return stringList(a, 64) && a.toSet().size() == a.size()
+        && (a.size() < 1 || safeId(a[0]))
+        && (a.size() < 2 || safeId(a[1]))
+        && (a.size() < 3 || safeId(a[2]))
+        && (a.size() < 4 || safeId(a[3]))
+        && (a.size() < 5 || safeId(a[4]))
+        && (a.size() < 6 || safeId(a[5]));
+    }
+    function majors(a) {
+      return a is list && a.size() <= 6 && a.hasOnly(['SE', 'AI', 'MKT', 'GD']);
+    }
+    function validUser(d) {
+      return d.keys().hasAll(['displayName', 'role', 'lastSignInAt'])
+        && d.keys().hasOnly(['displayName', 'role', 'lastSignInAt'])
+        && text(d.displayName, 120) && d.role == 'mentor'
+        && d.lastSignInAt == request.time;
+    }
+    function validClass(d) {
+      return d.keys().hasAll(['name', 'mentorUid', 'createdAt'])
+        && d.keys().hasOnly(['name', 'mentorUid', 'createdAt'])
+        && text(d.name, 120) && text(d.mentorUid, 128) && d.createdAt is timestamp;
+    }
+    function validStudent(d) {
+      return d.keys().hasAll(['fullName', 'major', 'teamId'])
+        && d.keys().hasOnly(['fullName', 'major', 'teamId', 'semester'])
+        && text(d.fullName, 120) && d.major in ['SE', 'AI', 'MKT', 'GD']
+        && (d.teamId == null || safeId(d.teamId))
+        && (!('semester' in d) || text(d.semester, 32));
+    }
+    function validTeam(d) {
+      return d.keys().hasAll(['name', 'memberIds', 'majors'])
+        && d.keys().hasOnly(['name', 'memberIds', 'majors', 'rosterChangeProposalId'])
+        && text(d.name, 120) && ids(d.memberIds) && majors(d.majors)
+        && d.memberIds.size() == d.majors.size()
+        && (!('rosterChangeProposalId' in d) || d.rosterChangeProposalId == null
+          || safeId(d.rosterChangeProposalId));
+    }
+    function validProposal(d, classId) {
+      return d.keys().hasAll(['classId', 'mentorUid', 'teamId', 'teamName',
+          'currentMemberIds', 'currentMajors', 'addStudentIds', 'addMajors',
+          'fit', 'reasons', 'status', 'source'])
+        && d.keys().hasOnly(['classId', 'mentorUid', 'teamId', 'teamName',
+          'currentMemberIds', 'currentMajors', 'addStudentIds', 'addMajors',
+          'fit', 'reasons', 'status', 'source', 'approvedAt'])
+        && d.classId == classId && d.mentorUid == request.auth.uid
+        && safeId(d.classId) && text(d.mentorUid, 128)
+        && safeId(d.teamId) && text(d.teamName, 120)
+        && ids(d.currentMemberIds) && ids(d.addStudentIds)
+        && !d.currentMemberIds.hasAny(d.addStudentIds)
+        && majors(d.currentMajors) && majors(d.addMajors)
+        && d.currentMemberIds.size() == d.currentMajors.size()
+        && d.addStudentIds.size() == d.addMajors.size()
+        && d.currentMemberIds.size() + d.addStudentIds.size() <= 6
+        && d.fit in ['strong', 'good'] && stringList(d.reasons, 240)
+        && d.status in ['pending', 'approved', 'discarded']
+        && (d.status != 'approved' || d.currentMemberIds.size() + d.addStudentIds.size() >= 5)
+        && (d.status == 'approved'
+          ? ('approvedAt' in d && d.approvedAt is timestamp && d.approvedAt <= request.time)
+          : !('approvedAt' in d))
+        && d.source in ['ai', 'manual'];
+    }
+    function validReport(d) {
+      return d.keys().hasAll(['ownerUid', 'classId', 'storagePath', 'downloadUrl', 'sizeKb', 'createdAt'])
+        && d.keys().hasOnly(['ownerUid', 'classId', 'storagePath', 'downloadUrl', 'sizeKb', 'createdAt'])
+        && text(d.ownerUid, 128) && safeId(d.classId) && ownsClass(d.classId)
+        && text(d.storagePath, 512)
+        && d.storagePath.split('/').size() == 3
+        && d.storagePath.split('/')[0] == 'reports'
+        && d.storagePath.split('/')[1] == request.auth.uid
+        && d.storagePath.split('/')[2].matches('^[A-Za-z0-9_-]+[.]pdf$')
+        && text(d.downloadUrl, 2048) && d.downloadUrl.matches('^https://.*')
+        && d.sizeKb is int && d.sizeKb > 0 && d.sizeKb <= 10240
+        && d.createdAt is timestamp;
+    }
+    function validNotification(d) {
+      return d.keys().hasAll(['title', 'body', 'receivedAt', 'read'])
+        && d.keys().hasOnly(['title', 'body', 'receivedAt', 'read', 'route'])
+        && text(d.title, 200) && d.body is string && d.body.size() <= 4000
+        && d.receivedAt is timestamp && d.receivedAt <= request.time
+        && d.read is bool
+        && (!('route' in d) || d.route == null ||
+          (text(d.route, 256) && d.route.matches('^/.*')));
+    }
+    function validFcmToken(d) {
+      return d.keys().hasAll(['token', 'platform', 'updatedAt'])
+        && d.keys().hasOnly(['token', 'platform', 'updatedAt'])
+        && text(d.token, 2048) && d.platform == 'android'
+        && d.updatedAt == request.time;
+    }
+    // Check the final documents in the same atomic proposal approval/undo.
+    // Firestore rules have no loops, so each possible addition is checked.
+    function noRosterProposalMarker(d) {
+      return !('rosterChangeProposalId' in d) || d.rosterChangeProposalId == null;
+    }
+    function rosterMarkerMatches(classId, teamId, proposalId, beforeId, afterId) {
+      let teamPath = /databases/$(database)/documents/classes/$(classId)/teams/$(teamId);
+      let before = get(teamPath).data;
+      let after = getAfter(teamPath).data;
+      return (beforeId == null ? noRosterProposalMarker(before)
+          : before.rosterChangeProposalId == beforeId)
+        && (afterId == null ? noRosterProposalMarker(after)
+          : after.rosterChangeProposalId == afterId);
+    }
+    function assignedAfter(classId, studentId, teamId, major) {
+      let data = getAfter(/databases/$(database)/documents/classes/$(classId)/students/$(studentId)).data;
+      return data.teamId == teamId && data.major == major;
+    }
+    function addedStudentsAfter(classId, proposal, teamId) {
+      let students = proposal.addStudentIds;
+      let majors = proposal.addMajors;
+      return (students.size() < 1 || assignedAfter(classId, students[0], teamId, majors[0]))
+        && (students.size() < 2 || assignedAfter(classId, students[1], teamId, majors[1]))
+        && (students.size() < 3 || assignedAfter(classId, students[2], teamId, majors[2]))
+        && (students.size() < 4 || assignedAfter(classId, students[3], teamId, majors[3]))
+        && (students.size() < 5 || assignedAfter(classId, students[4], teamId, majors[4]))
+        && (students.size() < 6 || assignedAfter(classId, students[5], teamId, majors[5]));
+    }
+    function unassignedAfter(classId, studentId) {
+      return getAfter(/databases/$(database)/documents/classes/$(classId)/students/$(studentId)).data.teamId == null;
+    }
+    function removedStudentsAfter(classId, proposal) {
+      let students = proposal.addStudentIds;
+      return (students.size() < 1 || unassignedAfter(classId, students[0]))
+        && (students.size() < 2 || unassignedAfter(classId, students[1]))
+        && (students.size() < 3 || unassignedAfter(classId, students[2]))
+        && (students.size() < 4 || unassignedAfter(classId, students[3]))
+        && (students.size() < 5 || unassignedAfter(classId, students[4]))
+        && (students.size() < 6 || unassignedAfter(classId, students[5]));
+    }
+    function validRosterTransition(classId, teamId, proposalId) {
+      let proposalPath = /databases/$(database)/documents/classes/$(classId)/proposals/$(proposalId);
+      let before = get(proposalPath).data;
+      let after = getAfter(proposalPath).data;
+      return (before.teamId == teamId && before.mentorUid == request.auth.uid
+          && before.status == 'pending' && after.status == 'approved'
+          && noRosterProposalMarker(resource.data)
+          && request.resource.data.rosterChangeProposalId == proposalId
+          && resource.data.memberIds == before.currentMemberIds
+          && resource.data.majors == before.currentMajors
+          && request.resource.data.memberIds == before.currentMemberIds.concat(before.addStudentIds)
+          && request.resource.data.majors == before.currentMajors.concat(before.addMajors))
+        || (before.teamId == teamId && before.mentorUid == request.auth.uid
+          && before.status == 'approved' && after.status == 'pending'
+          && resource.data.rosterChangeProposalId == proposalId
+          && request.resource.data.rosterChangeProposalId == null
+          && resource.data.memberIds == before.currentMemberIds.concat(before.addStudentIds)
+          && resource.data.majors == before.currentMajors.concat(before.addMajors)
+          && request.resource.data.memberIds == before.currentMemberIds
+          && request.resource.data.majors == before.currentMajors);
+    }
+    function proposalIdentityUnchanged() {
+      return request.resource.data.classId == resource.data.classId
+        && request.resource.data.mentorUid == resource.data.mentorUid
+        && request.resource.data.teamId == resource.data.teamId
+        && request.resource.data.source == resource.data.source;
+    }
+
+    match /users/{uid} {
+      allow read: if isSelf(uid);
+      // Lab 3 mentor is the baseline role: only owns personal imports.
+      allow create: if isSelf(uid) && validUser(request.resource.data);
+      allow update: if isSelf(uid) && validUser(request.resource.data)
+        && request.resource.data.role == resource.data.role;
+      // No client delete/recreate path to change an assigned role.
+      match /notifications/{id} {
+        allow read: if isSelf(uid) && isMentor();
+        allow create: if isSelf(uid) && isMentor() && validNotification(request.resource.data);
+        allow update: if isSelf(uid) && isMentor() && validNotification(request.resource.data)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+      }
+      match /fcmTokens/{id} {
+        allow read: if isSelf(uid) && isMentor();
+        allow create, update: if isSelf(uid) && isMentor()
+          // Token document IDs are base64url-encoded FCM tokens. Keep the
+          // Firestore document-ID limit without relying on unsupported regex
+          // repetition bounds in the Rules runtime.
+          && id.size() > 0 && id.size() <= 1500
+          && validFcmToken(request.resource.data);
+        allow delete: if isSelf(uid) && isMentor();
+      }
+    }
+    match /classes/{classId} {
+      allow read: if isMentor() && resource.data.mentorUid == request.auth.uid;
+      allow create: if isMentor() && safeId(classId) && validClass(request.resource.data)
+        && request.resource.data.mentorUid == request.auth.uid
+        && request.resource.data.createdAt == request.time;
+      allow update: if ownsClass(classId) && validClass(request.resource.data)
+        && request.resource.data.mentorUid == resource.data.mentorUid
+        && request.resource.data.createdAt == resource.data.createdAt;
+      // Delete needs a server-side cascade; prevent orphaned children.
+      match /students/{mssv} {
+        allow read: if ownsClass(classId);
+        allow create: if ownsClassAfter(classId) && safeId(mssv)
+          && validStudent(request.resource.data)
+          && (request.resource.data.teamId == null ||
+            getAfter(/databases/$(database)/documents/classes/$(classId)/teams/$(request.resource.data.teamId))
+              .data.memberIds.hasAny([mssv]));
+        allow update: if ownsClass(classId) && safeId(mssv)
+          && validStudent(request.resource.data)
+           && (request.resource.data.major == resource.data.major
+             || resource.data.teamId == null && request.resource.data.teamId == null)
+           && (request.resource.data.teamId == resource.data.teamId
+             || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['teamId']))
+          && (request.resource.data.teamId == resource.data.teamId
+            || (resource.data.teamId == null && request.resource.data.teamId != null
+              && getAfter(/databases/$(database)/documents/classes/$(classId)/teams/$(request.resource.data.teamId))
+                .data.memberIds.hasAny([mssv]))
+            || (resource.data.teamId != null && request.resource.data.teamId == null
+              && !getAfter(/databases/$(database)/documents/classes/$(classId)/teams/$(resource.data.teamId))
+                .data.memberIds.hasAny([mssv])));
+        allow delete: if ownsClass(classId) && resource.data.teamId == null;
+      }
+      match /teams/{teamId} {
+        allow read: if ownsClass(classId);
+        allow create: if ownsClassAfter(classId) && safeId(teamId)
+          && validTeam(request.resource.data)
+          && !('rosterChangeProposalId' in request.resource.data)
+          && (request.resource.data.memberIds.size() < 1 ||
+            assignedAfter(classId, request.resource.data.memberIds[0], teamId, request.resource.data.majors[0]))
+          && (request.resource.data.memberIds.size() < 2 ||
+            assignedAfter(classId, request.resource.data.memberIds[1], teamId, request.resource.data.majors[1]))
+          && (request.resource.data.memberIds.size() < 3 ||
+            assignedAfter(classId, request.resource.data.memberIds[2], teamId, request.resource.data.majors[2]))
+          && (request.resource.data.memberIds.size() < 4 ||
+            assignedAfter(classId, request.resource.data.memberIds[3], teamId, request.resource.data.majors[3]))
+          && (request.resource.data.memberIds.size() < 5 ||
+            assignedAfter(classId, request.resource.data.memberIds[4], teamId, request.resource.data.majors[4]))
+          && (request.resource.data.memberIds.size() < 6 ||
+            assignedAfter(classId, request.resource.data.memberIds[5], teamId, request.resource.data.majors[5]));
+        // Roster changes are authorized by the linked proposal transition.
+        // The proposal rule verifies the exact before/after roster and student
+        // assignments in the same atomic commit.
+        allow update: if ownsClass(classId) && safeId(teamId)
+          && request.resource.data.name == resource.data.name
+          && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['memberIds', 'majors', 'rosterChangeProposalId'])
+          && 'rosterChangeProposalId' in request.resource.data
+          && (request.resource.data.rosterChangeProposalId == null
+            || safeId(request.resource.data.rosterChangeProposalId))
+          && validRosterTransition(
+            classId,
+            teamId,
+            request.resource.data.rosterChangeProposalId == null
+              ? resource.data.rosterChangeProposalId
+              : request.resource.data.rosterChangeProposalId
+          );
+        allow delete: if ownsClass(classId) && resource.data.memberIds.size() == 0;
+      }
+      match /proposals/{id} {
+        allow read: if ownsClass(classId);
+        allow create: if ownsClass(classId) && validProposal(request.resource.data, classId)
+          && request.resource.data.status == 'pending';
+        // Guard expensive schema checks with a conditional to avoid evaluating
+        // them for approval/discard transitions in the Rules emulator.
+        allow update: if resource.data.status == 'pending'
+          && request.resource.data.status == 'pending'
+          && proposalIdentityUnchanged()
+          && ownsClass(classId)
+          && (request.resource.data.status == 'pending'
+            ? validProposal(request.resource.data, classId) : false);
+        allow update: if resource.data.status == 'pending'
+          && request.resource.data.status == 'approved'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'approvedAt'])
+          && request.resource.data.approvedAt == request.time
+          && proposalIdentityUnchanged()
+          && ownsClass(classId)
+          && rosterMarkerMatches(classId, resource.data.teamId, id, null, id)
+          && addedStudentsAfter(classId, resource.data, resource.data.teamId);
+        allow update: if resource.data.status == 'pending'
+          && request.resource.data.status == 'discarded'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+          && proposalIdentityUnchanged()
+          && ownsClass(classId);
+        allow update: if resource.data.status == 'approved'
+          && request.resource.data.status == 'pending'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'approvedAt'])
+          && resource.data.approvedAt is timestamp
+          && request.time - resource.data.approvedAt <= duration.value(5, 's')
+          && proposalIdentityUnchanged()
+          && ownsClass(classId)
+          && rosterMarkerMatches(classId, resource.data.teamId, id, id, null)
+          && removedStudentsAfter(classId, resource.data);
+      }
+    }
+    // watchAllPending filters mentorUid == UID and status == pending.
+    // These fields are checked against the parent path on every write.
+    match /{path=**}/proposals/{id} {
+      allow read: if isMentor() && resource.data.mentorUid == request.auth.uid;
+    }
+    match /reports/{id} {
+      allow read: if isMentor() && resource.data.ownerUid == request.auth.uid;
+      allow create: if isMentor() && validReport(request.resource.data)
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.createdAt == request.time;
+      allow update: if isMentor() && resource.data.ownerUid == request.auth.uid
+        && validReport(request.resource.data)
+        && request.resource.data.ownerUid == resource.data.ownerUid
+        && request.resource.data.classId == resource.data.classId
+        && request.resource.data.createdAt == resource.data.createdAt;
+      allow delete: if isMentor() && resource.data.ownerUid == request.auth.uid;
+    }
+    match /{document=**} { allow read, write: if false; }
   }
 }

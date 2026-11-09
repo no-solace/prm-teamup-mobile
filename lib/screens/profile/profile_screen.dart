@@ -7,9 +7,13 @@ import '../../router/routes.dart';
 
 import '../../theme/app_spacing.dart';
 import '../../viewmodels/auth/session_view_model.dart';
+import '../../viewmodels/notifications/inbox_view_model.dart';
 import '../../viewmodels/profile/profile_view_model.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_card.dart';
+import '../../widgets/error_banner.dart';
+import '../notifications/config_demo_panel.dart';
+import 'report_demo_panel.dart';
 
 /// S6 Profile. Owner: Ken (profile), Cuong (Firebase demo section).
 class ProfileScreen extends ConsumerWidget {
@@ -19,6 +23,7 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(sessionProvider).value;
     final vm = ref.read(profileViewModelProvider.notifier);
+    final state = ref.watch(profileViewModelProvider);
     final text = Theme.of(context).textTheme;
     final scheme = Theme.of(context).colorScheme;
 
@@ -37,15 +42,37 @@ class ProfileScreen extends ConsumerWidget {
           ),
           const SizedBox(height: kSpaceSm),
           Center(child: Text(user?.displayName ?? '', style: text.titleLarge)),
-          Center(child: Text('Mentor', style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant))),
+          Center(
+            child: Text(
+              'Mentor',
+              style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+            ),
+          ),
           if (user?.email != null)
-            Center(child: Text(user!.email!, style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant))),
+            Center(
+              child: Text(
+                user!.email!,
+                style: text.bodyMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          if (user?.phoneNumber != null)
+            Center(
+              child: Text(
+                user!.phoneNumber!,
+                style: text.bodyMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+            ),
           const SizedBox(height: kSpaceLg),
-          // TODO(Dan): bind to NotificationService permission (POST_NOTIFICATIONS).
-          const ListTile(
-            leading: Icon(Icons.notifications_outlined),
-            title: Text('Notifications'),
-            trailing: Switch(value: true, onChanged: null),
+          ListTile(
+            leading: const Icon(Icons.notifications_outlined),
+            title: const Text('Notifications'),
+            subtitle: Text('${ref.watch(unreadCountProvider)} unread'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push(Routes.notifications),
           ),
           const ListTile(
             leading: Icon(Icons.language),
@@ -53,14 +80,16 @@ class ProfileScreen extends ConsumerWidget {
             trailing: Text('English'),
           ),
           const SizedBox(height: kSpaceLg),
-          // TODO(Cuong): Firebase demo section (FCM token, Remote Config values,
-          // last fetch status, upload test). Lab 3 demo only.
           AppCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Firebase demo', style: text.titleMedium),
                 const SizedBox(height: kSpaceSm),
+                const ConfigDemoPanel(),
+                const SizedBox(height: kSpaceMd),
+                const ReportDemoPanel(),
+                const SizedBox(height: kSpaceMd),
                 AppButton(
                   label: 'Test crash',
                   variant: AppButtonVariant.tonal,
@@ -77,7 +106,13 @@ class ProfileScreen extends ConsumerWidget {
               onTap: () => context.push(Routes.gallery),
             ),
           const SizedBox(height: kSpaceLg),
-          AppButton(label: 'Sign out', variant: AppButtonVariant.text, onPressed: vm.signOut),
+          if (state.error != null) ErrorBanner(message: state.error!.message),
+          AppButton(
+            label: 'Sign out',
+            variant: AppButtonVariant.text,
+            loading: state.signingOut,
+            onPressed: vm.signOut,
+          ),
         ],
       ),
     );

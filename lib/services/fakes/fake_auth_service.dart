@@ -3,45 +3,146 @@ import 'dart:async';
 import '../../models/app_user.dart';
 import '../app_error.dart';
 import '../auth_service.dart';
+import '../auth_validation.dart';
 import 'sample_data.dart';
 
+/// Development only. Configurable latency/errors without network or Firebase.
 class FakeAuthService implements AuthService {
-  FakeAuthService({this.signedIn = false, this.failWith}) {
+  FakeAuthService({
+    bool signedIn = false,
+    this.failWith,
+    this.latency = const Duration(milliseconds: 400),
+  }) {
     _current = signedIn ? _lan : null;
   }
 
-  final bool signedIn;
-
-  /// Set to simulate S19 (for example `CancelledError()`).
   AppError? failWith;
-
-  static const _lan = AppUser(uid: SampleData.mentorUid, displayName: 'Lan Nguyen', email: 'lan@example.com');
-
+  AppError? signOutError;
+  final Duration latency;
+  int signInCalls = 0;
+  int signOutCalls = 0;
+  bool autoVerifyPhone = false;
+  bool autoRetrievalTimeout = false;
+  static const testSmsCode = '123456';
+  static const _lan = AppUser(
+    uid: SampleData.mentorUid,
+    displayName: 'Lan Nguyen',
+    email: 'lan@example.com',
+  );
   AppUser? _current;
+  String? _phoneNumber;
+  int _phoneAttempt = 0;
   final _controller = StreamController<AppUser?>.broadcast();
 
   @override
-  Stream<AppUser?> authStateChanges() async* {
-    yield _current;
-    yield* _controller.stream;
-  }
+  Stream<AppUser?> authStateChanges() => Stream<AppUser?>.multi((events) {
+    final sub = _controller.stream.listen(events.add, onError: events.addError);
+    events.add(_current);
+    events.onCancel = sub.cancel;
+  });
 
   @override
   AppUser? get currentUser => _current;
 
-  @override
-  Future<AppUser> signInWithGoogle() async {
-    await Future<void>.delayed(const Duration(milliseconds: 400));
+  Future<void> _wait() async {
+    await Future<void>.delayed(latency);
     final error = failWith;
     if (error != null) throw error;
-    _current = _lan;
-    _controller.add(_current);
-    return _lan;
+  }
+
+  AppUser _signedIn(AppUser user) {
+    _current = user;
+    _controller.add(user);
+    return user;
+  }
+
+  @override
+  Future<AppUser> signInWithGoogle() async {
+    signInCalls++;
+    await _wait();
+    return _signedIn(_lan);
+  }
+
+  @override
+  Future<AppUser> signInWithEmail({
+    required String email,
+    required String password,
+  }) async {
+    final normalized = AuthValidation.email(email);
+    AuthValidation.password(password);
+    signInCalls++;
+    await _wait();
+    return _signedIn(
+      AppUser(uid: _lan.uid, displayName: 'Mentor', email: normalized),
+    );
+  }
+
+  @override
+  Future<AppUser> registerWithEmail({
+    required String email,
+    required String password,
+  }) async {
+    AuthValidation.password(password, registering: true);
+    return signInWithEmail(email: email, password: password);
+  }
+
+  @override
+  Stream<PhoneAuthEvent> requestPhoneCode(
+    String phoneNumber, {
+    bool resend = false,
+  }) async* {
+    final normalized = AuthValidation.phone(phoneNumber);
+    final attempt = ++_phoneAttempt;
+    _phoneNumber = normalized;
+    await _wait();
+    if (attempt != _phoneAttempt) return;
+    yield const PhoneCodeSent();
+    if (autoVerifyPhone) {
+      yield PhoneSignedIn(
+        _signedIn(
+          AppUser(
+            uid: _lan.uid,
+            displayName: 'Mentor',
+            phoneNumber: normalized,
+          ),
+        ),
+      );
+    } else if (autoRetrievalTimeout) {
+      yield const PhoneAutoRetrievalTimedOut();
+    }
+  }
+
+  @override
+  Future<AppUser> confirmPhoneCode(String smsCode) async {
+    final code = AuthValidation.smsCode(smsCode);
+    final number = _phoneNumber;
+    if (number == null) {
+      throw const ValidationError('Request an SMS code first');
+    }
+    await _wait();
+    if (code != testSmsCode) {
+      throw const ValidationError('The SMS code is incorrect. Try again.');
+    }
+    return _signedIn(
+      AppUser(uid: _lan.uid, displayName: 'Mentor', phoneNumber: number),
+    );
+  }
+
+  @override
+  void cancelPhoneVerification() {
+    _phoneAttempt++;
+    _phoneNumber = null;
   }
 
   @override
   Future<void> signOut() async {
+    signOutCalls++;
+    final error = signOutError;
+    if (error != null) throw error;
+    cancelPhoneVerification();
     _current = null;
     _controller.add(null);
   }
+
+  Future<void> dispose() => _controller.close();
 }

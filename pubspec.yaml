@@ -35,6 +35,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - firebase/remote-config-defaults.json
   fonts:
     - family: BeVietnamPro
       fonts:

@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app.dart';
+import 'firebase/background_notification_handler.dart';
 import 'firebase/fcm_notification_service.dart';
 import 'firebase/firebase_config_service.dart';
 import 'firebase_options.dart';
@@ -17,8 +18,7 @@ import 'providers/service_providers.dart';
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  // The system tray shows the notification; the tap is handled by
-  // FcmNotificationService (onMessageOpenedApp / getInitialMessage).
+  await keepBackgroundNotification(message);
 }
 
 /// The submitted build: real Firebase services only (D6, C10).

@@ -23,7 +23,10 @@ class MyClassesViewModel extends Notifier<ViewState<List<ClassRoom>>> {
 
   void _listen() {
     _sub?.cancel();
-    _sub = ref.read(classServiceProvider).watchMyClasses().listen(
+    _sub = ref
+        .read(classServiceProvider)
+        .watchMyClasses()
+        .listen(
           (classes) => state = classes.isEmpty ? const Empty() : Data(classes),
           onError: (Object e) => state = Failure(toAppError(e)),
         );
@@ -36,4 +39,7 @@ class MyClassesViewModel extends Notifier<ViewState<List<ClassRoom>>> {
 }
 
 final myClassesViewModelProvider =
-    NotifierProvider.autoDispose<MyClassesViewModel, ViewState<List<ClassRoom>>>(MyClassesViewModel.new);
+    NotifierProvider.autoDispose<
+      MyClassesViewModel,
+      ViewState<List<ClassRoom>>
+    >(MyClassesViewModel.new);

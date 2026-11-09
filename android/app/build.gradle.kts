@@ -4,6 +4,12 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Firebase config is downloaded from the existing project, never synthesized.
+// Keep the explicit main_fake.dart build usable before credentials are supplied.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+}
+
 android {
     namespace = "com.group6.teamup_exe"
     compileSdk = flutter.compileSdkVersion

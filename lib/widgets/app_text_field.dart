@@ -16,6 +16,9 @@ class AppTextField extends StatelessWidget {
     this.prefixIcon,
     this.suffix,
     this.maxLength,
+    this.obscureText = false,
+    this.enabled = true,
+    this.autofillHints,
   });
 
   final TextEditingController? controller;
@@ -29,12 +32,20 @@ class AppTextField extends StatelessWidget {
   final IconData? prefixIcon;
   final Widget? suffix;
   final int? maxLength;
+  final bool obscureText;
+  final bool enabled;
+  final Iterable<String>? autofillHints;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return TextField(
       controller: controller,
+      obscureText: obscureText,
+      enabled: enabled,
+      autofillHints: autofillHints,
+      autocorrect: !obscureText,
+      enableSuggestions: !obscureText,
       keyboardType: keyboardType,
       textInputAction: textInputAction,
       onChanged: onChanged,
@@ -44,7 +55,11 @@ class AppTextField extends StatelessWidget {
         labelText: label,
         hintText: hint,
         prefixIcon: prefixIcon == null ? null : Icon(prefixIcon),
-        suffixIcon: suffix ?? (errorText != null ? Icon(Icons.error_outline, color: scheme.error) : null),
+        suffixIcon:
+            suffix ??
+            (errorText != null
+                ? Icon(Icons.error_outline, color: scheme.error)
+                : null),
         errorText: errorText,
         counterText: '',
       ),
