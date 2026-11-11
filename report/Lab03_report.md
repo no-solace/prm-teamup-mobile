@@ -456,7 +456,7 @@ logcat dùng cho ARTEMIS (test `TC-17` kiểm `ai_match_start` **và** `ai_match
 | Bộ test | Lệnh | Kết quả |
 |---|---|---|
 | Unit / widget / integration Dart | `flutter test` | **145/145 pass** |
-| Firestore Security Rules | `firebase emulators:exec --only firestore "node --test firestore.rules.test.mjs"` | **21/21 pass** |
+| Firestore Security Rules | `npx firebase-tools@15.35.0 emulators:exec --only firestore --project demo-teamup-data "node --test firestore.rules.test.mjs"` | **21/21 pass** |
 | Ràng buộc kiến trúc | `bash tool/check_layers.sh` | **Layers OK** — 0 vi phạm |
 | Phân tích tĩnh | `flutter analyze` | **No issues found** |
 

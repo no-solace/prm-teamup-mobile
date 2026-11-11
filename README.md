@@ -17,7 +17,8 @@
 | Dart | 3.13.7 |
 | JDK cho Gradle | 17 hoặc 21 (JDK 25 có thể làm Gradle lỗi: `flutter config --jdk-dir <đường dẫn JDK 17>`) |
 | Android | minSdk 23, máy thật hoặc emulator có Google Play |
-| Firebase CLI / FlutterFire CLI | 15.x / 1.4.x |
+| Firebase CLI | **15.35.0** — chưa cài global, dùng qua `npx firebase-tools@15.35.0` |
+| FlutterFire CLI | **1.4.x** — `dart pub global activate flutterfire_cli` |
 | Google ARTEMIS | commit ghim trong `e2e_test/pyproject.toml` |
 | AI code review | GitHub Copilot Code Review (pull request `feature/lab3-complete-gaps`) |
 
@@ -43,10 +44,16 @@ flutter test
 bash tool/check_layers.sh        # Windows: "C:\Program Files\Git\bin\bash.exe" tool/check_layers.sh
 ```
 
-## Cấu hình Firebase (làm một lần)
+## Cấu gình Firebase (làm một lần)
 
-1. Dự án: `prm-lab3-cc39e` (khớp `.firebaserc`). Cấu hình app Android:
+> **Firebase CLI chưa được đăng nhập** trên máy này (`firebase login:list` →
+> "No authorized accounts"). Các bước dưới cần bạn chạy sau khi
+> `npx firebase-tools@15.35.0 login` (mở trình duyệt, đăng nhập tài khoản có
+> quyền trên project `prm-lab3-cc39e`).
+
+1. Dự án: `prm-lab3-cc39e` (khớp `.firebaserc`). Cài FlutterFire CLI rồi cấu hình app Android:
    ```bash
+   dart pub global activate flutterfire_cli
    flutterfire configure --project prm-lab3-cc39e --platforms android \
         --android-package-name com.group6.teamup_exe
    ```
@@ -58,8 +65,19 @@ bash tool/check_layers.sh        # Windows: "C:\Program Files\Git\bin\bash.exe" 
    Copy dòng `SHA1` của biến thể `debug`, dán vào Firebase Console → Project settings → app Android → Add fingerprint. Sau đó tải lại `google-services.json`.
 3. Deploy rules:
    ```bash
-   firebase deploy --only firestore:rules,storage
+   npx firebase-tools@15.35.0 deploy --only firestore:rules,storage
    ```
+
+### Chạy test Firestore rules cục bộ (không cần đăng nhập)
+
+Bộ test này dùng Firestore emulator nên chạy được hoàn toàn offline:
+```bash
+cd firebase/test
+npm install
+npx firebase-tools@15.35.0 emulators:exec --only firestore \
+     --project demo-teamup-data "node --test firestore.rules.test.mjs"
+```
+Kết quả hiện tại: **21/21 pass**.
 
 ## Chạy bộ test E2E (Google ARTEMIS)
 
@@ -129,7 +147,7 @@ Chi tiết và quyết định cho từng phát hiện: [docs/code-review.md](do
 |---|---|---|
 | `flutter analyze` | ✅ **No issues found** | 0 cảnh báo |
 | `flutter test` | ✅ **145/145 pass** | unit + widget |
-| Firestore rules test | ✅ **21/21 pass** | `firebase emulators:exec --only firestore "node --test firestore.rules.test.mjs"` |
+| Firestore rules test | ✅ **21/21 pass** | `npx firebase-tools@15.35.0 emulators:exec --only firestore "node --test firestore.rules.test.mjs"` |
 | `tool/check_layers.sh` | ✅ **Layers OK** | 0 vi phạm layer |
 | Báo cáo PDF | ✅ 10 trang | rubric yêu cầu 8–12 |
 | Slide PDF | ✅ 15 slide chính + 4 slide phụ | rubric yêu cầu 12–15 |
