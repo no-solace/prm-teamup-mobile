@@ -71,12 +71,18 @@ class FakeProposalService implements ProposalService {
         .where(
           (p) => p.classId == classId && p.status == ProposalStatus.pending,
         )
-        .toList(),
+        .toList()
+      // Same order as FirestoreProposalService, so the Remote Config cap
+      // `max_proposals_shown` selects the same cards in tests and in the app.
+      ..sort((a, b) => a.teamName.compareTo(b.teamName)),
   );
 
   @override
   Stream<List<Proposal>> watchAllPending() => _watch(
-    () => _items.where((p) => p.status == ProposalStatus.pending).toList(),
+    () => _items
+        .where((p) => p.status == ProposalStatus.pending)
+        .toList()
+      ..sort((a, b) => a.teamName.compareTo(b.teamName)),
   );
 
   @override
