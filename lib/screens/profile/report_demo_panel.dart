@@ -26,6 +26,9 @@ class _ReportDemoPanelState extends ConsumerState<ReportDemoPanel> {
   double? _progress;
   String? _status;
 
+  /// Lab 3 rubric: the download URL of the uploaded file must be visible.
+  String? _downloadUrl;
+
   void _feedback(String message) {
     if (mounted) setState(() => _status = message);
   }
@@ -35,12 +38,17 @@ class _ReportDemoPanelState extends ConsumerState<ReportDemoPanel> {
       _busy = true;
       _progress = null;
       _status = null;
+      _downloadUrl = null;
     });
     try {
       final actions = ref.read(reportDemoActionsProvider);
-      final bytes = await actions.buildPdf(classId);
+      final built = await actions.buildPdf(classId);
       Report? saved;
-      await for (final event in actions.upload(classId, bytes)) {
+      await for (final event in actions.upload(
+        classId,
+        built.bytes,
+        teamCount: built.teamCount,
+      )) {
         if (!mounted) return;
         if (event is UploadProgress) {
           setState(() => _progress = event.fraction);
@@ -50,9 +58,13 @@ class _ReportDemoPanelState extends ConsumerState<ReportDemoPanel> {
       if (saved == null) {
         throw const UnknownError('Report upload was interrupted');
       }
-      _feedback('Uploaded ${saved.sizeKb} KB. Opening the PDF share dialog.');
+      _feedback(
+        'Uploaded ${saved.sizeKb} KB to ${saved.storagePath}. '
+        'Opening the PDF share dialog.',
+      );
+      setState(() => _downloadUrl = saved!.downloadUrl);
       await Printing.sharePdf(
-        bytes: Uint8List.fromList(bytes),
+        bytes: Uint8List.fromList(built.bytes),
         filename: 'teamup_$classId.pdf',
       );
     } catch (error) {
@@ -125,6 +137,15 @@ class _ReportDemoPanelState extends ConsumerState<ReportDemoPanel> {
           const SizedBox(height: kSpaceSm),
           Text(_status!, style: text.bodyMedium),
         ],
+        if (_downloadUrl != null) ...[
+          const SizedBox(height: kSpaceSm),
+          Text('Download URL', style: text.titleSmall),
+          SelectableText(
+            _downloadUrl!,
+            style: text.bodySmall,
+            semanticsLabel: 'Download URL of the uploaded report',
+          ),
+        ],
         const SizedBox(height: kSpaceMd),
         Text('Saved reports', style: text.titleMedium),
         if (reports.isLoading) const LinearProgressIndicator(),
@@ -145,8 +166,22 @@ class _ReportDemoPanelState extends ConsumerState<ReportDemoPanel> {
                       .firstOrNull ??
                   report.classId,
             ),
-            subtitle: Text(
-              '${report.sizeKb} KB · ${report.createdAt.toLocal()}',
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('${report.sizeKb} KB · ${report.createdAt.toLocal()}'),
+                Text(
+                  report.storagePath,
+                  style: text.bodySmall,
+                  semanticsLabel: 'Storage path ${report.storagePath}',
+                ),
+                SelectableText(
+                  report.downloadUrl,
+                  style: text.bodySmall,
+                  semanticsLabel:
+                      'Download URL of ${report.storagePath}',
+                ),
+              ],
             ),
             trailing: IconButton(
               tooltip: 'Share saved PDF',
