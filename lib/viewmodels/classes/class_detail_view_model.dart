@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../models/class_room.dart';
 import '../../providers/service_providers.dart';
+import '../instrumentation.dart';
 import '../view_state.dart';
 
 /// S3 and the live class summary reused by S23.
@@ -12,6 +13,7 @@ class ClassDetailViewModel extends Notifier<ViewState<ClassRoom>> {
   final String classId;
   StreamSubscription<ClassRoom>? _subscription;
   int _generation = 0;
+  bool _viewTracked = false;
 
   @override
   ViewState<ClassRoom> build() {
@@ -32,6 +34,7 @@ class ClassDetailViewModel extends Notifier<ViewState<ClassRoom>> {
         .listen(
           (room) {
             if (ref.mounted && generation == _generation) state = Data(room);
+            _trackView(room);
           },
           onError: (Object error) {
             if (ref.mounted && generation == _generation) {
@@ -39,6 +42,18 @@ class ClassDetailViewModel extends Notifier<ViewState<ClassRoom>> {
             }
           },
         );
+  }
+
+  /// docs/analytics-plan.md: view_item opens once per class detail visit.
+  void _trackView(ClassRoom room) {
+    if (_viewTracked) return;
+    _viewTracked = true;
+    unawaited(
+      ref.trackAnalytics(
+        (analytics) =>
+            analytics.logViewItem(itemCategory: 'class', itemId: room.id),
+      ),
+    );
   }
 
   void retry() {

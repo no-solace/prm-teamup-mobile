@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/class_room.dart';
 import '../../models/student.dart';
 import '../../providers/service_providers.dart';
+import '../instrumentation.dart';
 import '../view_state.dart';
 
 typedef StudentKey = ({String classId, String studentId});
@@ -43,6 +44,13 @@ class StudentDetailViewModel extends Notifier<ViewState<StudentProfile>> {
       final room = values[1] as ClassRoom;
       if (ref.mounted && generation == _generation) {
         state = Data(StudentProfile(student: student, className: room.name));
+        // docs/analytics-plan.md: view_item on every kind of detail screen.
+        await ref.trackAnalytics(
+          (analytics) => analytics.logViewItem(
+            itemCategory: 'student',
+            itemId: student.mssv,
+          ),
+        );
       }
     } catch (error) {
       if (ref.mounted && generation == _generation) {

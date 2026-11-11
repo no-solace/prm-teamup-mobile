@@ -5,9 +5,14 @@ import '../services/crash_service.dart';
 /// Owner: Cuong. Fatal errors are wired in main.dart (FlutterError.onError,
 /// PlatformDispatcher.onError); this class covers user ID, keys and non-fatals.
 class FirebaseCrashService implements CrashService {
-  FirebaseCrashService({FirebaseCrashlytics? crashlytics}) : _c = crashlytics ?? FirebaseCrashlytics.instance;
+  FirebaseCrashService({FirebaseCrashlytics? crashlytics}) : _injected = crashlytics;
 
-  final FirebaseCrashlytics _c;
+  final FirebaseCrashlytics? _injected;
+
+  /// Resolved lazily: `FirebaseCrashlytics.instance` throws when Firebase is
+  /// not initialised, and that must not break the provider that reads it.
+  late final FirebaseCrashlytics _c =
+      _injected ?? FirebaseCrashlytics.instance;
 
   @override
   Future<void> setUser({required String uid, required String role}) async {

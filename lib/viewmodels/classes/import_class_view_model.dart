@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/service_providers.dart';
 import '../../services/app_error.dart';
 import '../../services/class_service.dart';
+import '../instrumentation.dart';
 import '../view_state.dart';
 import 'my_classes_view_model.dart';
 
@@ -71,7 +72,10 @@ class ImportClassViewModel extends Notifier<ImportClassState> {
         return;
       }
       await _preview(picked);
-    } catch (error) {
+    } catch (error, stack) {
+      // A rejected file is a real error path (S22 error state): the mentor
+      // sees the message and Crashlytics gets one non-fatal report.
+      await ref.trackNonFatal(error, stack, reason: 'class_import_file_rejected');
       if (ref.mounted) state = ImportClassState(error: toAppError(error));
     }
   }
@@ -112,8 +116,17 @@ class ImportClassViewModel extends Notifier<ImportClassState> {
       if (!ref.mounted) return null;
       state = ImportClassState(preview: preview, result: result);
       ref.invalidate(myClassesViewModelProvider);
+      // docs/analytics-plan.md: class_import records how many rows the mentor
+      // uploaded and how many students stayed available for matching.
+      await ref.trackAnalytics(
+        (analytics) => analytics.logClassImport(
+          rowCount: preview.rowCount,
+          availableCount: result.available,
+        ),
+      );
       return result;
-    } catch (error) {
+    } catch (error, stack) {
+      await ref.trackNonFatal(error, stack, reason: 'class_import_write_failed');
       if (ref.mounted) {
         state = ImportClassState(preview: preview, error: toAppError(error));
       }

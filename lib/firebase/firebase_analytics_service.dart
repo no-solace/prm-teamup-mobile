@@ -6,9 +6,13 @@ import '../services/analytics_service.dart';
 /// Analytics only accepts String and num parameters, so bools are sent as 0/1.
 class FirebaseAnalyticsService implements AnalyticsService {
   FirebaseAnalyticsService({FirebaseAnalytics? analytics})
-    : _a = analytics ?? FirebaseAnalytics.instance;
+    : _injected = analytics;
 
-  final FirebaseAnalytics _a;
+  final FirebaseAnalytics? _injected;
+
+  /// Resolved lazily: `FirebaseAnalytics.instance` throws when Firebase is
+  /// not initialised yet, and that must not break the provider that reads it.
+  late final FirebaseAnalytics _a = _injected ?? FirebaseAnalytics.instance;
 
   Future<void> _log(String name, Map<String, Object> params) =>
       _a.logEvent(name: name, parameters: params);
