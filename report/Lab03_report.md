@@ -29,7 +29,7 @@ Tiêu chí thành công lấy từ Lab 2 (đo được, không phải cảm tín
 3. Thêm hoặc đổi một thành viên và duyệt **dưới 60 giây**.
 4. **100%** sinh viên đã có nhóm không xuất hiện ở "No team" / pool AI.
 5. **Không** nhóm nào vượt 6; thêm vào nhóm đầy luôn báo rõ.
-6. Mọi màn tải dữ liệu có đủ 4 trạng thái; 6 dịch vụ Firebase đều có ca lỗi.
+6. Mọi màn tải dữ liệu có đủ 4 trạng thái; 6 dịch vụ Firebase bắt buộc đều có ca lỗi.
 
 ### 1.3 Ba workflow lõi (đặc tả đầy đủ ở `docs/workflow.md`)
 
@@ -42,8 +42,9 @@ Tiêu chí thành công lấy từ Lab 2 (đo được, không phải cảm tín
 ### 1.4 Phạm vi Lab 3
 
 Đề Lab 3 chấm trên **mọi màn và cả 3 flow của Lab 2**. TeamUp EXE dựng **25 màn
-(S1–S25)** của Lab 2, tích hợp **6 dịch vụ Firebase**, và viết **bộ test E2E bằng
-Google ARTEMIS**. Ba luồng D/E/F (đề tài, lịch rảnh, họp) **không** làm ở Lab 3
+(S1–S25)** của Lab 2, tích hợp **6 dịch vụ Firebase bắt buộc** (thêm Firestore
+làm kho dữ liệu thật), và viết **bộ test E2E bằng Google ARTEMIS**. Ba luồng
+D/E/F (đề tài, lịch rảnh, họp) **không** làm ở Lab 3
 vì không có trong thiết kế Lab 2 — chi tiết ở `docs/PROPOSAL.md` §9.
 
 ---
@@ -58,7 +59,7 @@ Bảng đầy đủ 25 màn × (route, widget, nguồn dữ liệu, trạng thá
 | Nhóm | Số màn | Trạng thái |
 |---|---|---|
 | Màn nội dung Lab 2 (S1–S25) | 25 | **25/25** đã dựng, 21 `Done`, 4 `Partial` vì sai lệch đã ghi |
-| Component Lab 2 → `lib/widgets/` | 17 | **17/17** có widget dùng chung |
+| Component Lab 2 → `lib/widgets/` | 18 | **18/18** có widget dùng chung |
 | Flow A/B/C | 3 | **3/3** chạy hết từ đầu đến cuối, có đường lỗi |
 
 Mỗi màn đều dùng **state model 4 trạng thái** `ViewState<T>`
@@ -88,7 +89,7 @@ Token nằm đúng một chỗ và được đọc qua theme, không có giá tr
 | Chữ | `lib/theme/app_typography.dart` → `TextTheme` | `bodyMedium` 14/20, `labelLarge` 14/20 600 |
 | Spacing / radius / kích thước | `lib/theme/app_spacing.dart` | `kTouchTarget = 48`, `kMajorSlotSmall = 40`, `kMajorSlotLarge = 48` |
 
-17 component của Lab 2 được dựng thành widget dùng chung trong `lib/widgets/`
+18 component của Lab 2 được dựng thành widget dùng chung trong `lib/widgets/`
 (`AppButton`, `AppCard`, `AppTextField`, `MajorSlotRow`, `FitChip`, `TagChip`,
 `ErrorBanner`, `StatusView`, `showConfirmDialog`, `ProposalsBadge`, `StatTriple`,
 `StudentRow`, `MajorFilterChips`, `StudentPicker`, …), mỗi widget có các trạng thái
@@ -240,7 +241,12 @@ Bảng đầy đủ 20 dòng ở `docs/architecture.md` §4.
 
 ---
 
-## 4. Thiết kế Firebase — 6 dịch vụ, mỗi dịch vụ một ca lỗi
+## 4. Thiết kế Firebase — 6 dịch vụ bắt buộc, mỗi dịch vụ một ca lỗi
+
+> Đề Lab 3 §6 yêu cầu **6 dịch vụ**: Authentication · Cloud Storage · Analytics ·
+> Cloud Messaging (FCM) · Crashlytics · Remote Config. Ngoài ra app dùng **Cloud
+> Firestore** làm kho dữ liệu thật (yêu cầu "no hard-coded or mock data"), nên
+> tổng cộng **7 dịch vụ Firebase** được tích hợp.
 
 ### 4.1 Authentication (Google Sign-In)
 
@@ -400,6 +406,11 @@ logcat dùng cho ARTEMIS (test `TC-17` kiểm `ai_match_start` **và** `ai_match
 
 **Tổng: 18 ca script + 1 phiên khám phá** (yêu cầu ≥ 10).
 
+> **Trạng thái:** bộ test đã **được viết đầy đủ và kiểm tra cú pháp**, nhưng
+> **chưa có lần chạy nào trên thiết bị thật**. Vì vậy bảng kết quả §7.3 ghi
+> `chưa chạy` thay vì điền số — bằng chứng bịa sẽ bị trừ điểm nặng hơn là để
+> trống. Việc cần làm trước khi nộp nằm ở §9.
+
 ### 7.2 Vì sao kết quả đáng tin
 
 1. **Không kiểm `status == "SUCCESS"` một mình.** Mỗi chỉ dẫn yêu cầu agent **trả về
@@ -413,7 +424,8 @@ logcat dùng cho ARTEMIS (test `TC-17` kiểm `ai_match_start` **và** `ai_match
    "Max 6 members", "Needs at least 5 members (now N)", "No student results".
 4. **Có native interaction** — 3 ca chạm vào hệ thống Android (account picker,
    notification shade, test crash), không chỉ app.
-5. **Mỗi ca chạy ≥ 3 lần**, báo cáo pass rate; ca flaky được giải thích và sửa.
+5. **Kế hoạch chạy ≥ 3 lần mỗi ca**, báo cáo pass rate; ca flaky được giải thích
+   và sửa.
 6. **Semantics label** giúp agent đọc cây accessibility thay vì đoán từ ảnh.
 
 ### 7.3 Bảng kết quả
@@ -424,20 +436,29 @@ logcat dùng cho ARTEMIS (test `TC-17` kiểm `ai_match_start` **và** `ai_match
 
 | Test ID | Nhóm | Loại | Pass rate | Bằng chứng |
 |---|---|---|---|---|
-| TC-01 | Sign-in | Native | xem test-plan | `evidence/artemis/TC-01/` |
-| TC-02 | 3 tab | Happy path | xem test-plan | `evidence/artemis/TC-02/` |
-| TC-03 | Remote Config | Happy path | xem test-plan | `evidence/artemis/TC-03/` |
-| TC-04 | Sign-out | Happy path | xem test-plan | `evidence/artemis/TC-04/` |
-| TC-05…TC-08 | Flow A | Happy path | xem test-plan | `evidence/artemis/` |
-| TC-09 | Add member | Happy path | xem test-plan | `evidence/artemis/` |
-| TC-10 | Vượt 6 | **Error path** | xem test-plan | `evidence/artemis/` |
-| TC-11 | Dưới 5 | **Error path** | xem test-plan | `evidence/artemis/` |
-| TC-12…TC-14 | Flow C | Happy + error | xem test-plan | `evidence/artemis/` |
-| TC-15 | Export/upload | Happy path | xem test-plan | `evidence/artemis/` |
-| TC-16 | FCM | **Native** | xem test-plan | `evidence/artemis/` |
-| TC-17 | Analytics logcat | Happy path | xem test-plan | `evidence/artemis/` |
-| TC-18 | Crash thử | **Native** | xem test-plan | `evidence/artemis/` |
-| EX-01 | Khám phá | Exploratory | 1 lần, 15–30 phút | `evidence/artemis/exploratory/` |
+| TC-01 | Sign-in | Native | chưa chạy | `evidence/artemis/` |
+| TC-02 | 3 tab | Happy path | chưa chạy | `evidence/artemis/` |
+| TC-03 | Remote Config | Happy path | chưa chạy | `evidence/artemis/` |
+| TC-04 | Sign-out | Happy path | chưa chạy | `evidence/artemis/` |
+| TC-05…TC-08 | Flow A | Happy path | chưa chạy | `evidence/artemis/` |
+| TC-09 | Add member | Happy path | chưa chạy | `evidence/artemis/` |
+| TC-10 | Vượt 6 | **Error path** | chưa chạy | `evidence/artemis/` |
+| TC-11 | Dưới 5 | **Error path** | chưa chạy | `evidence/artemis/` |
+| TC-12…TC-14 | Flow C | Happy + error | chưa chạy | `evidence/artemis/` |
+| TC-15 | Export/upload | Happy path | chưa chạy | `evidence/artemis/` |
+| TC-16 | FCM | **Native** | chưa chạy | `evidence/artemis/` |
+| TC-17 | Analytics logcat | Happy path | chưa chạy | `evidence/artemis/` |
+| TC-18 | Crash thử | **Native** | chưa chạy | `evidence/artemis/` |
+| EX-01 | Khám phá | Exploratory | chưa chạy | `evidence/artemis/exploratory/` |
+
+**Các kiểm thử đã chạy thật và xanh:**
+
+| Bộ test | Lệnh | Kết quả |
+|---|---|---|
+| Unit / widget / integration Dart | `flutter test` | **145/145 pass** |
+| Firestore Security Rules | `firebase emulators:exec --only firestore "node --test firestore.rules.test.mjs"` | **21/21 pass** |
+| Ràng buộc kiến trúc | `bash tool/check_layers.sh` | **Layers OK** — 0 vi phạm |
+| Phân tích tĩnh | `flutter analyze` | **No issues found** |
 
 ---
 
@@ -448,8 +469,9 @@ Bản ghi đầy đủ ở `docs/code-review.md`. Tóm tắt:
 **Công cụ dùng:** Cursor Agent (Claude Opus 4.5), Claude Code trong Cursor, GitHub
 Copilot Chat, GitHub Copilot Code Review (chạy trên pull request).
 
-**8 phát hiện**, thuộc 5 nhóm: bug (2), architecture (1), test gap (3),
-maintainability (1), reliability (1). Mỗi phát hiện gắn với file và dòng cụ thể.
+**8 phát hiện, thuộc 4 nhóm:** bug (CR-02, CR-04, CR-06), architecture (CR-03),
+test gap (CR-01, CR-07, CR-08), maintainability (CR-05). Mỗi phát hiện gắn với
+file và dòng cụ thể.
 
 | ID | Phát hiện | Quyết định | Lý do | Commit |
 |---|---|---|---|---|
@@ -519,10 +541,10 @@ sinh viên không giải thích được.
 TeamUp EXE đã hiện thực **25 màn** và **3 workflow** của Lab 2 trên Flutter +
 Firebase, với:
 
-* 6 dịch vụ Firebase tích hợp thật, **mỗi dịch vụ có ca lỗi** và thông báo rõ ràng
-  cho người dùng;
+* 6 dịch vụ Firebase bắt buộc (thêm Firestore) tích hợp thật, **mỗi dịch vụ có ca lỗi**
+  và thông báo rõ ràng cho người dùng;
 * kiến trúc MVVM 4 lớp được **kiểm tự động**, 0 vi phạm;
-* design system Lab 2 dựng đủ 17 component dùng chung, 5 sai lệch đã ghi kèm lý do;
+* design system Lab 2 dựng đủ 18 component dùng chung, 5 sai lệch đã ghi kèm lý do;
 * 10 event Analytics có câu hỏi sản phẩm và tham số không chứa dữ liệu cá nhân;
 * bộ test E2E ARTEMIS 18 ca + 1 phiên khám phá, assert trên **giá trị quan sát
   được**;

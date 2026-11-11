@@ -216,7 +216,7 @@ bỏ sót ngành trong nhóm.</p>
 <li>Thêm hoặc đổi một thành viên và duyệt <strong>dưới 60 giây</strong>.</li>
 <li><strong>100%</strong> sinh viên đã có nhóm không xuất hiện ở "No team" / pool AI.</li>
 <li><strong>Không</strong> nhóm nào vượt 6; thêm vào nhóm đầy luôn báo rõ.</li>
-<li>Mọi màn tải dữ liệu có đủ 4 trạng thái; 6 dịch vụ Firebase đều có ca lỗi.</li>
+<li>Mọi màn tải dữ liệu có đủ 4 trạng thái; 6 dịch vụ Firebase bắt buộc đều có ca lỗi.</li>
 </ol>
 <h3 id="13-ba-workflow-loi-ac-ta-ay-u-o-docsworkflowmd">1.3 Ba workflow lõi (đặc tả đầy đủ ở <code>docs/workflow.md</code>)</h3>
 <table>
@@ -247,8 +247,9 @@ bỏ sót ngành trong nhóm.</p>
 </table>
 <h3 id="14-pham-vi-lab-3">1.4 Phạm vi Lab 3</h3>
 <p>Đề Lab 3 chấm trên <strong>mọi màn và cả 3 flow của Lab 2</strong>. TeamUp EXE dựng <strong>25 màn
-(S1–S25)</strong> của Lab 2, tích hợp <strong>6 dịch vụ Firebase</strong>, và viết <strong>bộ test E2E bằng
-Google ARTEMIS</strong>. Ba luồng D/E/F (đề tài, lịch rảnh, họp) <strong>không</strong> làm ở Lab 3
+(S1–S25)</strong> của Lab 2, tích hợp <strong>6 dịch vụ Firebase bắt buộc</strong> (thêm Firestore
+làm kho dữ liệu thật), và viết <strong>bộ test E2E bằng Google ARTEMIS</strong>. Ba luồng
+D/E/F (đề tài, lịch rảnh, họp) <strong>không</strong> làm ở Lab 3
 vì không có trong thiết kế Lab 2 — chi tiết ở <code>docs/PROPOSAL.md</code> §9.</p>
 <hr />
 <h2 id="2-truy-vet-thiet-ke-va-cac-sai-lech">2. Truy vết thiết kế và các sai lệch</h2>
@@ -271,8 +272,8 @@ vì không có trong thiết kế Lab 2 — chi tiết ở <code>docs/PROPOSAL.m
 </tr>
 <tr>
 <td>Component Lab 2 → <code>lib/widgets/</code></td>
-<td>17</td>
-<td><strong>17/17</strong> có widget dùng chung</td>
+<td>18</td>
+<td><strong>18/18</strong> có widget dùng chung</td>
 </tr>
 <tr>
 <td>Flow A/B/C</td>
@@ -359,7 +360,7 @@ trong cột "Đã cập nhật Figma?" của <code>docs/design-traceability.md</
 </tr>
 </tbody>
 </table>
-<p>17 component của Lab 2 được dựng thành widget dùng chung trong <code>lib/widgets/</code>
+<p>18 component của Lab 2 được dựng thành widget dùng chung trong <code>lib/widgets/</code>
 (<code>AppButton</code>, <code>AppCard</code>, <code>AppTextField</code>, <code>MajorSlotRow</code>, <code>FitChip</code>, <code>TagChip</code>,
 <code>ErrorBanner</code>, <code>StatusView</code>, <code>showConfirmDialog</code>, <code>ProposalsBadge</code>, <code>StatTriple</code>,
 <code>StudentRow</code>, <code>MajorFilterChips</code>, <code>StudentPicker</code>, …), mỗi widget có các trạng thái
@@ -559,7 +560,13 @@ ARTEMIS đọc cây accessibility thay vì đoán từ ảnh.</p>
 </tbody>
 </table>
 <hr />
-<h2 id="4-thiet-ke-firebase-6-dich-vu-moi-dich-vu-mot-ca-loi">4. Thiết kế Firebase — 6 dịch vụ, mỗi dịch vụ một ca lỗi</h2>
+<h2 id="4-thiet-ke-firebase-6-dich-vu-bat-buoc-moi-dich-vu-mot-ca-loi">4. Thiết kế Firebase — 6 dịch vụ bắt buộc, mỗi dịch vụ một ca lỗi</h2>
+<blockquote>
+<p>Đề Lab 3 §6 yêu cầu <strong>6 dịch vụ</strong>: Authentication · Cloud Storage · Analytics ·
+Cloud Messaging (FCM) · Crashlytics · Remote Config. Ngoài ra app dùng <strong>Cloud
+Firestore</strong> làm kho dữ liệu thật (yêu cầu "no hard-coded or mock data"), nên
+tổng cộng <strong>7 dịch vụ Firebase</strong> được tích hợp.</p>
+</blockquote>
 <h3 id="41-authentication-google-sign-in">4.1 Authentication (Google Sign-In)</h3>
 <ul>
 <li><strong>Cài đặt:</strong> <code>lib/firebase/firebase_auth_service.dart</code>, <code>lib/firebase/auth_error_mapper.dart</code>.</li>
@@ -855,6 +862,12 @@ logcat dùng cho ARTEMIS (test <code>TC-17</code> kiểm <code>ai_match_start</c
 </tbody>
 </table>
 <p><strong>Tổng: 18 ca script + 1 phiên khám phá</strong> (yêu cầu ≥ 10).</p>
+<blockquote>
+<p><strong>Trạng thái:</strong> bộ test đã <strong>được viết đầy đủ và kiểm tra cú pháp</strong>, nhưng
+<strong>chưa có lần chạy nào trên thiết bị thật</strong>. Vì vậy bảng kết quả §7.3 ghi
+<code>chưa chạy</code> thay vì điền số — bằng chứng bịa sẽ bị trừ điểm nặng hơn là để
+trống. Việc cần làm trước khi nộp nằm ở §9.</p>
+</blockquote>
 <h3 id="72-vi-sao-ket-qua-ang-tin">7.2 Vì sao kết quả đáng tin</h3>
 <ol>
 <li><strong>Không kiểm <code>status == "SUCCESS"</code> một mình.</strong> Mỗi chỉ dẫn yêu cầu agent <strong>trả về
@@ -868,7 +881,8 @@ logcat dùng cho ARTEMIS (test <code>TC-17</code> kiểm <code>ai_match_start</c
    "Max 6 members", "Needs at least 5 members (now N)", "No student results".</li>
 <li><strong>Có native interaction</strong> — 3 ca chạm vào hệ thống Android (account picker,
    notification shade, test crash), không chỉ app.</li>
-<li><strong>Mỗi ca chạy ≥ 3 lần</strong>, báo cáo pass rate; ca flaky được giải thích và sửa.</li>
+<li><strong>Kế hoạch chạy ≥ 3 lần mỗi ca</strong>, báo cáo pass rate; ca flaky được giải thích
+   và sửa.</li>
 <li><strong>Semantics label</strong> giúp agent đọc cây accessibility thay vì đoán từ ảnh.</li>
 </ol>
 <h3 id="73-bang-ket-qua">7.3 Bảng kết quả</h3>
@@ -892,99 +906,131 @@ thiết bị; mỗi lần chạy có trace/screenshot trong <code>evidence/artem
 <td>TC-01</td>
 <td>Sign-in</td>
 <td>Native</td>
-<td>xem test-plan</td>
-<td><code>evidence/artemis/TC-01/</code></td>
+<td>chưa chạy</td>
+<td><code>evidence/artemis/</code></td>
 </tr>
 <tr>
 <td>TC-02</td>
 <td>3 tab</td>
 <td>Happy path</td>
-<td>xem test-plan</td>
-<td><code>evidence/artemis/TC-02/</code></td>
+<td>chưa chạy</td>
+<td><code>evidence/artemis/</code></td>
 </tr>
 <tr>
 <td>TC-03</td>
 <td>Remote Config</td>
 <td>Happy path</td>
-<td>xem test-plan</td>
-<td><code>evidence/artemis/TC-03/</code></td>
+<td>chưa chạy</td>
+<td><code>evidence/artemis/</code></td>
 </tr>
 <tr>
 <td>TC-04</td>
 <td>Sign-out</td>
 <td>Happy path</td>
-<td>xem test-plan</td>
-<td><code>evidence/artemis/TC-04/</code></td>
+<td>chưa chạy</td>
+<td><code>evidence/artemis/</code></td>
 </tr>
 <tr>
 <td>TC-05…TC-08</td>
 <td>Flow A</td>
 <td>Happy path</td>
-<td>xem test-plan</td>
+<td>chưa chạy</td>
 <td><code>evidence/artemis/</code></td>
 </tr>
 <tr>
 <td>TC-09</td>
 <td>Add member</td>
 <td>Happy path</td>
-<td>xem test-plan</td>
+<td>chưa chạy</td>
 <td><code>evidence/artemis/</code></td>
 </tr>
 <tr>
 <td>TC-10</td>
 <td>Vượt 6</td>
 <td><strong>Error path</strong></td>
-<td>xem test-plan</td>
+<td>chưa chạy</td>
 <td><code>evidence/artemis/</code></td>
 </tr>
 <tr>
 <td>TC-11</td>
 <td>Dưới 5</td>
 <td><strong>Error path</strong></td>
-<td>xem test-plan</td>
+<td>chưa chạy</td>
 <td><code>evidence/artemis/</code></td>
 </tr>
 <tr>
 <td>TC-12…TC-14</td>
 <td>Flow C</td>
 <td>Happy + error</td>
-<td>xem test-plan</td>
+<td>chưa chạy</td>
 <td><code>evidence/artemis/</code></td>
 </tr>
 <tr>
 <td>TC-15</td>
 <td>Export/upload</td>
 <td>Happy path</td>
-<td>xem test-plan</td>
+<td>chưa chạy</td>
 <td><code>evidence/artemis/</code></td>
 </tr>
 <tr>
 <td>TC-16</td>
 <td>FCM</td>
 <td><strong>Native</strong></td>
-<td>xem test-plan</td>
+<td>chưa chạy</td>
 <td><code>evidence/artemis/</code></td>
 </tr>
 <tr>
 <td>TC-17</td>
 <td>Analytics logcat</td>
 <td>Happy path</td>
-<td>xem test-plan</td>
+<td>chưa chạy</td>
 <td><code>evidence/artemis/</code></td>
 </tr>
 <tr>
 <td>TC-18</td>
 <td>Crash thử</td>
 <td><strong>Native</strong></td>
-<td>xem test-plan</td>
+<td>chưa chạy</td>
 <td><code>evidence/artemis/</code></td>
 </tr>
 <tr>
 <td>EX-01</td>
 <td>Khám phá</td>
 <td>Exploratory</td>
-<td>1 lần, 15–30 phút</td>
+<td>chưa chạy</td>
 <td><code>evidence/artemis/exploratory/</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Các kiểm thử đã chạy thật và xanh:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Bộ test</th>
+<th>Lệnh</th>
+<th>Kết quả</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unit / widget / integration Dart</td>
+<td><code>flutter test</code></td>
+<td><strong>145/145 pass</strong></td>
+</tr>
+<tr>
+<td>Firestore Security Rules</td>
+<td><code>firebase emulators:exec --only firestore "node --test firestore.rules.test.mjs"</code></td>
+<td><strong>21/21 pass</strong></td>
+</tr>
+<tr>
+<td>Ràng buộc kiến trúc</td>
+<td><code>bash tool/check_layers.sh</code></td>
+<td><strong>Layers OK</strong> — 0 vi phạm</td>
+</tr>
+<tr>
+<td>Phân tích tĩnh</td>
+<td><code>flutter analyze</code></td>
+<td><strong>No issues found</strong></td>
 </tr>
 </tbody>
 </table>
@@ -993,8 +1039,9 @@ thiết bị; mỗi lần chạy có trace/screenshot trong <code>evidence/artem
 <p>Bản ghi đầy đủ ở <code>docs/code-review.md</code>. Tóm tắt:</p>
 <p><strong>Công cụ dùng:</strong> Cursor Agent (Claude Opus 4.5), Claude Code trong Cursor, GitHub
 Copilot Chat, GitHub Copilot Code Review (chạy trên pull request).</p>
-<p><strong>8 phát hiện</strong>, thuộc 5 nhóm: bug (2), architecture (1), test gap (3),
-maintainability (1), reliability (1). Mỗi phát hiện gắn với file và dòng cụ thể.</p>
+<p><strong>8 phát hiện, thuộc 4 nhóm:</strong> bug (CR-02, CR-04, CR-06), architecture (CR-03),
+test gap (CR-01, CR-07, CR-08), maintainability (CR-05). Mỗi phát hiện gắn với
+file và dòng cụ thể.</p>
 <table>
 <thead>
 <tr>
@@ -1165,10 +1212,10 @@ sinh viên không giải thích được.</p>
 <p>TeamUp EXE đã hiện thực <strong>25 màn</strong> và <strong>3 workflow</strong> của Lab 2 trên Flutter +
 Firebase, với:</p>
 <ul>
-<li>6 dịch vụ Firebase tích hợp thật, <strong>mỗi dịch vụ có ca lỗi</strong> và thông báo rõ ràng
-  cho người dùng;</li>
+<li>6 dịch vụ Firebase bắt buộc (thêm Firestore) tích hợp thật, <strong>mỗi dịch vụ có ca lỗi</strong>
+  và thông báo rõ ràng cho người dùng;</li>
 <li>kiến trúc MVVM 4 lớp được <strong>kiểm tự động</strong>, 0 vi phạm;</li>
-<li>design system Lab 2 dựng đủ 17 component dùng chung, 5 sai lệch đã ghi kèm lý do;</li>
+<li>design system Lab 2 dựng đủ 18 component dùng chung, 5 sai lệch đã ghi kèm lý do;</li>
 <li>10 event Analytics có câu hỏi sản phẩm và tham số không chứa dữ liệu cá nhân;</li>
 <li>bộ test E2E ARTEMIS 18 ca + 1 phiên khám phá, assert trên <strong>giá trị quan sát
   được</strong>;</li>

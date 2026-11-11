@@ -89,6 +89,7 @@ Kết quả: `report/Lab03_<StudentID>.pdf` và `slides/Lab03_<StudentID>_slides
 |---|---|---|
 | Truy vết thiết kế | [docs/design-traceability.md](docs/design-traceability.md) | 25 màn Lab 2 → route, widget, nguồn dữ liệu; 5 sai lệch kèm lý do; ma trận component và token |
 | Kiến trúc | [docs/architecture.md](docs/architecture.md) | Cây thư mục, sơ đồ layer, sequence diagram Flow A, bảng ViewModel → Service, trạng thái 7 dịch vụ Firebase |
+| Data model | [docs/data-model.md](docs/data-model.md) | 8 collection Firestore + Storage, trường và ràng buộc từng trường, state machine của `Proposal`, quy tắc nghiệp vụ R1–R7, index cần thiết |
 | Đặc tả workflow | [docs/workflow.md](docs/workflow.md) | 3 workflow lõi đủ 7 thành phần, activity diagram, state machine, registry BR-01…BR-07 |
 | Kế hoạch Analytics | [docs/analytics-plan.md](docs/analytics-plan.md) | 10 event: trigger, tham số có kiểu, câu hỏi sản phẩm, ánh xạ flow, quy tắc không PII |
 | Kế hoạch kiểm thử | [docs/test-plan.md](docs/test-plan.md) | 18 ca ARTEMIS + 1 phiên khám phá, bảng kết quả, giải thích ca flaky |
@@ -110,6 +111,32 @@ Kết quả: `report/Lab03_<StudentID>.pdf` và `slides/Lab03_<StudentID>_slides
 | Mermaid CLI (`mmdc`) | Vẽ sơ đồ activity / state / sequence / layer cho báo cáo và slide |
 
 Chi tiết và quyết định cho từng phát hiện: [docs/code-review.md](docs/code-review.md) §5.
+
+## Demo video
+
+> **Cần điền trước khi nộp** (đề Lab 3 §9 yêu cầu "demo video link" trong README).
+> Video 5–10 phút, quay trên máy thật, theo đúng thứ tự trong
+> `docs/test-plan.md`: đăng nhập → Flow A → Flow B → Flow C → xuất & upload PDF →
+> nhận thông báo FCM → đổi Remote Config **không build lại** → demo Crashlytics →
+> chạy 1 ca ARTEMIS trên thiết bị → 1 phát hiện AI code review kèm fix. Mở
+> Firebase Console ở đúng khoảnh khắc nó chứng minh kết quả.
+
+**Link video:** _(chưa có — điền sau khi quay)_
+
+## Trạng thái bằng chứng
+
+| Hạng mục | Trạng thái | Ghi chú |
+|---|---|---|
+| `flutter analyze` | ✅ **No issues found** | 0 cảnh báo |
+| `flutter test` | ✅ **145/145 pass** | unit + widget |
+| Firestore rules test | ✅ **21/21 pass** | `firebase emulators:exec --only firestore "node --test firestore.rules.test.mjs"` |
+| `tool/check_layers.sh` | ✅ **Layers OK** | 0 vi phạm layer |
+| Báo cáo PDF | ✅ 9 trang | rubric yêu cầu 8–12 |
+| Slide PDF | ✅ 15 slide chính + 4 slide phụ | rubric yêu cầu 12–15 |
+| 18 ca ARTEMIS | ⚠️ **đã viết, chưa chạy trên thiết bị** | cần chạy + điền `docs/test-plan.md` §6 + ảnh vào `evidence/artemis/` |
+| Ảnh Console (6 dịch vụ) | ⚠️ **chưa chụp** | checklist trong `evidence/README.md` |
+| `android/app/google-services.json` | ⚠️ **chưa có trong repo** | chạy `flutterfire configure` rồi commit (đề §9 cho phép commit) |
+| Video demo | ⚠️ **chưa quay** | xem mục trên |
 
 ## Không commit
 

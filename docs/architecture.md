@@ -128,6 +128,10 @@ Redirect theo `sessionProvider`: chưa đăng nhập → `/sign-in`; đã đăng
 | FCM | `firebase/fcm_notification_service.dart`, `background_notification_handler.dart` | xong | Xử lý foreground/background/terminated; đăng ký token vào `users/{uid}/fcmTokens`; deep-link qua allow-list. |
 | PDF generation | `firebase/pdf_report_service.dart` | xong | Sinh PDF từ **cùng** stream Firestore mà mentor đang xem → file phản ánh đúng màn hình. |
 
+**Schema Firestore chi tiết** (từng trường, ràng buộc, state machine của
+`Proposal`, index) nằm ở **[docs/data-model.md](data-model.md)** — đó là hợp
+đồng tích hợp giữa app và `firebase/firestore.rules`.
+
 ## 6. Sơ đồ sequence — Flow A đầy đủ (nhập lớp → AI ghép → duyệt → xuất PDF)
 
 ```mermaid

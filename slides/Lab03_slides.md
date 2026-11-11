@@ -9,7 +9,7 @@
 | **Người dùng** | Mentor / giảng viên môn EXE (persona "Cô Lan") — người dùng duy nhất trên mobile |
 | **Giá trị** | Chia lớp ~40 sinh viên thành nhóm 5–6 người đa ngành (SE/AI/MKT/GD) trong một lần ghép |
 | **Nền tảng** | Android · Flutter 3.47 + Material 3 · Firebase (7 dịch vụ) |
-| **Bằng chứng** | App chạy thật trên máy · 145 test Dart · 18 ca ARTEMIS + 1 phiên khám phá · 8 phát hiện AI review có 4 commit sửa |
+| **Bằng chứng** | App chạy thật trên máy · 145/145 test Dart · 21/21 test Firestore rules · 18 ca ARTEMIS + 1 phiên khám phá (đã viết) · 8 phát hiện AI review có 4 commit sửa |
 
 **Tiêu chí thành công (Lab 2):** duyệt xong một lớp **< 5 phút** · mọi nhóm có **5–6 người, ≥ 3 ngành** · thêm/đổi một thành viên và duyệt **< 60 giây** · **100%** SV đã có nhóm không lọt vào pool AI · **0** nhóm vượt 6.
 
@@ -118,7 +118,7 @@ flowchart LR
 | **Mobile** | Flutter 3.47.9 · Dart 3.13.7 · Material 3 | Giao diện Android một tay, đúng design system Lab 2 |
 | **State** | Riverpod 3.4.3 (`Notifier` viết tay) | 4 trạng thái rõ ràng, service inject được, test bằng fake |
 | **Navigation** | go_router 18.1.3 + `StatefulShellRoute` | 3 tab, chặn route theo auth state, deep-link allow-list |
-| **Cloud** | Firebase Auth · Firestore · Storage · FCM · Analytics · Crashlytics · Remote Config | 6 dịch vụ bắt buộc + dữ liệu thật |
+| **Cloud** | Firebase Auth · Firestore · Storage · FCM · Analytics · Crashlytics · Remote Config | **6 dịch vụ bắt buộc** (§6) + Firestore làm kho dữ liệu thật |
 | **File** | `pdf` · `file_picker` · `csv` | Sinh PDF từ dữ liệu đang xem; đọc CSV import |
 | **AI/Logic** | `RuleBasedMatchingService` (thuật toán quy tắc thuần Dart) | "AI" ghép theo ngành — giải thích được, test được, không cần ML |
 | **Dev / Test** | Git · Figma · Copilot Code Review · `flutter_test` · Google ARTEMIS | Review truy vết + unit/widget + E2E trên thiết bị thật |
@@ -167,7 +167,7 @@ sequenceDiagram
 | — | — | Banner lỗi · dialog xác nhận | `ErrorBanner`, `showConfirmDialog` |
 | — | — | Loading / Empty / Error | `StatusView` |
 
-**17 component dùng chung**, mỗi cái có trạng thái Lab 2 làm tham số; không có giá trị màu/cỡ chữ/padding hard-code trong màn — `check_layers.sh` chặn tự động. **Accessibility:** vùng chạm ≥ 48 dp · chữ thân bài ≥ 14 sp · không truyền thông tin chỉ bằng màu · `Semantics` label trên widget chính.
+**18 component dùng chung**, mỗi cái có trạng thái Lab 2 làm tham số; không có giá trị màu/cỡ chữ/padding hard-code trong màn — `check_layers.sh` chặn tự động. **Accessibility:** vùng chạm ≥ 48 dp · chữ thân bài ≥ 14 sp · không truyền thông tin chỉ bằng màu · `Semantics` label trên widget chính.
 
 | ID | Sai lệch so với Figma | Lý do | Ảnh hưởng |
 |---|---|---|---|
@@ -237,7 +237,7 @@ sequenceDiagram
 | FR-08 Ghép tay | S15, S16, S20, S21 | `ProposalService` | TC-13 |
 | FR-10 Xuất báo cáo PDF | S6 demo | `ReportService`, `StorageService` | TC-15 |
 
-**25/25 màn Lab 2 → route + widget + nguồn dữ liệu** (`docs/design-traceability.md` §1) · 17/17 component → widget dùng chung · 3/3 flow chạy hết có đường lỗi.
+**25/25 màn Lab 2 → route + widget + nguồn dữ liệu** (`docs/design-traceability.md` §1) · 18/18 component → widget dùng chung · 3/3 flow chạy hết có đường lỗi.
 
 **Demo plan — 3 workflow thành một câu chuyện liền mạch:**
 
@@ -256,10 +256,12 @@ sequenceDiagram
 | Level | Công cụ | Số lượng | Kết quả |
 |---|---|---|---|
 | Unit / widget / integration | `flutter_test` | **145 test** | **145/145 pass** |
-| E2E / UI | **Google ARTEMIS** (pytest) | **18 ca + 1 phiên khám phá** | bảng pass rate ở `docs/test-plan.md` §6 |
-| Rules test | Firestore Rules emulator | `firestore.rules.test.mjs` | xanh |
+| E2E / UI | **Google ARTEMIS** (pytest) | **18 ca + 1 phiên khám phá** | bộ test đã viết; **chưa có lần chạy trên thiết bị** — bảng kết quả để trống trong `docs/test-plan.md` §6 |
+| Rules test | Firestore Rules emulator | `firestore.rules.test.mjs` | **21/21 pass** |
 
-Assert trên **giá trị agent báo lại** (`Observed.number()`, `Observed.contains()`), không chỉ `status == "SUCCESS"`; có 3 ca lỗi thật (vượt 6 · dưới 5 · không tìm ra SV) và 3 native interaction (account picker · notification shade · test crash); mỗi ca chạy ≥ 3 lần, trace lưu ở `evidence/artemis/`.
+Assert trên **giá trị agent báo lại** (`Observed.number()`, `Observed.contains()`), không chỉ `status == "SUCCESS"`; có 3 ca lỗi thật (vượt 6 · dưới 5 · không tìm ra SV) và 3 native interaction (account picker · notification shade · test crash); kế hoạch chạy mỗi ca ≥ 3 lần, trace lưu ở `evidence/artemis/`.
+
+> **Trạng thái bằng chứng:** 145/145 test Dart và 21/21 test Firestore rules **đã chạy thật** và xanh. 18 ca ARTEMIS **đã viết nhưng chưa chạy trên thiết bị** — cần chạy và điền `docs/test-plan.md` §6 + ảnh vào `evidence/artemis/` trước khi nộp.
 
 **AI code review — 8 phát hiện, 4 commit sửa có tên mã**
 
@@ -281,17 +283,17 @@ Assert trên **giá trị agent báo lại** (`Observed.number()`, `Observed.con
 | Mục tiêu | Kết quả | Bằng chứng |
 |---|---|---|
 | 25 màn + 3 flow Lab 2, có đường lỗi | ✅ 25/25 route/state · 3/3 flow | `docs/design-traceability.md`, `e2e_test/` |
-| 6 dịch vụ Firebase, mỗi dịch vụ có ca lỗi | ✅ Auth · Firestore · Storage · FCM · Analytics · Crashlytics · Remote Config | `evidence/`, `docs/architecture.md` §5 |
+| 6 dịch vụ Firebase, mỗi dịch vụ có ca lỗi | ✅ Auth · Storage · Analytics · FCM · Crashlytics · Remote Config (+ Firestore) | `evidence/`, `docs/architecture.md` §5 |
 | MVVM 4 lớp, phụ thuộc chỉ đi xuống | ✅ **0 vi phạm** / 6 quy tắc, kiểm tự động | `tool/check_layers.sh` → `Layers OK` |
-| Design system Lab 2 trong code | ✅ 17 component dùng chung, token trong `ThemeData` | `docs/design-traceability.md` §3–§4 |
+| Design system Lab 2 trong code | ✅ 18 component dùng chung, token trong `ThemeData` | `docs/design-traceability.md` §3–§4 |
 | Analytics ≥ 7 event, **không PII** | ✅ **10 event** có câu hỏi sản phẩm | `docs/analytics-plan.md`, DebugView |
 | Remote Config ≥ 2 tham số đổi hành vi | ✅ `ai_matching_enabled` + `max_proposals_shown` | ảnh trước/sau |
-| ARTEMIS ≥ 10 ca, ≥ 3 lần/ca, exploratory | ✅ 18 ca + 1 phiên khám phá | `evidence/artemis/` |
+| ARTEMIS ≥ 10 ca, ≥ 3 lần/ca, exploratory | ⚠️ **18 ca + 1 phiên khám phá đã viết, chưa chạy trên thiết bị** | `e2e_test/`, `docs/test-plan.md` §6 |
 | AI review ≥ 5 phát hiện, ≥ 3 commit sửa | ✅ **8 phát hiện**, **4 commit** có tên mã | `docs/code-review.md` |
 
-**Giới hạn trung thực:** ① **Figma chưa cập nhật** cho D1–D4 (đã ghi ở traceability, cần sửa trước khi nộp) — ưu tiên **Cao**; ② "AI" là thuật toán quy tắc, chưa dùng kỹ năng/lịch — Final thay bằng Gemini; ③ chưa có web admin và luồng liên vai — Final bổ sung; ④ chưa test tải 2 mentor duyệt đồng thời — thấp.
+**Giới hạn trung thực:** ① **Figma chưa cập nhật** cho D1–D4 (đã ghi ở traceability, cần sửa trước khi nộp) — ưu tiên **Cao**; ② **18 ca ARTEMIS đã viết nhưng chưa chạy trên thiết bị** — cần chạy + chụp bằng chứng vào `evidence/artemis/` — ưu tiên **Cao**; ③ "AI" là thuật toán quy tắc, chưa dùng kỹ năng/lịch — Final thay bằng Gemini; ④ chưa có web admin và luồng liên vai — Final bổ sung; ⑤ chưa test tải 2 mentor duyệt đồng thời — thấp.
 
-**Kết luận:** *PROBLEM SOLVED* — chia nhóm thủ công mất hàng giờ và dễ sai quy tắc 5–6 người / ≥ 3 ngành → 25 màn + 3 workflow tự động hoá, có ràng buộc ở cả UI lẫn Firestore rules. *WORKING PRODUCT* — app Flutter + Firebase chạy thật trên Android: import → ghép theo ngành → sửa & duyệt → undo → xuất PDF lên Cloud Storage. *VERIFIED RESULT* — 145/145 test · 18 ca ARTEMIS + 1 phiên khám phá · 8 phát hiện AI review có 4 commit sửa · 6 dịch vụ Firebase có ca lỗi và bằng chứng Console.
+**Kết luận:** *PROBLEM SOLVED* — chia nhóm thủ công mất hàng giờ và dễ sai quy tắc 5–6 người / ≥ 3 ngành → 25 màn + 3 workflow tự động hoá, có ràng buộc ở cả UI lẫn Firestore rules. *WORKING PRODUCT* — app Flutter + Firebase chạy thật trên Android: import → ghép theo ngành → sửa & duyệt → undo → xuất PDF lên Cloud Storage. *VERIFIED RESULT* — 145/145 test Dart · 21/21 test Firestore rules · 18 ca ARTEMIS + 1 phiên khám phá (đã viết, cần chạy) · 8 phát hiện AI review có 4 commit sửa · 6 dịch vụ Firebase có ca lỗi.
 
 **Repo:** `github.com/no-solace/prm-teamup-mobile` · **Figma:** file Lab 2 Final UI · **Video demo:** 5–10 phút (link trong README). **Hướng tiếp:** web admin cho Điều phối khoa, luồng duyệt mobile → web, và Gemini thay thuật toán quy tắc — giữ nguyên interface `MatchingService`/`ProposalService`.
 

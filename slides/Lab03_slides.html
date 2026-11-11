@@ -171,7 +171,7 @@ hr {
 </tr>
 <tr>
 <td><strong>Bằng chứng</strong></td>
-<td>App chạy thật trên máy · 145 test Dart · 18 ca ARTEMIS + 1 phiên khám phá · 8 phát hiện AI review có 4 commit sửa</td>
+<td>App chạy thật trên máy · 145/145 test Dart · 21/21 test Firestore rules · 18 ca ARTEMIS + 1 phiên khám phá (đã viết) · 8 phát hiện AI review có 4 commit sửa</td>
 </tr>
 </tbody>
 </table>
@@ -385,7 +385,7 @@ hr {
 <tr>
 <td><strong>Cloud</strong></td>
 <td>Firebase Auth · Firestore · Storage · FCM · Analytics · Crashlytics · Remote Config</td>
-<td>6 dịch vụ bắt buộc + dữ liệu thật</td>
+<td><strong>6 dịch vụ bắt buộc</strong> (§6) + Firestore làm kho dữ liệu thật</td>
 </tr>
 <tr>
 <td><strong>File</strong></td>
@@ -457,7 +457,7 @@ hr {
 </tr>
 </tbody>
 </table>
-<p><strong>17 component dùng chung</strong>, mỗi cái có trạng thái Lab 2 làm tham số; không có giá trị màu/cỡ chữ/padding hard-code trong màn — <code>check_layers.sh</code> chặn tự động. <strong>Accessibility:</strong> vùng chạm ≥ 48 dp · chữ thân bài ≥ 14 sp · không truyền thông tin chỉ bằng màu · <code>Semantics</code> label trên widget chính.</p>
+<p><strong>18 component dùng chung</strong>, mỗi cái có trạng thái Lab 2 làm tham số; không có giá trị màu/cỡ chữ/padding hard-code trong màn — <code>check_layers.sh</code> chặn tự động. <strong>Accessibility:</strong> vùng chạm ≥ 48 dp · chữ thân bài ≥ 14 sp · không truyền thông tin chỉ bằng màu · <code>Semantics</code> label trên widget chính.</p>
 <table>
 <thead>
 <tr>
@@ -644,7 +644,7 @@ hr {
 </tr>
 </tbody>
 </table>
-<p><strong>25/25 màn Lab 2 → route + widget + nguồn dữ liệu</strong> (<code>docs/design-traceability.md</code> §1) · 17/17 component → widget dùng chung · 3/3 flow chạy hết có đường lỗi.</p>
+<p><strong>25/25 màn Lab 2 → route + widget + nguồn dữ liệu</strong> (<code>docs/design-traceability.md</code> §1) · 18/18 component → widget dùng chung · 3/3 flow chạy hết có đường lỗi.</p>
 <p><strong>Demo plan — 3 workflow thành một câu chuyện liền mạch:</strong></p>
 <table>
 <thead>
@@ -699,17 +699,20 @@ hr {
 <td>E2E / UI</td>
 <td><strong>Google ARTEMIS</strong> (pytest)</td>
 <td><strong>18 ca + 1 phiên khám phá</strong></td>
-<td>bảng pass rate ở <code>docs/test-plan.md</code> §6</td>
+<td>bộ test đã viết; <strong>chưa có lần chạy trên thiết bị</strong> — bảng kết quả để trống trong <code>docs/test-plan.md</code> §6</td>
 </tr>
 <tr>
 <td>Rules test</td>
 <td>Firestore Rules emulator</td>
 <td><code>firestore.rules.test.mjs</code></td>
-<td>xanh</td>
+<td><strong>21/21 pass</strong></td>
 </tr>
 </tbody>
 </table>
-<p>Assert trên <strong>giá trị agent báo lại</strong> (<code>Observed.number()</code>, <code>Observed.contains()</code>), không chỉ <code>status == "SUCCESS"</code>; có 3 ca lỗi thật (vượt 6 · dưới 5 · không tìm ra SV) và 3 native interaction (account picker · notification shade · test crash); mỗi ca chạy ≥ 3 lần, trace lưu ở <code>evidence/artemis/</code>.</p>
+<p>Assert trên <strong>giá trị agent báo lại</strong> (<code>Observed.number()</code>, <code>Observed.contains()</code>), không chỉ <code>status == "SUCCESS"</code>; có 3 ca lỗi thật (vượt 6 · dưới 5 · không tìm ra SV) và 3 native interaction (account picker · notification shade · test crash); kế hoạch chạy mỗi ca ≥ 3 lần, trace lưu ở <code>evidence/artemis/</code>.</p>
+<blockquote>
+<p><strong>Trạng thái bằng chứng:</strong> 145/145 test Dart và 21/21 test Firestore rules <strong>đã chạy thật</strong> và xanh. 18 ca ARTEMIS <strong>đã viết nhưng chưa chạy trên thiết bị</strong> — cần chạy và điền <code>docs/test-plan.md</code> §6 + ảnh vào <code>evidence/artemis/</code> trước khi nộp.</p>
+</blockquote>
 <p><strong>AI code review — 8 phát hiện, 4 commit sửa có tên mã</strong></p>
 <table>
 <thead>
@@ -798,7 +801,7 @@ hr {
 </tr>
 <tr>
 <td>6 dịch vụ Firebase, mỗi dịch vụ có ca lỗi</td>
-<td>✅ Auth · Firestore · Storage · FCM · Analytics · Crashlytics · Remote Config</td>
+<td>✅ Auth · Storage · Analytics · FCM · Crashlytics · Remote Config (+ Firestore)</td>
 <td><code>evidence/</code>, <code>docs/architecture.md</code> §5</td>
 </tr>
 <tr>
@@ -808,7 +811,7 @@ hr {
 </tr>
 <tr>
 <td>Design system Lab 2 trong code</td>
-<td>✅ 17 component dùng chung, token trong <code>ThemeData</code></td>
+<td>✅ 18 component dùng chung, token trong <code>ThemeData</code></td>
 <td><code>docs/design-traceability.md</code> §3–§4</td>
 </tr>
 <tr>
@@ -823,8 +826,8 @@ hr {
 </tr>
 <tr>
 <td>ARTEMIS ≥ 10 ca, ≥ 3 lần/ca, exploratory</td>
-<td>✅ 18 ca + 1 phiên khám phá</td>
-<td><code>evidence/artemis/</code></td>
+<td>⚠️ <strong>18 ca + 1 phiên khám phá đã viết, chưa chạy trên thiết bị</strong></td>
+<td><code>e2e_test/</code>, <code>docs/test-plan.md</code> §6</td>
 </tr>
 <tr>
 <td>AI review ≥ 5 phát hiện, ≥ 3 commit sửa</td>
@@ -833,8 +836,8 @@ hr {
 </tr>
 </tbody>
 </table>
-<p><strong>Giới hạn trung thực:</strong> ① <strong>Figma chưa cập nhật</strong> cho D1–D4 (đã ghi ở traceability, cần sửa trước khi nộp) — ưu tiên <strong>Cao</strong>; ② "AI" là thuật toán quy tắc, chưa dùng kỹ năng/lịch — Final thay bằng Gemini; ③ chưa có web admin và luồng liên vai — Final bổ sung; ④ chưa test tải 2 mentor duyệt đồng thời — thấp.</p>
-<p><strong>Kết luận:</strong> <em>PROBLEM SOLVED</em> — chia nhóm thủ công mất hàng giờ và dễ sai quy tắc 5–6 người / ≥ 3 ngành → 25 màn + 3 workflow tự động hoá, có ràng buộc ở cả UI lẫn Firestore rules. <em>WORKING PRODUCT</em> — app Flutter + Firebase chạy thật trên Android: import → ghép theo ngành → sửa &amp; duyệt → undo → xuất PDF lên Cloud Storage. <em>VERIFIED RESULT</em> — 145/145 test · 18 ca ARTEMIS + 1 phiên khám phá · 8 phát hiện AI review có 4 commit sửa · 6 dịch vụ Firebase có ca lỗi và bằng chứng Console.</p>
+<p><strong>Giới hạn trung thực:</strong> ① <strong>Figma chưa cập nhật</strong> cho D1–D4 (đã ghi ở traceability, cần sửa trước khi nộp) — ưu tiên <strong>Cao</strong>; ② <strong>18 ca ARTEMIS đã viết nhưng chưa chạy trên thiết bị</strong> — cần chạy + chụp bằng chứng vào <code>evidence/artemis/</code> — ưu tiên <strong>Cao</strong>; ③ "AI" là thuật toán quy tắc, chưa dùng kỹ năng/lịch — Final thay bằng Gemini; ④ chưa có web admin và luồng liên vai — Final bổ sung; ⑤ chưa test tải 2 mentor duyệt đồng thời — thấp.</p>
+<p><strong>Kết luận:</strong> <em>PROBLEM SOLVED</em> — chia nhóm thủ công mất hàng giờ và dễ sai quy tắc 5–6 người / ≥ 3 ngành → 25 màn + 3 workflow tự động hoá, có ràng buộc ở cả UI lẫn Firestore rules. <em>WORKING PRODUCT</em> — app Flutter + Firebase chạy thật trên Android: import → ghép theo ngành → sửa &amp; duyệt → undo → xuất PDF lên Cloud Storage. <em>VERIFIED RESULT</em> — 145/145 test Dart · 21/21 test Firestore rules · 18 ca ARTEMIS + 1 phiên khám phá (đã viết, cần chạy) · 8 phát hiện AI review có 4 commit sửa · 6 dịch vụ Firebase có ca lỗi.</p>
 <p><strong>Repo:</strong> <code>github.com/no-solace/prm-teamup-mobile</code> · <strong>Figma:</strong> file Lab 2 Final UI · <strong>Video demo:</strong> 5–10 phút (link trong README). <strong>Hướng tiếp:</strong> web admin cho Điều phối khoa, luồng duyệt mobile → web, và Gemini thay thuật toán quy tắc — giữ nguyên interface <code>MatchingService</code>/<code>ProposalService</code>.</p>
 <hr />
 <h1 id="phu-luc-slide-du-phong-khong-trinh-bay-mo-khi-bi-hoi">Phụ lục — slide dự phòng (không trình bày, mở khi bị hỏi)</h1>

@@ -116,30 +116,54 @@ adb shell uiautomator dump /sdcard/ui.xml && adb pull /sdcard/ui.xml
 
 ## 6. Bảng kết quả
 
-> Điền sau khi chạy thật trên thiết bị. Cột "Pass rate" = số lần đạt / tổng số lần
-> chạy (mỗi test ≥ 3 lần).
+> **Trạng thái: CHƯA CHẠY.** Bảng này được điền **sau khi chạy thật trên thiết bị
+> thật** (emulator có Google Play hoặc máy Android). Cột "Pass rate" = số lần đạt
+> / tổng số lần chạy (mỗi test ≥ 3 lần).
+>
+> Hiện tại bộ test đã **được viết và kiểm tra cú pháp**, nhưng **chưa có lần chạy
+> nào trên thiết bị** — vì vậy cột "Kết quả" ghi `chưa chạy` thay vì điền số.
+> Số liệu bịa sẽ là điểm trừ lớn hơn là để trống. Ảnh chụp và log thực tế đặt
+> ở `evidence/artemis/` kèm `evidence/artemis/README.md`.
 
 | Test ID | Runs | Pass rate | Thời gian TB | Ghi chú |
 |---|---|---|---|---|
-| TC-01 | 3 | 3/3 | | Native: chọn tài khoản trong account picker |
-| TC-02 | 3 | 3/3 | | |
-| TC-03 | 3 | 3/3 | | |
-| TC-04 | 3 | 3/3 | | |
-| TC-05 | 3 | 3/3 | | |
-| TC-06 | 3 | 3/3 | | |
-| TC-07 | 3 | 3/3 | | |
-| TC-08 | 3 | 3/3 | | |
-| TC-09 | 3 | 3/3 | | |
-| TC-10 | 3 | 3/3 | | |
-| TC-11 | 3 | 3/3 | | |
-| TC-12 | 3 | 3/3 | | |
-| TC-13 | 3 | 3/3 | | |
-| TC-14 | 3 | 3/3 | | |
-| TC-15 | 3 | 3/3 | | |
-| TC-16 | 3 | 3/3 | | Native: notification shade |
-| TC-17 | 3 | 3/3 | | Kiểm Logcat |
-| TC-18 | 3 | 3/3 | | Native: deliberate crash |
-| EX-01 | 1 | 1/1 | 15–30 phút | Pro profile, báo cáo trong `evidence/artemis/exploratory/` |
+| TC-01 | 0 | chưa chạy | — | Native: chọn tài khoản trong account picker |
+| TC-02 | 0 | chưa chạy | — | |
+| TC-03 | 0 | chưa chạy | — | |
+| TC-04 | 0 | chưa chạy | — | |
+| TC-05 | 0 | chưa chạy | — | |
+| TC-06 | 0 | chưa chạy | — | |
+| TC-07 | 0 | chưa chạy | — | |
+| TC-08 | 0 | chưa chạy | — | |
+| TC-09 | 0 | chưa chạy | — | |
+| TC-10 | 0 | chưa chạy | — | |
+| TC-11 | 0 | chưa chạy | — | |
+| TC-12 | 0 | chưa chạy | — | |
+| TC-13 | 0 | chưa chạy | — | |
+| TC-14 | 0 | chưa chạy | — | |
+| TC-15 | 0 | chưa chạy | — | |
+| TC-16 | 0 | chưa chạy | — | Native: notification shade |
+| TC-17 | 0 | chưa chạy | — | Kiểm Logcat |
+| TC-18 | 0 | chưa chạy | — | Native: deliberate crash |
+| EX-01 | 0 | chưa chạy | — | Pro profile, báo cáo trong `evidence/artemis/exploratory/` |
+
+### Cách điền bảng này
+
+```bash
+cd e2e_test
+pip install -e ".[artemis]"
+export ARTEMIS_API_KEY=<model api key>
+export ARTEMIS_DEVICE=emulator-5554
+
+# 3 lần mỗi test để đo pass rate
+for i in 1 2 3; do pytest -m "not exploratory" -v; done
+
+# Phiên khám phá (Pro profile)
+ARTEMIS_PROFILE=pro pytest test_exploratory.py -s -m exploratory
+```
+
+Sau đó: điền số vào bảng trên, chụp Logcat/DebugView vào `evidence/artemis/`, và
+ghi nhận xét về ca flaky vào §7.
 
 ## 7. Giải thích test flaky / fail / skip
 
