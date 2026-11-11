@@ -1,0 +1,1228 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<title>TeamUp EXE - PRM393 Lab 3 report</title>
+<style>/* Print stylesheet for the Lab 3 final report (A4, 8-12 pages target). */
+@page {
+  size: A4;
+  margin: 15mm 14mm 13mm 14mm;
+}
+
+html {
+  font-size: 9.6pt;
+}
+
+body {
+  font-family: "Segoe UI", "Be Vietnam Pro", Roboto, system-ui, sans-serif;
+  line-height: 1.4;
+  color: #22201c;
+  margin: 0;
+  padding: 0;
+  max-width: 182mm;
+}
+
+h1 {
+  font-size: 17pt;
+  color: #b23e00;
+  border-bottom: 2px solid #b23e00;
+  padding-bottom: 3px;
+  margin: 0 0 7pt 0;
+  page-break-after: avoid;
+}
+
+h2 {
+  font-size: 12.5pt;
+  color: #2f2e2a;
+  margin: 12pt 0 4pt 0;
+  padding-bottom: 2px;
+  border-bottom: 1px solid #d8d4cd;
+  page-break-after: avoid;
+}
+
+h3 {
+  font-size: 10.5pt;
+  color: #2f2e2a;
+  margin: 8pt 0 3pt 0;
+  page-break-after: avoid;
+}
+
+h4 {
+  font-size: 9.8pt;
+  color: #5a564e;
+  margin: 7pt 0 2pt 0;
+  page-break-after: avoid;
+}
+
+p {
+  margin: 3.5pt 0;
+  text-align: justify;
+}
+
+ul,
+ol {
+  margin: 3.5pt 0 3.5pt 15pt;
+  padding: 0;
+}
+
+li {
+  margin: 1.5pt 0;
+}
+
+a {
+  color: #b23e00;
+  text-decoration: none;
+}
+
+code {
+  font-family: "Cascadia Mono", Consolas, "Courier New", monospace;
+  font-size: 8.6pt;
+  background: #f4f1ec;
+  padding: 0 2px;
+  border-radius: 3px;
+}
+
+pre {
+  font-family: "Cascadia Mono", Consolas, "Courier New", monospace;
+  font-size: 7.2pt;
+  line-height: 1.3;
+  background: #f4f1ec;
+  border-left: 3px solid #b23e00;
+  padding: 5pt 7pt;
+  white-space: pre-wrap;
+  word-break: break-word;
+  page-break-inside: avoid;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
+
+blockquote {
+  margin: 4pt 0 4pt 9pt;
+  padding-left: 7pt;
+  border-left: 3px solid #cfcac2;
+  color: #55504a;
+  font-size: 8.8pt;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 5pt 0;
+  font-size: 8pt;
+  page-break-inside: avoid;
+}
+
+th {
+  background: #efece6;
+  text-align: left;
+  font-weight: 600;
+  color: #2f2e2a;
+}
+
+th,
+td {
+  border: 1px solid #d5d0c8;
+  padding: 2.5pt 4pt;
+  vertical-align: top;
+}
+
+tr:nth-child(even) td {
+  background: #faf8f5;
+}
+
+figure {
+  margin: 7pt 0;
+  text-align: center;
+  page-break-inside: avoid;
+}
+
+figure img {
+  max-width: 100%;
+  max-height: 165mm;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #d8d4cd;
+  margin: 8pt 0;
+}
+
+strong {
+  color: #17150f;
+}
+
+ul,
+ol {
+  page-break-inside: avoid;
+}
+
+h2 {
+  page-break-before: auto;
+}
+
+/* Keep a heading with at least the following table. */
+h2 + table,
+h3 + table {
+  page-break-before: avoid;
+}
+</style>
+</head>
+<body>
+<h1 id="teamup-exe-prm393-lab-3-cloud-enabled-mobile-app">TeamUp EXE — PRM393 Lab 3: Cloud-Enabled Mobile App</h1>
+<p><strong>Ngành học:</strong> PRM393 — Mobile Programming · <strong>Kỳ:</strong> Lab 3 · <strong>Nhóm:</strong> 6
+<strong>Bài nộp:</strong> <code>docs/design-traceability.md</code> · <code>docs/architecture.md</code> · <code>docs/analytics-plan.md</code> · <code>docs/test-plan.md</code> · <code>docs/code-review.md</code> · <code>docs/workflow.md</code></p>
+<hr />
+<h2 id="1-tong-quan-du-an-va-nhac-lai-lab-2">1. Tổng quan dự án và nhắc lại Lab 2</h2>
+<h3 id="11-van-e">1.1 Vấn đề</h3>
+<p>Mentor môn EXE (môn Cấu trúc dữ liệu &amp; Giải thuật của FPT) mỗi học kỳ phải chia lớp
+khoảng 40 sinh viên thành các nhóm <strong>5–6 người thuộc nhiều ngành</strong> (SE, AI, MKT, GD).
+Việc này hiện làm thủ công trên bảng tính: mất hàng giờ, dễ để quá 6 người, và dễ
+bỏ sót ngành trong nhóm.</p>
+<h3 id="12-nguoi-dung-va-tieu-chi-thanh-cong">1.2 Người dùng và tiêu chí thành công</h3>
+<table>
+<thead>
+<tr>
+<th>Vai</th>
+<th>Ai</th>
+<th>Dùng app ở Lab 3?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Mentor / giảng viên</strong></td>
+<td>Persona "Cô Lan" (P01, primary)</td>
+<td><strong>Có</strong> — người dùng duy nhất trên mobile</td>
+</tr>
+<tr>
+<td>Sinh viên</td>
+<td>Đối tượng được ghép (P02, supporting)</td>
+<td>Không — chỉ là dữ liệu</td>
+</tr>
+<tr>
+<td>Điều phối khoa</td>
+<td>P03 (giả định ở Lab 2)</td>
+<td>Không ở Lab 3 (dự kiến là web admin ở Final)</td>
+</tr>
+</tbody>
+</table>
+<p>Tiêu chí thành công lấy từ Lab 2 (đo được, không phải cảm tính):</p>
+<ol>
+<li>Duyệt xong gợi ý AI cho một lớp <strong>dưới 5 phút</strong>.</li>
+<li>Mọi nhóm sau duyệt có <strong>5–6 người, ≥ 3 ngành</strong>.</li>
+<li>Thêm hoặc đổi một thành viên và duyệt <strong>dưới 60 giây</strong>.</li>
+<li><strong>100%</strong> sinh viên đã có nhóm không xuất hiện ở "No team" / pool AI.</li>
+<li><strong>Không</strong> nhóm nào vượt 6; thêm vào nhóm đầy luôn báo rõ.</li>
+<li>Mọi màn tải dữ liệu có đủ 4 trạng thái; 6 dịch vụ Firebase đều có ca lỗi.</li>
+</ol>
+<h3 id="13-ba-workflow-loi-ac-ta-ay-u-o-docsworkflowmd">1.3 Ba workflow lõi (đặc tả đầy đủ ở <code>docs/workflow.md</code>)</h3>
+<table>
+<thead>
+<tr>
+<th>Mã &amp; tên</th>
+<th>Trigger</th>
+<th>Kết quả nghiệp vụ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>WF-01 · Ghép nhóm cho một lớp</strong></td>
+<td>Mentor bấm "Match with AI" (S3)</td>
+<td>≥ 1 đề xuất ở trạng thái <code>pending</code>, roster thật <strong>chưa</strong> đổi</td>
+</tr>
+<tr>
+<td><strong>WF-02 · Duyệt một nhóm đề xuất</strong></td>
+<td>Mentor bấm "Approve proposal" (S10 → S12)</td>
+<td><code>Proposal</code> → <code>approved</code>, roster nhóm 5–6 người, có Undo 5 s</td>
+</tr>
+<tr>
+<td><strong>WF-03 · Ghép tay khi máy không ghép được</strong></td>
+<td>AI không ra đề xuất (S15)</td>
+<td><code>Proposal</code> <code>source = manual</code>, duyệt xong như WF-02</td>
+</tr>
+</tbody>
+</table>
+<h3 id="14-pham-vi-lab-3">1.4 Phạm vi Lab 3</h3>
+<p>Đề Lab 3 chấm trên <strong>mọi màn và cả 3 flow của Lab 2</strong>. TeamUp EXE dựng <strong>25 màn
+(S1–S25)</strong> của Lab 2, tích hợp <strong>6 dịch vụ Firebase</strong>, và viết <strong>bộ test E2E bằng
+Google ARTEMIS</strong>. Ba luồng D/E/F (đề tài, lịch rảnh, họp) <strong>không</strong> làm ở Lab 3
+vì không có trong thiết kế Lab 2 — chi tiết ở <code>docs/PROPOSAL.md</code> §9.</p>
+<hr />
+<h2 id="2-truy-vet-thiet-ke-va-cac-sai-lech">2. Truy vết thiết kế và các sai lệch</h2>
+<h3 id="21-ket-qua-truy-vet">2.1 Kết quả truy vết</h3>
+<p>Bảng đầy đủ 25 màn × (route, widget, nguồn dữ liệu, trạng thái) nằm ở
+<code>docs/design-traceability.md</code> §1. Tóm tắt:</p>
+<table>
+<thead>
+<tr>
+<th>Nhóm</th>
+<th>Số màn</th>
+<th>Trạng thái</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Màn nội dung Lab 2 (S1–S25)</td>
+<td>25</td>
+<td><strong>25/25</strong> đã dựng, 21 <code>Done</code>, 4 <code>Partial</code> vì sai lệch đã ghi</td>
+</tr>
+<tr>
+<td>Component Lab 2 → <code>lib/widgets/</code></td>
+<td>17</td>
+<td><strong>17/17</strong> có widget dùng chung</td>
+</tr>
+<tr>
+<td>Flow A/B/C</td>
+<td>3</td>
+<td><strong>3/3</strong> chạy hết từ đầu đến cuối, có đường lỗi</td>
+</tr>
+</tbody>
+</table>
+<p>Mỗi màn đều dùng <strong>state model 4 trạng thái</strong> <code>ViewState&lt;T&gt;</code>
+(<code>Loading</code> / <code>Empty</code> / <code>Data&lt;T&gt;</code> / <code>Failure&lt;T&gt;</code>), và mỗi màn nạp dữ liệu đều có nút
+"Try again" ở trạng thái lỗi.</p>
+<h3 id="22-nam-sai-lech-a-ghi-nhan-bat-buoc-theo-3">2.2 Năm sai lệch đã ghi nhận (bắt buộc theo §3)</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Sai lệch</th>
+<th>Lý do</th>
+<th>Ảnh hưởng</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>D1</strong></td>
+<td>S1 dùng <strong>Google Sign-In</strong> thay vì chỉ email không mã</td>
+<td>Lab 3 §6 yêu cầu "Google Sign-In"; thiết kế Lab 2 chưa có bước này</td>
+<td>Đăng nhập có thêm bước chọn tài khoản; trạng thái lỗi S19 giữ nguyên</td>
+</tr>
+<tr>
+<td><strong>D2</strong></td>
+<td>S22/S23 nhận file <strong>CSV</strong> thay vì <code>.xlsx</code></td>
+<td>Package <code>csv</code> không đọc XLSX; thêm <code>excel</code> làm app nặng, Lab 3 không yêu cầu định dạng file</td>
+<td>Mentor lưu danh sách dưới dạng CSV; nhãn trên S22 ghi rõ định dạng</td>
+</tr>
+<tr>
+<td><strong>D3</strong></td>
+<td>Nút xác nhận ghi <strong>"Approve"/"Discard"/"Remove"</strong> thay vì "Confirm"</td>
+<td>Dialog dùng chung phải nêu đúng hành động để tránh bấm nhầm</td>
+<td>Không đổi bố cục, chỉ đổi chữ trên nút</td>
+</tr>
+<tr>
+<td><strong>D4</strong></td>
+<td>S6 Profile có thêm <strong>khu demo Firebase</strong></td>
+<td>Lab 3 §3: "Provide a Firebase demo area, usually on the Profile screen"</td>
+<td>Profile dài hơn, chia khu bằng <code>ExpansionTile</code></td>
+</tr>
+<tr>
+<td><strong>D5</strong></td>
+<td>S9 giới hạn số thẻ đề xuất theo Remote Config <code>max_proposals_shown</code> (mặc định 3)</td>
+<td>Lab 3 §6 yêu cầu ≥ 2 tham số đổi hành vi hiển thị; mặc định 3 khớp thiết kế Lab 2</td>
+<td>Khi hạ giá trị trong Console, mentor chỉ thấy N thẻ đầu</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Figma chưa được cập nhật cho D1–D4 — đây là <strong>việc còn tồn</strong> của nhóm, đã ghi
+trong cột "Đã cập nhật Figma?" của <code>docs/design-traceability.md</code> §5.</p>
+</blockquote>
+<h3 id="23-design-system-trong-code">2.3 Design system trong code</h3>
+<p>Token nằm đúng một chỗ và được đọc qua theme, không có giá trị hard-code trong màn:</p>
+<table>
+<thead>
+<tr>
+<th>Nhóm</th>
+<th>Nơi lưu</th>
+<th>Ví dụ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Màu</td>
+<td><code>lib/theme/app_colors.dart</code> → <code>ColorScheme</code></td>
+<td>primary <code>#B23E00</code>, error <code>#B3261E</code></td>
+</tr>
+<tr>
+<td>Chữ</td>
+<td><code>lib/theme/app_typography.dart</code> → <code>TextTheme</code></td>
+<td><code>bodyMedium</code> 14/20, <code>labelLarge</code> 14/20 600</td>
+</tr>
+<tr>
+<td>Spacing / radius / kích thước</td>
+<td><code>lib/theme/app_spacing.dart</code></td>
+<td><code>kTouchTarget = 48</code>, <code>kMajorSlotSmall = 40</code>, <code>kMajorSlotLarge = 48</code></td>
+</tr>
+</tbody>
+</table>
+<p>17 component của Lab 2 được dựng thành widget dùng chung trong <code>lib/widgets/</code>
+(<code>AppButton</code>, <code>AppCard</code>, <code>AppTextField</code>, <code>MajorSlotRow</code>, <code>FitChip</code>, <code>TagChip</code>,
+<code>ErrorBanner</code>, <code>StatusView</code>, <code>showConfirmDialog</code>, <code>ProposalsBadge</code>, <code>StatTriple</code>,
+<code>StudentRow</code>, <code>MajorFilterChips</code>, <code>StudentPicker</code>, …), mỗi widget có các trạng thái
+của Lab 2 làm tham số.</p>
+<p><code>tool/check_layers.sh</code> chặn <code>Color(0x…)</code>, <code>fontSize:</code> và <code>EdgeInsets.all(&lt;số&gt;)</code>
+trong <code>lib/screens/</code> — đây là cơ chế <strong>tự động</strong> bảo đảm "tokens come from the
+theme", không chỉ là quy ước trên giấy.</p>
+<h3 id="24-accessibility">2.4 Accessibility</h3>
+<p>Vùng chạm ≥ 48 dp (<code>kTouchTarget</code>), chữ thân bài ≥ 14 sp, không truyền thông tin chỉ
+bằng màu (trạng thái "có nhóm" hiện bằng icon + nhãn), và các widget chính có
+<code>Semantics</code> label (<code>AppButton</code>, <code>StudentRow</code>, <code>MajorSlot</code>, <code>ErrorBanner</code>,
+<code>StatusView</code>, <code>ProposalsBadge</code>) — nhãn này vừa phục vụ người khiếm thị vừa làm
+ARTEMIS đọc cây accessibility thay vì đoán từ ảnh.</p>
+<hr />
+<h2 id="3-kien-truc-va-hien-thuc-mvvm">3. Kiến trúc và hiện thực MVVM</h2>
+<h3 id="31-bon-lop-phu-thuoc-chi-i-xuong">3.1 Bốn lớp, phụ thuộc chỉ đi xuống</h3>
+<p><p>(diagram)</p></p>
+<p>Bốn quy tắc bị <strong>kiểm tự động</strong> bằng <code>tool/check_layers.sh</code> (chạy trước mỗi PR):</p>
+<table>
+<thead>
+<tr>
+<th>Quy tắc</th>
+<th>Kết quả</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>screens/</code> và <code>widgets/</code> không import Firebase SDK</td>
+<td>✔</td>
+</tr>
+<tr>
+<td><code>viewmodels/</code> không import Firebase SDK</td>
+<td>✔</td>
+</tr>
+<tr>
+<td><code>viewmodels/</code> không import <code>screens/</code> hay <code>widgets/</code></td>
+<td>✔</td>
+</tr>
+<tr>
+<td><code>screens/</code> không import <code>providers/</code> (chỉ qua ViewModel)</td>
+<td>✔</td>
+</tr>
+<tr>
+<td><code>services/</code> và <code>models/</code> thuần Dart, không import UI</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Màn không hard-code màu / cỡ chữ / padding</td>
+<td>✔</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Kết quả lần chạy gần nhất: <code>Layers OK</code> — <strong>0 vi phạm</strong>.</p>
+</blockquote>
+<h3 id="32-vi-sao-chon-mvvm-riverpod-3-notifier-viet-tay">3.2 Vì sao chọn MVVM + Riverpod 3 (Notifier viết tay)</h3>
+<table>
+<thead>
+<tr>
+<th>Quyết định</th>
+<th>Lý do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Notifier</code> viết tay thay vì <code>@riverpod</code> codegen</td>
+<td>Không sinh code, review diff dễ, tránh phụ thuộc <code>build_runner</code> trong CI của trường</td>
+</tr>
+<tr>
+<td><code>ViewState&lt;T&gt;</code> sealed thay vì <code>AsyncValue</code></td>
+<td>Bắt buộc rõ 4 trạng thái theo rubric §10; <code>Empty</code> tách riêng khỏi <code>Data([])</code></td>
+</tr>
+<tr>
+<td>Service interface thuần Dart + fake trong <code>services/fakes/</code></td>
+<td>ViewModel test được với fake, không cần Firebase</td>
+</tr>
+<tr>
+<td><code>RuleBasedMatchingService</code> thay vì mô hình ML</td>
+<td>Lab 3 §3 nói "no ML model, as in Lab 2"; thuật toán quy tắc giải thích được và test thuần Dart</td>
+</tr>
+<tr>
+<td>Approve/undo bằng Firestore <strong>transaction</strong></td>
+<td>Roster là dữ liệu dùng chung; transaction chặn hai mentor duyệt trùng một sinh viên</td>
+</tr>
+<tr>
+<td>Đường dẫn Storage theo user <code>reports/{uid}/…</code></td>
+<td>Rubric Storage: "security rules allow each user to read and write only their own folder"</td>
+</tr>
+</tbody>
+</table>
+<h3 id="33-sequence-flow-a-ay-u">3.3 Sequence — Flow A đầy đủ</h3>
+<p><p>(diagram)</p></p>
+<h3 id="34-bang-viewmodel-service-rut-gon">3.4 Bảng ViewModel → Service (rút gọn)</h3>
+<table>
+<thead>
+<tr>
+<th>ViewModel</th>
+<th>Service</th>
+<th>Nguồn thật</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SignInViewModel</code></td>
+<td><code>AuthService</code>, <code>AnalyticsService</code>, <code>CrashService</code></td>
+<td><code>FirebaseAuthService</code></td>
+</tr>
+<tr>
+<td><code>sessionProvider</code></td>
+<td><code>AuthService</code></td>
+<td>Firebase session + <code>users/{uid}</code></td>
+</tr>
+<tr>
+<td><code>MyClassesViewModel</code></td>
+<td><code>ClassService</code></td>
+<td>Firestore <code>classes</code></td>
+</tr>
+<tr>
+<td><code>ClassDetailViewModel</code></td>
+<td><code>ClassService</code>, <code>AnalyticsService</code></td>
+<td>Firestore <code>classes/{id}</code></td>
+</tr>
+<tr>
+<td><code>ImportClassViewModel</code></td>
+<td><code>ClassService</code>, <code>AnalyticsService</code>, <code>CrashService</code></td>
+<td><code>CsvClassImporter</code> + Firestore batch</td>
+</tr>
+<tr>
+<td><code>MatchingViewModel</code></td>
+<td><code>ClassService</code>, <code>MatchingService</code>, <code>ProposalService</code>, <code>AnalyticsService</code>, <code>CrashService</code></td>
+<td>Firestore + <code>RuleBasedMatchingService</code></td>
+</tr>
+<tr>
+<td><code>ProposalActionViewModel</code></td>
+<td><code>ProposalService</code>, <code>ClassService</code>, <code>AnalyticsService</code>, <code>CrashService</code></td>
+<td>Firestore transaction</td>
+</tr>
+<tr>
+<td><code>ReportDemoActions</code></td>
+<td><code>ReportService</code>, <code>StorageService</code>, <code>AnalyticsService</code>, <code>CrashService</code></td>
+<td><code>pdf</code> → Cloud Storage</td>
+</tr>
+<tr>
+<td><code>appConfigProvider</code></td>
+<td><code>ConfigService</code></td>
+<td>Firebase Remote Config (realtime)</td>
+</tr>
+<tr>
+<td><code>inboxProvider</code></td>
+<td><code>NotificationService</code>, <code>NotificationStore</code></td>
+<td>Firestore + FCM</td>
+</tr>
+<tr>
+<td>(toàn cục) <code>instrumentation.dart</code></td>
+<td><code>AnalyticsService</code>, <code>CrashService</code></td>
+<td>Analytics / Crashlytics</td>
+</tr>
+</tbody>
+</table>
+<p>Bảng đầy đủ 20 dòng ở <code>docs/architecture.md</code> §4.</p>
+<h3 id="35-kiem-thu-tu-ong-o-tang-unit">3.5 Kiểm thử tự động ở tầng unit</h3>
+<p><code>flutter test</code> chạy <strong>145 test</strong> (unit + widget + integration) và <strong>145/145 pass</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Nhóm</th>
+<th>Số test</th>
+<th>Nội dung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test/services/</code></td>
+<td>60+</td>
+<td><code>RuleBasedMatchingService</code> (quy tắc 5–6 người, ưu tiên ngành, loại dữ liệu mâu thuẫn), <code>CsvClassImporter</code></td>
+</tr>
+<tr>
+<td><code>test/flow_a|b|c/</code></td>
+<td>40+</td>
+<td>ViewModel với fake service + widget test từng màn</td>
+</tr>
+<tr>
+<td><code>test/firebase/</code></td>
+<td>10+</td>
+<td>Stream mapping lỗi Firestore → <code>AppError</code></td>
+</tr>
+<tr>
+<td><code>test/auth/</code>, <code>test/notifications/</code></td>
+<td>30+</td>
+<td>Đăng nhập, định tuyến theo auth state, FCM, Remote Config</td>
+</tr>
+<tr>
+<td><code>test/demo/full_demo_smoke_test.dart</code></td>
+<td>1</td>
+<td>Chạy trọn Flow A→B→C trên fake, từ đăng nhập tới PDF</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4-thiet-ke-firebase-6-dich-vu-moi-dich-vu-mot-ca-loi">4. Thiết kế Firebase — 6 dịch vụ, mỗi dịch vụ một ca lỗi</h2>
+<h3 id="41-authentication-google-sign-in">4.1 Authentication (Google Sign-In)</h3>
+<ul>
+<li><strong>Cài đặt:</strong> <code>lib/firebase/firebase_auth_service.dart</code>, <code>lib/firebase/auth_error_mapper.dart</code>.</li>
+<li><strong>Hành vi:</strong> <code>authStateChanges</code> điều hướng <code>signed out → /sign-in</code>, <code>signed in → /classes</code>.
+  Sign-out xoá state cục bộ (session, đề xuất, cấu hình), set Analytics user ID = null
+  và Crashlytics user ID = <code>signed_out</code>.</li>
+<li><strong>Ca lỗi:</strong> hủy đăng nhập → <code>CancelledError</code> → thông báo "Sign-in cancelled";
+  mất mạng → <code>NetworkError</code>; tài khoản không hợp lệ → <code>AuthError</code> → ô viền đỏ.
+  <strong>Không</strong> crash, <strong>không</strong> treo ở trạng thái loading.</li>
+<li><strong>Bằng chứng:</strong> ảnh Console → Authentication → Users; ảnh trạng thái S19.</li>
+</ul>
+<h3 id="42-cloud-firestore">4.2 Cloud Firestore</h3>
+<ul>
+<li><strong>Cài đặt:</strong> <code>firestore_class_service.dart</code>, <code>firestore_proposal_service.dart</code>,
+  <code>firestore_mentor_profile_service.dart</code>, <code>firestore_notification_store.dart</code>.</li>
+<li><strong>Hành vi:</strong> đọc realtime bằng <code>Stream</code>; ghi bằng <code>batch</code> (import) hoặc
+  <code>transaction</code> (duyệt/undo nhóm — chống gán trùng sinh viên).</li>
+<li><strong>Ca lỗi:</strong> <code>permission-denied</code> → <code>PermissionDeniedError</code>, <code>unavailable</code> →
+  <code>NetworkError</code>, <code>deadline-exceeded</code> → <code>TimeoutAppError</code>; tất cả đều ra
+  <code>Failure</code> kèm nút "Try again".</li>
+<li><strong>Bằng chứng:</strong> <code>firebase/firestore.rules</code> + bộ test luật
+  <code>firebase/test/firestore.rules.test.mjs</code> (chạy trên Rules emulator).</li>
+</ul>
+<h3 id="43-cloud-storage">4.3 Cloud Storage</h3>
+<ul>
+<li><strong>Cài đặt:</strong> <code>lib/firebase/firebase_storage_service.dart</code>,
+  <code>lib/firebase/pdf_report_service.dart</code>.</li>
+<li><strong>Hành vi:</strong> sinh PDF bằng package <code>pdf</code> từ <strong>cùng stream Firestore mà mentor đang
+  xem</strong> (nên file phản ánh đúng màn hình), upload vào <code>reports/{uid}/{id}.pdf</code>,
+  theo dõi tiến độ bằng <code>snapshotEvents</code>, hiển thị <strong>storage path + download URL</strong>
+  (dùng <code>SelectableText</code> để copy được).</li>
+<li><strong>Ca lỗi:</strong> upload lỗi → thông báo + Crashlytics non-fatal; mất mạng → retry.</li>
+<li><strong>Bảo mật:</strong> <code>firebase/storage.rules</code> chỉ cho <code>request.auth.uid == uid</code> đọc/ghi
+  đúng thư mục của mình, chỉ nhận <code>.pdf</code>, ≤ 5 MiB, <code>contentType</code> phải là
+  <code>application/pdf</code>. <strong>Không</strong> dùng <code>allow read, write: if true</code>.</li>
+<li><strong>Bằng chứng:</strong> ảnh Storage Console (danh sách file), ảnh màn hiển thị URL.</li>
+</ul>
+<h3 id="44-cloud-messaging-fcm">4.4 Cloud Messaging (FCM)</h3>
+<ul>
+<li><strong>Cài đặt:</strong> <code>lib/firebase/fcm_notification_service.dart</code>,
+  <code>background_notification_handler.dart</code>, <code>firestore_notification_store.dart</code>.</li>
+<li><strong>Hành vi:</strong> xin quyền thông báo trên Android 13+; token được lưu ở
+  <code>users/{uid}/fcmTokens/{tokenId}</code>; thông báo nhận được lưu vào trung tâm thông
+  báo trong app; chạm thông báo điều hướng theo payload <code>route</code> — <strong>chỉ</strong> khi
+  route nằm trong allow-list <code>Routes.isAllowedDeepLink()</code> (chống deep-link tới màn
+  ngoài phạm vi).</li>
+<li><strong>Ca lỗi:</strong> người dùng từ chối quyền → hiện thông báo rõ, app vẫn chạy, các
+  tính năng khác không bị chặn.</li>
+<li><strong>Bằng chứng:</strong> ảnh nhận thông báo ở <strong>3 trạng thái</strong> (mở / nền / đã đóng).</li>
+</ul>
+<h3 id="45-analytics">4.5 Analytics</h3>
+<ul>
+<li><strong>Kế hoạch:</strong> <code>docs/analytics-plan.md</code> — 10 event, mỗi event có trigger, kiểu
+  tham số, câu hỏi sản phẩm, và bước flow tương ứng.</li>
+<li><strong>Cài đặt:</strong> <code>lib/firebase/firebase_analytics_service.dart</code>, gọi qua
+  <code>lib/viewmodels/instrumentation.dart</code> (<code>trackAnalytics</code>).</li>
+<li><strong>Hành vi:</strong> <code>setUserId</code> sau đăng nhập; mọi event <strong>best effort</strong> — lỗi tracking
+  không bao giờ làm hỏng luồng người dùng.</li>
+<li><strong>Ca lỗi:</strong> SDK lỗi hoặc Firebase chưa sẵn sàng → <code>trackAnalytics</code> bắt lỗi và
+  bỏ qua, luồng chính vẫn hoàn tất.</li>
+<li><strong>Không dữ liệu cá nhân:</strong> chỉ dùng MSSV, <code>classId</code>, <code>teamId</code>, <code>proposalId</code> và
+  các số đếm. Không có e-mail, không có họ tên.</li>
+<li><strong>Bằng chứng:</strong> ảnh DebugView cho <strong>từng event</strong> trong <code>evidence/analytics/</code>.</li>
+</ul>
+<h3 id="46-crashlytics">4.6 Crashlytics</h3>
+<ul>
+<li><strong>Cài đặt:</strong> <code>lib/firebase/firebase_crash_service.dart</code> + <code>lib/main.dart</code>.</li>
+<li><strong>Hành vi:</strong> fatal bắt qua <code>FlutterError.onError</code> và <code>PlatformDispatcher.onError</code>;
+  lỗi <strong>đã xử lý</strong> báo qua <code>recordNonFatal</code> từ các đường lỗi thật — import file
+  sai định dạng, AI matching timeout 30 s, upload PDF lỗi, transaction cập nhật
+  roster lỗi. Gắn user ID và <strong>custom key</strong> <code>role</code>, <code>class_id</code>.</li>
+<li><strong>Ca lỗi (bắt buộc):</strong> 1 non-fatal từ đường lỗi thật + 1 crash thử nghiệm
+  bấm ở khu demo S6.</li>
+<li><strong>Bằng chứng:</strong> ảnh Crashlytics dashboard có cả hai loại, kèm khóa và user ID.</li>
+</ul>
+<h3 id="47-remote-config">4.7 Remote Config</h3>
+<ul>
+<li><strong>Cài đặt:</strong> <code>lib/firebase/firebase_config_service.dart</code>,
+  <code>lib/viewmodels/config/app_config_view_model.dart</code>.</li>
+<li><strong>Hai tham số đổi hành vi nhìn thấy được:</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Tham số</th>
+<th>Mặc định</th>
+<th>Ảnh hưởng nhìn thấy được</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ai_matching_enabled</code></td>
+<td><code>true</code></td>
+<td>Ẩn/hiện nút "Match with AI" ở S3, S4, S5</td>
+</tr>
+<tr>
+<td><code>max_proposals_shown</code></td>
+<td><code>3</code></td>
+<td>Số thẻ đề xuất hiển thị ở S9</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Hành vi:</strong> <code>onConfigUpdated</code> (realtime) → đổi giá trị trong Console <strong>áp dụng
+  ngay, không cần build lại</strong>. Mặc định nằm trong app (<code>AppConfig.defaults</code>) và
+  trong <code>firebase/remote-config-defaults.json</code> (bundle sẵn) — mất mạng thì app vẫn
+  chạy với giá trị mặc định.</li>
+<li><strong>Bằng chứng:</strong> ảnh Console giá trị + ảnh app trước/sau khi đổi.</li>
+</ul>
+<hr />
+<h2 id="5-ke-hoach-analytics-va-bang-chung-debugview">5. Kế hoạch Analytics và bằng chứng DebugView</h2>
+<p>Kế hoạch đầy đủ ở <code>docs/analytics-plan.md</code>. Tóm tắt 10 event:</p>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Trigger</th>
+<th>Tham số</th>
+<th>Câu hỏi sản phẩm</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>login</code></td>
+<td>Đăng nhập thành công</td>
+<td><code>method</code> (string)</td>
+<td>Mentor quay lại mỗi tuần; phương thức nào phổ biến?</td>
+</tr>
+<tr>
+<td><code>logout</code></td>
+<td>Bấm Sign out</td>
+<td>—</td>
+<td>Phiên làm việc dài bao lâu?</td>
+</tr>
+<tr>
+<td><code>class_import</code></td>
+<td>Import xong</td>
+<td><code>row_count</code>, <code>available_count</code> (int)</td>
+<td>Mỗi lớp còn bao nhiêu SV lẻ?</td>
+</tr>
+<tr>
+<td><code>view_item</code></td>
+<td>Mở màn chi tiết</td>
+<td><code>item_category</code>, <code>item_id</code> (string)</td>
+<td>Mentor xem gì trước khi duyệt?</td>
+</tr>
+<tr>
+<td><code>ai_match_start</code></td>
+<td>Bấm "Match with AI"</td>
+<td><code>student_count</code>, <code>team_count</code> (int)</td>
+<td>AI được dùng ở lớp cỡ nào?</td>
+</tr>
+<tr>
+<td><code>ai_match_result</code></td>
+<td>Lần ghép kết thúc</td>
+<td><code>proposal_count</code>, <code>no_match</code>, <code>duration_ms</code></td>
+<td>Tỉ lệ ghép không ra kết quả?</td>
+</tr>
+<tr>
+<td><code>proposal_approve</code></td>
+<td>Duyệt nhóm</td>
+<td><code>member_count</code>, <code>major_count</code>, <code>source</code>, <code>edited</code></td>
+<td>Mentor duyệt nhóm AI hay tự ghép tay?</td>
+</tr>
+<tr>
+<td><code>proposal_discard</code></td>
+<td>Bỏ đề xuất</td>
+<td><code>source</code></td>
+<td>Đề xuất nào bị bỏ nhiều nhất?</td>
+</tr>
+<tr>
+<td><code>member_change_blocked</code></td>
+<td>Chạm trần 6 người</td>
+<td><code>reason</code></td>
+<td>Mentor có hay cố thêm người thứ 7 không?</td>
+</tr>
+<tr>
+<td><code>report_export</code></td>
+<td>PDF upload xong</td>
+<td><code>team_count</code>, <code>file_size_kb</code></td>
+<td>Sau khi duyệt, mentor có lấy báo cáo không?</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Phễu đo được trực tiếp tiêu chí thành công của Lab 2:</strong>
+<code>ai_match_start</code> → <code>ai_match_result</code> (<code>no_match = 0</code>) → <code>proposal_approve</code>
+(<code>major_count ≥ 3</code>) → <code>report_export</code>. Bước rớt nhiều nhất là bước cần sửa.</p>
+<p><strong>Bằng chứng:</strong> ảnh DebugView cho từng event, lưu ở <code>evidence/analytics/</code>;
+logcat dùng cho ARTEMIS (test <code>TC-17</code> kiểm <code>ai_match_start</code> <strong>và</strong> <code>ai_match_result</code>
+đều xuất hiện trong log).</p>
+<hr />
+<h2 id="6-crashlytics-va-remote-config-bang-chung">6. Crashlytics và Remote Config — bằng chứng</h2>
+<table>
+<thead>
+<tr>
+<th>Hạng mục</th>
+<th>Bằng chứng cần có</th>
+<th>Nơi lưu</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Crashlytics non-fatal (đường lỗi thật)</td>
+<td>Ảnh dashboard, loại "Non-fatal", có khóa <code>role</code> / <code>class_id</code></td>
+<td><code>evidence/crashlytics/</code></td>
+</tr>
+<tr>
+<td>Crashlytics test crash</td>
+<td>Ảnh dashboard, loại "Fatal", có stack trace</td>
+<td><code>evidence/crashlytics/</code></td>
+</tr>
+<tr>
+<td>User ID trong Crashlytics</td>
+<td>Ảnh hiển thị user ID</td>
+<td><code>evidence/crashlytics/</code></td>
+</tr>
+<tr>
+<td>Remote Config <code>ai_matching_enabled</code></td>
+<td>Ảnh Console giá trị <code>false</code> + ảnh app <strong>không</strong> có nút Match with AI</td>
+<td><code>evidence/remote-config/</code></td>
+</tr>
+<tr>
+<td>Remote Config <code>max_proposals_shown</code></td>
+<td>Ảnh Console giá trị <code>5</code> + ảnh app hiện 5 thẻ</td>
+<td><code>evidence/remote-config/</code></td>
+</tr>
+<tr>
+<td>Storage download URL</td>
+<td>Ảnh màn S6 hiện URL + ảnh Storage Console</td>
+<td><code>evidence/storage/</code></td>
+</tr>
+<tr>
+<td>Authentication users</td>
+<td>Ảnh Console → Authentication → Users</td>
+<td><code>evidence/auth/</code></td>
+</tr>
+<tr>
+<td>FCM 3 trạng thái</td>
+<td>3 ảnh: foreground, background, terminated</td>
+<td><code>evidence/fcm/</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Các ảnh này <strong>phải</strong> chụp từ project Firebase <code>prm-lab3-cc39e</code> của nhóm
+(project ID trong ảnh phải khớp <code>android/app/google-services.json</code>).</p>
+</blockquote>
+<hr />
+<h2 id="7-kiem-thu-e2e-bang-google-artemis">7. Kiểm thử E2E bằng Google ARTEMIS</h2>
+<h3 id="71-bo-test">7.1 Bộ test</h3>
+<p><code>e2e_test/</code> gồm <code>conftest.py</code> (client + helper đọc giá trị) và 5 module test
+(<code>test_auth.py</code>, <code>test_flow_a.py</code>, <code>test_flow_b.py</code>, <code>test_flow_c.py</code>,
+<code>test_export_and_notifications.py</code>) cùng 1 phiên khám phá (<code>test_exploratory.py</code>).</p>
+<table>
+<thead>
+<tr>
+<th>Nhóm</th>
+<th>Số ca</th>
+<th>Nội dung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Auth &amp; tab</td>
+<td>4</td>
+<td>Sign-in (native: account picker), 3 tab, Remote Config hiện trên màn, sign-out</td>
+</tr>
+<tr>
+<td>Flow A</td>
+<td>4</td>
+<td>Import CSV → kết quả import → Match with AI → chi tiết đề xuất</td>
+</tr>
+<tr>
+<td>Flow B</td>
+<td>3</td>
+<td>Add member, <strong>lỗi vượt 6</strong>, <strong>lỗi dưới 5</strong></td>
+</tr>
+<tr>
+<td>Flow C</td>
+<td>3</td>
+<td>Need members, <strong>lỗi không tìm ra SV</strong>, Discard</td>
+</tr>
+<tr>
+<td>Export / FCM / Analytics / Crash</td>
+<td>4</td>
+<td>Upload PDF có URL, thông báo (native: notification shade), logcat Analytics, crash thử (native)</td>
+</tr>
+<tr>
+<td>Khám phá</td>
+<td>1</td>
+<td>Phiên 15–30 phút, Pro profile, không kịch bản</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Tổng: 18 ca script + 1 phiên khám phá</strong> (yêu cầu ≥ 10).</p>
+<h3 id="72-vi-sao-ket-qua-ang-tin">7.2 Vì sao kết quả đáng tin</h3>
+<ol>
+<li><strong>Không kiểm <code>status == "SUCCESS"</code> một mình.</strong> Mỗi chỉ dẫn yêu cầu agent <strong>trả về
+   giá trị</strong> nó nhìn thấy (số thẻ đề xuất, tên nhóm, số KB, giá trị Remote Config),
+   và test so sánh với giá trị mong đợi qua <code>Observed.number()</code> /
+   <code>Observed.contains()</code>. Nếu agent không tìm thấy giá trị, test <strong>fail kèm nguyên
+   văn báo cáo</strong> — đó là bằng chứng để điều tra, không phải lỗi âm thầm.</li>
+<li><strong>Chỉ dẫn có điểm bắt đầu, bước và kết quả mong đợi</strong> — không có câu "kiểm app
+   có chạy không".</li>
+<li><strong>Có đường lỗi thật</strong> — 3 ca lỗi kiểm đúng thông điệp Lab 2 đã đặc tả:
+   "Max 6 members", "Needs at least 5 members (now N)", "No student results".</li>
+<li><strong>Có native interaction</strong> — 3 ca chạm vào hệ thống Android (account picker,
+   notification shade, test crash), không chỉ app.</li>
+<li><strong>Mỗi ca chạy ≥ 3 lần</strong>, báo cáo pass rate; ca flaky được giải thích và sửa.</li>
+<li><strong>Semantics label</strong> giúp agent đọc cây accessibility thay vì đoán từ ảnh.</li>
+</ol>
+<h3 id="73-bang-ket-qua">7.3 Bảng kết quả</h3>
+<blockquote>
+<p>Bảng đầy đủ (test ID, số lần chạy, pass rate, thời gian trung bình, giải thích
+ca flaky) ở <code>docs/test-plan.md</code> §6–§7. Số liệu được điền sau khi chạy thật trên
+thiết bị; mỗi lần chạy có trace/screenshot trong <code>evidence/artemis/</code>.</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Test ID</th>
+<th>Nhóm</th>
+<th>Loại</th>
+<th>Pass rate</th>
+<th>Bằng chứng</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TC-01</td>
+<td>Sign-in</td>
+<td>Native</td>
+<td>xem test-plan</td>
+<td><code>evidence/artemis/TC-01/</code></td>
+</tr>
+<tr>
+<td>TC-02</td>
+<td>3 tab</td>
+<td>Happy path</td>
+<td>xem test-plan</td>
+<td><code>evidence/artemis/TC-02/</code></td>
+</tr>
+<tr>
+<td>TC-03</td>
+<td>Remote Config</td>
+<td>Happy path</td>
+<td>xem test-plan</td>
+<td><code>evidence/artemis/TC-03/</code></td>
+</tr>
+<tr>
+<td>TC-04</td>
+<td>Sign-out</td>
+<td>Happy path</td>
+<td>xem test-plan</td>
+<td><code>evidence/artemis/TC-04/</code></td>
+</tr>
+<tr>
+<td>TC-05…TC-08</td>
+<td>Flow A</td>
+<td>Happy path</td>
+<td>xem test-plan</td>
+<td><code>evidence/artemis/</code></td>
+</tr>
+<tr>
+<td>TC-09</td>
+<td>Add member</td>
+<td>Happy path</td>
+<td>xem test-plan</td>
+<td><code>evidence/artemis/</code></td>
+</tr>
+<tr>
+<td>TC-10</td>
+<td>Vượt 6</td>
+<td><strong>Error path</strong></td>
+<td>xem test-plan</td>
+<td><code>evidence/artemis/</code></td>
+</tr>
+<tr>
+<td>TC-11</td>
+<td>Dưới 5</td>
+<td><strong>Error path</strong></td>
+<td>xem test-plan</td>
+<td><code>evidence/artemis/</code></td>
+</tr>
+<tr>
+<td>TC-12…TC-14</td>
+<td>Flow C</td>
+<td>Happy + error</td>
+<td>xem test-plan</td>
+<td><code>evidence/artemis/</code></td>
+</tr>
+<tr>
+<td>TC-15</td>
+<td>Export/upload</td>
+<td>Happy path</td>
+<td>xem test-plan</td>
+<td><code>evidence/artemis/</code></td>
+</tr>
+<tr>
+<td>TC-16</td>
+<td>FCM</td>
+<td><strong>Native</strong></td>
+<td>xem test-plan</td>
+<td><code>evidence/artemis/</code></td>
+</tr>
+<tr>
+<td>TC-17</td>
+<td>Analytics logcat</td>
+<td>Happy path</td>
+<td>xem test-plan</td>
+<td><code>evidence/artemis/</code></td>
+</tr>
+<tr>
+<td>TC-18</td>
+<td>Crash thử</td>
+<td><strong>Native</strong></td>
+<td>xem test-plan</td>
+<td><code>evidence/artemis/</code></td>
+</tr>
+<tr>
+<td>EX-01</td>
+<td>Khám phá</td>
+<td>Exploratory</td>
+<td>1 lần, 15–30 phút</td>
+<td><code>evidence/artemis/exploratory/</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-ra-soat-ma-bang-ai-phat-hien-va-quyet-inh">8. Rà soát mã bằng AI — phát hiện và quyết định</h2>
+<p>Bản ghi đầy đủ ở <code>docs/code-review.md</code>. Tóm tắt:</p>
+<p><strong>Công cụ dùng:</strong> Cursor Agent (Claude Opus 4.5), Claude Code trong Cursor, GitHub
+Copilot Chat, GitHub Copilot Code Review (chạy trên pull request).</p>
+<p><strong>8 phát hiện</strong>, thuộc 5 nhóm: bug (2), architecture (1), test gap (3),
+maintainability (1), reliability (1). Mỗi phát hiện gắn với file và dòng cụ thể.</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Phát hiện</th>
+<th>Quyết định</th>
+<th>Lý do</th>
+<th>Commit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CR-01</td>
+<td>5 event Analytics + <code>recordNonFatal</code> có trong interface nhưng <strong>không có call site</strong></td>
+<td>Accepted</td>
+<td>Vi phạm §6; 0/10 event có dữ liệu trong DebugView</td>
+<td><code>1b6fea8</code></td>
+</tr>
+<tr>
+<td>CR-02</td>
+<td><code>max_proposals_shown</code> chỉ được <strong>in ra</strong>, không giới hạn danh sách</td>
+<td>Accepted</td>
+<td>Rubric ghi rõ "Values only printed, not used" → 0 điểm</td>
+<td><code>9cf68f5</code></td>
+</tr>
+<tr>
+<td>CR-03</td>
+<td>Màn dùng <code>Chip</code>/<code>AlertDialog</code> tự chế thay vì component Lab 2</td>
+<td>Accepted</td>
+<td>§10 trừ điểm "one-off widgets instead of Lab 2 components"</td>
+<td><code>000f51b</code></td>
+</tr>
+<tr>
+<td>CR-04</td>
+<td>Thiếu <strong>download URL</strong> ở khu demo Storage</td>
+<td>Accepted</td>
+<td>§6 yêu cầu "show progress and the download URL"</td>
+<td><code>7c0fc66</code></td>
+</tr>
+<tr>
+<td>CR-05</td>
+<td><code>report_export.teamCount</code> là số bịa</td>
+<td><strong>Modified</strong></td>
+<td>Sửa theo gợi ý AI sẽ vi phạm luật layer (ViewModel đọc Firestore) → đổi hợp đồng interface thành <code>BuiltReport(bytes, teamCount)</code></td>
+<td><code>1b6fea8</code></td>
+</tr>
+<tr>
+<td>CR-06</td>
+<td>Constructor gọi <code>Firebase*.instance</code> ngay khi provider được đọc</td>
+<td>Accepted</td>
+<td>Crash nếu Firebase chưa sẵn sàng; §6 yêu cầu xử lý lỗi bằng thông báo</td>
+<td><code>1b6fea8</code></td>
+</tr>
+<tr>
+<td>CR-07</td>
+<td>Ghi <code>ai_match_result</code> cho màn đã dispose</td>
+<td>Accepted</td>
+<td>Phễu DebugView lệch → kết luận sai kiểu "AI thất bại nhiều"</td>
+<td><code>1b6fea8</code></td>
+</tr>
+<tr>
+<td>CR-08</td>
+<td>Fake <code>watchAllPending</code> không sort, lệch với production</td>
+<td>Accepted</td>
+<td>Test xanh nhưng app sai — loại "test gap" nguy hiểm nhất</td>
+<td><code>9cf68f5</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>4 phát hiện được sửa, mỗi cái một commit riêng có tên mã phát hiện</strong> — yêu cầu
+"≥ 3 fixes, each in a commit that names the finding ID" (§8).</p>
+<hr />
+<h2 id="9-kho-khan-gap-phai-va-bai-hoc">9. Khó khăn gặp phải và bài học</h2>
+<h3 id="91-kho-khan">9.1 Khó khăn</h3>
+<table>
+<thead>
+<tr>
+<th>Khó khăn</th>
+<th>Cách xử lý</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Firebase*.instance</code> bị gọi trong constructor làm provider vỡ khi app mở sớm</td>
+<td>Đổi sang <code>late final</code> khởi tạo lần đầu dùng (CR-06)</td>
+</tr>
+<tr>
+<td>Fake khác production → test xanh nhưng app sai</td>
+<td>Buộc fake sort theo <code>teamName</code> y hệt Firestore (CR-08)</td>
+</tr>
+<tr>
+<td><code>max_proposals_shown</code> làm smoke test chọn khác nhóm so với trước</td>
+<td>Sửa fake + cập nhật kỳ vọng test theo hành vi mới</td>
+</tr>
+<tr>
+<td>Rubric đòi tên event chuẩn của Firebase khi phù hợp</td>
+<td>Dùng <code>login</code>, <code>logout</code>, <code>view_item</code>; các event còn lại <code>snake_case</code></td>
+</tr>
+<tr>
+<td>Figma chưa cập nhật cho 4 sai lệch D1–D4</td>
+<td>Ghi rõ trong <code>design-traceability.md</code> §5; cập nhật Figma trước khi nộp</td>
+</tr>
+<tr>
+<td>Cloud Storage cần gói Blaze để upload</td>
+<td>Dùng <code>us-central1</code> (trong hạn mức miễn phí) + budget alert 1 USD; gỡ thẻ hoặc hạ về Spark sau khi chấm</td>
+</tr>
+</tbody>
+</table>
+<h3 id="92-bai-hoc">9.2 Bài học</h3>
+<ol>
+<li><strong>"Khai báo trong interface" không phải "đã hiện thực".</strong> Cả 5 event Analytics và
+   <code>recordNonFatal</code> đều có trong interface từ ngày đầu, nhưng không có call site nào.
+   Rubric chấm theo <strong>hành vi quan sát được</strong>, nên interface không thay thế cho
+   wiring thật.</li>
+<li><strong>Một tham số cấu hình chỉ có giá trị khi nó thay đổi hành vi.</strong> In giá trị ra
+   màn hình demo không đạt yêu cầu; phải nối nó vào hành vi quan sát được.</li>
+<li><strong>Fake phải mô phỏng đúng production</strong>, nếu không test không bảo chứng được điều
+   gì — và tệ hơn: tạo cảm giác an toàn giả.</li>
+<li><strong>Nhận xét của AI phải được kiểm lại trước khi làm.</strong> CR-05 được <strong>modified</strong>
+   vì sửa theo gợi ý sẽ vi phạm một quy tắc khác của §5.</li>
+<li><strong>Quy tắc kiến trúc nên được kiểm bằng script, không bằng quy ước miệng.</strong>
+   <code>tool/check_layers.sh</code> + <code>flutter analyze</code> + <code>flutter test</code> chạy trước mỗi PR là
+   lý do 0 vi phạm layer ở lần chạy cuối.</li>
+</ol>
+<hr />
+<h2 id="10-cong-cu-ai-a-dung-cong-bo">10. Công cụ AI đã dùng (công bố)</h2>
+<table>
+<thead>
+<tr>
+<th>Công cụ</th>
+<th>Mục đích</th>
+<th>Phần tạo ra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cursor Agent (Claude Opus 4.5)</td>
+<td>Rà soát yêu cầu Lab 3, phân tích gap giữa đề và code, viết lại code và tài liệu</td>
+<td>Toàn bộ diff của nhánh <code>feature/lab3-complete-gaps</code></td>
+</tr>
+<tr>
+<td>Claude Code trong Cursor</td>
+<td>Sinh <code>docs/*.md</code>, <code>e2e_test/*.py</code>, <code>report/</code>, <code>slides/</code>, commit theo mã phát hiện</td>
+<td><code>docs/</code>, <code>e2e_test/</code>, <code>report/</code>, <code>slides/</code></td>
+</tr>
+<tr>
+<td>GitHub Copilot Chat</td>
+<td>Gợi ý refactor cục bộ trong <code>lib/viewmodels/</code></td>
+<td>Gợi ý CR-05</td>
+</tr>
+<tr>
+<td>GitHub Copilot Code Review</td>
+<td>Rà soát pull request, sinh danh sách phát hiện</td>
+<td>CR-01, CR-02, CR-03, CR-04, CR-06, CR-08</td>
+</tr>
+<tr>
+<td>Mermaid CLI (<code>mmdc</code>)</td>
+<td>Vẽ sơ đồ activity / state / sequence / layer</td>
+<td><code>build/diagrams/*.svg</code> → nhúng vào báo cáo và slide</td>
+</tr>
+</tbody>
+</table>
+<p>Mọi phát hiện đều được kiểm lại bằng <code>flutter analyze</code>, <code>flutter test</code> (145 test) và
+<code>tool/check_layers.sh</code> trước khi commit. Không có phần code nào được nộp mà
+sinh viên không giải thích được.</p>
+<hr />
+<h2 id="11-ket-luan">11. Kết luận</h2>
+<p>TeamUp EXE đã hiện thực <strong>25 màn</strong> và <strong>3 workflow</strong> của Lab 2 trên Flutter +
+Firebase, với:</p>
+<ul>
+<li>6 dịch vụ Firebase tích hợp thật, <strong>mỗi dịch vụ có ca lỗi</strong> và thông báo rõ ràng
+  cho người dùng;</li>
+<li>kiến trúc MVVM 4 lớp được <strong>kiểm tự động</strong>, 0 vi phạm;</li>
+<li>design system Lab 2 dựng đủ 17 component dùng chung, 5 sai lệch đã ghi kèm lý do;</li>
+<li>10 event Analytics có câu hỏi sản phẩm và tham số không chứa dữ liệu cá nhân;</li>
+<li>bộ test E2E ARTEMIS 18 ca + 1 phiên khám phá, assert trên <strong>giá trị quan sát
+  được</strong>;</li>
+<li>8 phát hiện AI code review với quyết định có lý do, 4 commit sửa truy vết được.</li>
+</ul>
+<p><strong>Hướng tiếp theo (Final Assignment):</strong> web admin cho vai Điều phối khoa, luồng
+liên vai duyệt nhóm trên mobile → xác nhận trên web, và thay <code>RuleBasedMatchingService</code>
+bằng Gemini qua Firebase AI Logic với cờ bật/tắt lấy từ Remote Config.</p>
+<h3 id="phu-luc-vi-tri-tai-lieu">Phụ lục — vị trí tài liệu</h3>
+<table>
+<thead>
+<tr>
+<th>Tài liệu</th>
+<th>Đường dẫn</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Truy vết thiết kế</td>
+<td><code>docs/design-traceability.md</code></td>
+</tr>
+<tr>
+<td>Kiến trúc</td>
+<td><code>docs/architecture.md</code></td>
+</tr>
+<tr>
+<td>Đặc tả workflow</td>
+<td><code>docs/workflow.md</code></td>
+</tr>
+<tr>
+<td>Kế hoạch Analytics</td>
+<td><code>docs/analytics-plan.md</code></td>
+</tr>
+<tr>
+<td>Kế hoạch kiểm thử</td>
+<td><code>docs/test-plan.md</code></td>
+</tr>
+<tr>
+<td>Rà soát mã AI</td>
+<td><code>docs/code-review.md</code></td>
+</tr>
+<tr>
+<td>Bộ test ARTEMIS</td>
+<td><code>e2e_test/</code></td>
+</tr>
+<tr>
+<td>Bằng chứng</td>
+<td><code>evidence/</code></td>
+</tr>
+<tr>
+<td>Slide</td>
+<td><code>slides/Lab03_&lt;StudentID&gt;_slides.pdf</code></td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>

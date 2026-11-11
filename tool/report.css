@@ -1,0 +1,166 @@
+/* Print stylesheet for the Lab 3 final report (A4, 8-12 pages target). */
+@page {
+  size: A4;
+  margin: 15mm 14mm 13mm 14mm;
+}
+
+html {
+  font-size: 9.6pt;
+}
+
+body {
+  font-family: "Segoe UI", "Be Vietnam Pro", Roboto, system-ui, sans-serif;
+  line-height: 1.4;
+  color: #22201c;
+  margin: 0;
+  padding: 0;
+  max-width: 182mm;
+}
+
+h1 {
+  font-size: 17pt;
+  color: #b23e00;
+  border-bottom: 2px solid #b23e00;
+  padding-bottom: 3px;
+  margin: 0 0 7pt 0;
+  page-break-after: avoid;
+}
+
+h2 {
+  font-size: 12.5pt;
+  color: #2f2e2a;
+  margin: 12pt 0 4pt 0;
+  padding-bottom: 2px;
+  border-bottom: 1px solid #d8d4cd;
+  page-break-after: avoid;
+}
+
+h3 {
+  font-size: 10.5pt;
+  color: #2f2e2a;
+  margin: 8pt 0 3pt 0;
+  page-break-after: avoid;
+}
+
+h4 {
+  font-size: 9.8pt;
+  color: #5a564e;
+  margin: 7pt 0 2pt 0;
+  page-break-after: avoid;
+}
+
+p {
+  margin: 3.5pt 0;
+  text-align: justify;
+}
+
+ul,
+ol {
+  margin: 3.5pt 0 3.5pt 15pt;
+  padding: 0;
+}
+
+li {
+  margin: 1.5pt 0;
+}
+
+a {
+  color: #b23e00;
+  text-decoration: none;
+}
+
+code {
+  font-family: "Cascadia Mono", Consolas, "Courier New", monospace;
+  font-size: 8.6pt;
+  background: #f4f1ec;
+  padding: 0 2px;
+  border-radius: 3px;
+}
+
+pre {
+  font-family: "Cascadia Mono", Consolas, "Courier New", monospace;
+  font-size: 7.2pt;
+  line-height: 1.3;
+  background: #f4f1ec;
+  border-left: 3px solid #b23e00;
+  padding: 5pt 7pt;
+  white-space: pre-wrap;
+  word-break: break-word;
+  page-break-inside: avoid;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
+
+blockquote {
+  margin: 4pt 0 4pt 9pt;
+  padding-left: 7pt;
+  border-left: 3px solid #cfcac2;
+  color: #55504a;
+  font-size: 8.8pt;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 5pt 0;
+  font-size: 8pt;
+  page-break-inside: avoid;
+}
+
+th {
+  background: #efece6;
+  text-align: left;
+  font-weight: 600;
+  color: #2f2e2a;
+}
+
+th,
+td {
+  border: 1px solid #d5d0c8;
+  padding: 2.5pt 4pt;
+  vertical-align: top;
+}
+
+tr:nth-child(even) td {
+  background: #faf8f5;
+}
+
+figure {
+  margin: 7pt 0;
+  text-align: center;
+  page-break-inside: avoid;
+}
+
+figure img {
+  max-width: 100%;
+  max-height: 165mm;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #d8d4cd;
+  margin: 8pt 0;
+}
+
+strong {
+  color: #17150f;
+}
+
+ul,
+ol {
+  page-break-inside: avoid;
+}
+
+h2 {
+  page-break-before: auto;
+}
+
+/* Keep a heading with at least the following table. */
+h2 + table,
+h3 + table {
+  page-break-before: avoid;
+}
