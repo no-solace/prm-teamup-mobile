@@ -1,0 +1,27 @@
+[project]
+name = "teamup-exe-e2e"
+version = "0.1.0"
+description = "ARTEMIS end-to-end suite for TeamUp EXE (PRM393 Lab 3 §7)"
+requires-python = ">=3.12"
+
+dependencies = [
+    # ARTEMIS is pinned to a specific commit for reproducibility (Lab 3 §4).
+    # Install with:
+    #   pip install "artemis @ git+https://github.com/google/artemis@<COMMIT>"
+    "pytest>=8.0",
+    "pytest-timeout>=2.3",
+]
+
+[project.optional-dependencies]
+artemis = [
+    "artemis @ git+https://github.com/google/artemis@main",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["."]
+python_files = ["test_*.py"]
+addopts = "-ra --strict-markers"
+markers = [
+    "exploratory: the unscripted pro-profile session; excluded from the regression run",
+]
+timeout = 900
