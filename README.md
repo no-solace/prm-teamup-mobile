@@ -88,7 +88,7 @@ Kết quả: `report/Lab03_<StudentID>.pdf` và `slides/Lab03_<StudentID>_slides
 | Tài liệu | Đường dẫn | Nội dung |
 |---|---|---|
 | Truy vết thiết kế | [docs/design-traceability.md](docs/design-traceability.md) | 25 màn Lab 2 → route, widget, nguồn dữ liệu; 5 sai lệch kèm lý do; ma trận component và token |
-| Kiến trúc | [docs/architecture.md](docs/architecture.md) | Cây thư mục, sơ đồ layer, sequence diagram Flow A, bảng ViewModel → Service, trạng thái 7 dịch vụ Firebase |
+| Kiến trúc | [docs/architecture.md](docs/architecture.md) | Cây thư mục, sơ đồ layer, sequence diagram Flow A, bảng ViewModel → Service, trạng thái 6 dịch vụ Firebase bắt buộc (+ Firestore) |
 | Data model | [docs/data-model.md](docs/data-model.md) | 8 collection Firestore + Storage, trường và ràng buộc từng trường, state machine của `Proposal`, quy tắc nghiệp vụ R1–R7, index cần thiết |
 | Đặc tả workflow | [docs/workflow.md](docs/workflow.md) | 3 workflow lõi đủ 7 thành phần, activity diagram, state machine, registry BR-01…BR-07 |
 | Kế hoạch Analytics | [docs/analytics-plan.md](docs/analytics-plan.md) | 10 event: trigger, tham số có kiểu, câu hỏi sản phẩm, ánh xạ flow, quy tắc không PII |
@@ -131,7 +131,7 @@ Chi tiết và quyết định cho từng phát hiện: [docs/code-review.md](do
 | `flutter test` | ✅ **145/145 pass** | unit + widget |
 | Firestore rules test | ✅ **21/21 pass** | `firebase emulators:exec --only firestore "node --test firestore.rules.test.mjs"` |
 | `tool/check_layers.sh` | ✅ **Layers OK** | 0 vi phạm layer |
-| Báo cáo PDF | ✅ 9 trang | rubric yêu cầu 8–12 |
+| Báo cáo PDF | ✅ 10 trang | rubric yêu cầu 8–12 |
 | Slide PDF | ✅ 15 slide chính + 4 slide phụ | rubric yêu cầu 12–15 |
 | 18 ca ARTEMIS | ⚠️ **đã viết, chưa chạy trên thiết bị** | cần chạy + điền `docs/test-plan.md` §6 + ảnh vào `evidence/artemis/` |
 | Ảnh Console (6 dịch vụ) | ⚠️ **chưa chụp** | checklist trong `evidence/README.md` |
