@@ -19,7 +19,8 @@ rules_version = '2';
 //   teamId,teamName,currentMemberIds,currentMajors,addStudentIds,addMajors,
 //   fit:strong|good,reasons:string[0..6],status:pending|approved|discarded,
 //   source:ai|manual immutable. Approve 5..6; pending may be below 5.
-// reports/{id}: ownerUid,classId,storagePath,downloadUrl,sizeKb,createdAt.
+// reports/{id}: ownerUid,classId,sizeKb,createdAt; bytes in files/pdf.
+// topics/{id}/files/outline: contentType,bytes (files live in Firestore).
 // notifications/{id}: title,body,receivedAt,route?:null|string,read:bool.
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -110,7 +111,7 @@ service cloud.firestore {
           'description', 'techStack', 'status', 'revisionCount', 'submittedAt'])
         && d.keys().hasOnly(['classId', 'teamId', 'teamName', 'mentorUid', 'leaderUid', 'title',
           'description', 'techStack', 'status', 'revisionCount', 'submittedAt',
-          'attachmentName', 'attachmentUrl', 'mentorFeedback', 'reviewedAt'])
+          'attachmentName', 'mentorFeedback', 'reviewedAt'])
         && safeId(d.classId) && safeId(d.teamId) && text(d.teamName, 120)
         && text(d.mentorUid, 128) && text(d.leaderUid, 128)
         && text(d.title, 200) && text(d.description, 4000) && text(d.techStack, 300)
@@ -119,7 +120,6 @@ service cloud.firestore {
         && d.revisionCount is int && d.revisionCount >= 0 && d.revisionCount <= 10
         && d.submittedAt is timestamp
         && (!('attachmentName' in d) || text(d.attachmentName, 200))
-        && (!('attachmentUrl' in d) || (text(d.attachmentUrl, 2048) && d.attachmentUrl.matches('^https://.*')))
         && (!('mentorFeedback' in d) || text(d.mentorFeedback, 2000))
         && (!('reviewedAt' in d) || d.reviewedAt is timestamp);
     }
@@ -157,15 +157,12 @@ service cloud.firestore {
       return d.keys().hasAll(['bookingId', 'mentorUid', 'classId', 'teamId', 'teamName', 'meetingDate',
           'summary', 'actionItems', 'mentorRating', 'isSignedByMentor', 'createdBy', 'updatedAt'])
         && d.keys().hasOnly(['bookingId', 'mentorUid', 'classId', 'teamId', 'teamName', 'meetingDate',
-          'summary', 'actionItems', 'mentorRating', 'isSignedByMentor', 'createdBy', 'updatedAt',
-          'pdfStoragePath', 'pdfDownloadUrl'])
+          'summary', 'actionItems', 'mentorRating', 'isSignedByMentor', 'createdBy', 'updatedAt'])
         && d.bookingId == id && text(d.summary, 4000)
         // Items are {task, assignee, deadline} strings; the app validates each.
         && d.actionItems is list && d.actionItems.size() <= 20
         && (d.mentorRating == null || (d.mentorRating is int && d.mentorRating >= 1 && d.mentorRating <= 5))
-        && d.isSignedByMentor is bool && d.updatedAt is timestamp
-        && (!('pdfStoragePath' in d) || d.pdfStoragePath == 'minutes/' + id + '/minutes.pdf')
-        && (!('pdfDownloadUrl' in d) || (text(d.pdfDownloadUrl, 2048) && d.pdfDownloadUrl.matches('^https://.*')));
+        && d.isSignedByMentor is bool && d.updatedAt is timestamp;
     }
     function validClass(d) {
       return d.keys().hasAll(['name', 'mentorUid', 'createdAt'])
@@ -212,23 +209,21 @@ service cloud.firestore {
         && d.source in ['ai', 'manual'];
     }
     function validReport(d) {
-      return d.keys().hasAll(['ownerUid', 'classId', 'storagePath', 'downloadUrl', 'sizeKb', 'createdAt'])
-        && d.keys().hasOnly(['ownerUid', 'classId', 'storagePath', 'downloadUrl', 'sizeKb', 'createdAt'])
+      return d.keys().hasAll(['ownerUid', 'classId', 'sizeKb', 'createdAt'])
+        && d.keys().hasOnly(['ownerUid', 'classId', 'sizeKb', 'createdAt'])
         && text(d.ownerUid, 128) && safeId(d.classId) && ownsClass(d.classId)
-        && text(d.storagePath, 512)
-        && d.storagePath.split('/').size() == 3
-        && d.storagePath.split('/')[0] == 'reports'
-        && d.storagePath.split('/')[1] == request.auth.uid
-        && d.storagePath.split('/')[2].matches('^[A-Za-z0-9_-]+[.]pdf$')
-        && text(d.downloadUrl, 2048) && d.downloadUrl.matches('^https://.*')
-        && d.sizeKb is int && d.sizeKb > 0 && d.sizeKb <= 10240
+        && d.sizeKb is int && d.sizeKb > 0 && d.sizeKb <= 900
         && d.createdAt is timestamp;
     }
+    // A file stored in Firestore (no Cloud Storage on the Spark plan): one
+    // document of raw bytes, at most 900 KB so it fits the 1 MiB document limit.
+    function fileBytes(b) { return b is bytes && b.size() > 0 && b.size() <= 921600; }
     function validNotification(d) {
       return d.keys().hasAll(['title', 'body', 'receivedAt', 'read'])
         && d.keys().hasOnly(['title', 'body', 'receivedAt', 'read', 'route'])
         && text(d.title, 200) && d.body is string && d.body.size() <= 4000
-        && d.receivedAt is timestamp && d.receivedAt <= request.time
+        // App-generated activity uses the device clock; allow a little skew.
+        && d.receivedAt is timestamp && d.receivedAt <= request.time + duration.value(5, 'm')
         && d.read is bool
         && (!('route' in d) || d.route == null ||
           (text(d.route, 256) && d.route.matches('^/.*')));
@@ -465,6 +460,15 @@ service cloud.firestore {
         && request.resource.data.classId == resource.data.classId
         && request.resource.data.createdAt == resource.data.createdAt;
       allow delete: if isMentor() && resource.data.ownerUid == request.auth.uid;
+      // The PDF, created in the same batch as the metadata above.
+      match /files/{name} {
+        allow get: if name == 'pdf' && isMentor()
+          && get(/databases/$(database)/documents/reports/$(id)).data.ownerUid == request.auth.uid;
+        allow create: if name == 'pdf' && isMentor()
+          && getAfter(/databases/$(database)/documents/reports/$(id)).data.ownerUid == request.auth.uid
+          && request.resource.data.keys().hasOnly(['bytes'])
+          && fileBytes(request.resource.data.bytes);
+      }
     }
 
     // ---- Flow D: project topics ----
@@ -490,7 +494,7 @@ service cloud.firestore {
         && resource.data.status != 'approved'
         && validTopic(request.resource.data)
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'description',
-          'techStack', 'attachmentName', 'attachmentUrl', 'status', 'submittedAt', 'revisionCount',
+          'techStack', 'attachmentName', 'status', 'submittedAt', 'revisionCount',
           'mentorFeedback'])
         && request.resource.data.status == 'pending'
         && request.resource.data.submittedAt == request.time
@@ -505,6 +509,21 @@ service cloud.firestore {
         && request.resource.data.reviewedAt == request.time
         && validTopic(request.resource.data)
         && (request.resource.data.status == 'approved' || 'mentorFeedback' in request.resource.data);
+      // The outline file. The leader writes it just before (re)submitting.
+      match /files/{name} {
+        allow get: if name == 'outline' && (
+          (isMentor() && get(/databases/$(database)/documents/topics/$(topicId)).data.mentorUid == request.auth.uid)
+          || (signedIn() && me().role in ['leader', 'member'] && topicId == topicIdOf(me())));
+        allow create, update: if name == 'outline'
+          && signedIn() && me().role == 'leader' && topicId == topicIdOf(me())
+          && (!exists(/databases/$(database)/documents/topics/$(topicId))
+            || get(/databases/$(database)/documents/topics/$(topicId)).data.status != 'approved')
+          && request.resource.data.keys().hasAll(['contentType', 'bytes'])
+          && request.resource.data.keys().hasOnly(['contentType', 'bytes'])
+          && request.resource.data.contentType in ['application/pdf',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+          && fileBytes(request.resource.data.bytes);
+      }
     }
 
     // ---- Flow E: availability slots ----
@@ -580,8 +599,7 @@ service cloud.firestore {
         && request.resource.data.mentorRating == null
         && request.resource.data.isSignedByMentor == false
         && request.resource.data.createdBy == request.auth.uid
-        && request.resource.data.updatedAt == request.time
-        && !('pdfStoragePath' in request.resource.data);
+        && request.resource.data.updatedAt == request.time;
       // Either side edits the draft.
       allow update: if bookingParty(minutesId) && resource.data.isSignedByMentor == false
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['summary', 'actionItems', 'updatedAt'])
@@ -595,11 +613,7 @@ service cloud.firestore {
         && request.resource.data.updatedAt == request.time
         && validMinutes(request.resource.data, minutesId)
         && request.resource.data.mentorRating != null;
-      // After signing: attach the exported PDF.
-      allow update: if bookingParty(minutesId) && resource.data.isSignedByMentor == true
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['pdfStoragePath', 'pdfDownloadUrl'])
-        && validMinutes(request.resource.data, minutesId)
-        && 'pdfStoragePath' in request.resource.data;
+      // The PDF is rebuilt on the device from the signed minutes; never stored.
     }
 
     match /{document=**} { allow read, write: if false; }

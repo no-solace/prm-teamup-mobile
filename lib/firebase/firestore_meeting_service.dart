@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -10,19 +9,14 @@ import '../services/app_error.dart';
 import '../services/meeting_service.dart';
 import 'firestore_codec.dart';
 
-/// minutes/{bookingId}; signed PDF in Storage minutes/{bookingId}/minutes.pdf.
+/// minutes/{bookingId}; the PDF is built on the device from signed minutes.
 class FirestoreMeetingService implements MeetingService {
-  FirestoreMeetingService({
-    FirebaseFirestore? db,
-    FirebaseAuth? auth,
-    FirebaseStorage? storage,
-  }) : _db = db ?? FirebaseFirestore.instance,
-       _auth = auth ?? FirebaseAuth.instance,
-       _storage = storage ?? FirebaseStorage.instance;
+  FirestoreMeetingService({FirebaseFirestore? db, FirebaseAuth? auth})
+    : _db = db ?? FirebaseFirestore.instance,
+      _auth = auth ?? FirebaseAuth.instance;
 
   final FirebaseFirestore _db;
   final FirebaseAuth _auth;
-  final FirebaseStorage _storage;
 
   DocumentReference<Map<String, dynamic>> _ref(String id) =>
       _db.collection('minutes').doc(id);
@@ -98,18 +92,12 @@ class FirestoreMeetingService implements MeetingService {
   });
 
   @override
-  Future<String> exportPdf(MeetingMinutes minutes) => guardWrite('minutes', () async {
+  Future<List<int>> exportPdf(MeetingMinutes minutes) async {
     if (!minutes.isSignedByMentor) {
       throw const ValidationError('Export after the mentor signs the minutes');
     }
-    final bytes = await buildMinutesPdf(minutes);
-    final path = 'minutes/${minutes.id}/minutes.pdf';
-    final file = _storage.ref(path);
-    await file.putData(bytes, SettableMetadata(contentType: 'application/pdf'));
-    final url = await file.getDownloadURL();
-    await _ref(minutes.id).update({'pdfStoragePath': path, 'pdfDownloadUrl': url});
-    return url;
-  });
+    return buildMinutesPdf(minutes);
+  }
 }
 
 /// Vietnamese-capable PDF (same bundled font as the roster report).

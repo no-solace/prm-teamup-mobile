@@ -201,6 +201,20 @@ void main() {
     verify(() => messaging.deleteToken()).called(greaterThanOrEqualTo(1));
   });
 
+  test('silent activity is saved to the inbox without a system popup', () async {
+    await service.start();
+    await signIn('alice');
+    final m = message(id: 'topic:a_1:1');
+    foreground.add(RemoteMessage(
+      data: {...m.data, 'silent': '1'},
+      notification: m.notification,
+      sentTime: m.sentTime,
+    ));
+    await pumpEventQueue();
+    expect(inbox.single.read, isFalse);
+    expect(presenter.shown, isEmpty);
+  });
+
   test(
     'foreground, background tap and duplicate delivery keep one read message',
     () async {

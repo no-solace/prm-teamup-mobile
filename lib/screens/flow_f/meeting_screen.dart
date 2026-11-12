@@ -195,21 +195,11 @@ class _MinutesState extends ConsumerState<_Minutes> {
                 const Text('Waiting for the mentor to rate and sign.'),
             ] else ...[
               AppButton(
-                label: m.pdfDownloadUrl == null ? 'Export PDF' : 'Export PDF again',
+                label: 'Export PDF',
                 icon: Icons.picture_as_pdf_outlined,
                 loading: busy,
-                onPressed: () => runWithFeedback(context, () async {
-                  await actions.exportPdf(m);
-                }, success: 'PDF uploaded'),
+                onPressed: () => runWithFeedback(context, () => actions.exportPdf(m)),
               ),
-              if (m.pdfDownloadUrl != null) ...[
-                const SizedBox(height: kSpaceSm),
-                AppButton(
-                  label: 'Open PDF',
-                  variant: AppButtonVariant.text,
-                  onPressed: () => openLink(context, m.pdfDownloadUrl!),
-                ),
-              ],
             ],
           ],
         );

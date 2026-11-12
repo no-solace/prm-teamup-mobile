@@ -14,6 +14,7 @@ abstract interface class MeetingService {
   /// Mentor rates progress (1..5) and signs; the minutes become read-only.
   Future<void> sign(String minutesId, int rating);
 
-  /// Builds the PDF, uploads it to Storage and returns its download URL.
-  Future<String> exportPdf(MeetingMinutes minutes);
+  /// Builds the PDF of signed minutes. Not stored: signed minutes are frozen,
+  /// so the same PDF can be rebuilt from them at any time.
+  Future<List<int>> exportPdf(MeetingMinutes minutes);
 }

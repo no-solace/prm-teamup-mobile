@@ -278,7 +278,8 @@ class FcmNotificationService implements NotificationService {
     );
     if (tapped) {
       _navigate(item.route);
-    } else if (isNew) {
+    } else if (isNew && message.data['silent'] != '1') {
+      // Silent: activity found on app start goes to the inbox only.
       unawaited(_show(message, item, uid));
     }
   }

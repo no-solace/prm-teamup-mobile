@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:printing/printing.dart';
 
 import '../../models/meeting.dart';
 import '../../providers/service_providers.dart';
@@ -83,9 +86,20 @@ class ScheduleActionViewModel extends Notifier<bool> {
   Future<void> sign(String minutesId, int rating) =>
       _run(() => ref.read(meetingServiceProvider).sign(minutesId, rating));
 
-  Future<String> exportPdf(MeetingMinutes minutes) =>
-      _run(() => ref.read(meetingServiceProvider).exportPdf(minutes));
+  /// Builds the signed minutes PDF and opens the share dialog.
+  Future<void> exportPdf(MeetingMinutes minutes) => _run(() async {
+    final bytes = await ref.read(meetingServiceProvider).exportPdf(minutes);
+    await ref.read(pdfSharerProvider)(
+      'bien_ban_${minutes.teamName}_${minutes.id}.pdf',
+      Uint8List.fromList(bytes),
+    );
+  });
 }
+
+/// Opens the OS share dialog for a PDF; replace in widget tests.
+final pdfSharerProvider = Provider<Future<void> Function(String name, Uint8List bytes)>(
+  (ref) => (name, bytes) => Printing.sharePdf(bytes: bytes, filename: name),
+);
 
 final scheduleActionProvider = NotifierProvider<ScheduleActionViewModel, bool>(
   ScheduleActionViewModel.new,

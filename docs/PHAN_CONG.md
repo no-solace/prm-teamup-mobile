@@ -1,6 +1,14 @@
 # Phân công Lab 3: TeamUp EXE
 
 > Sửa lần 3: 05/11/2026. **Còn 7 ngày.** Phạm vi: 3 flow A/B/C, 25 màn của Lab 2 (`docs/prm323-lab2-group6/ux/user-flow.md`). D/E/F **không làm** ở Lab 3.
+>
+> **Cập nhật 12/11/2026:**
+> - A/B/C xong. Đã làm thêm D/E/F và vai sinh viên (`docs/PROPOSAL.md` mục 9).
+> - Không nâng Blaze, dự án ở **gói Spark**:
+>   - Cloud Storage thay bằng lưu file trong Firestore, nên phần "Cloud Storage" của Cuong đổi thành **lưu PDF trong Firestore** (`FirestoreReportStorage`, rules trong `firestore.rules`);
+>   - không có `storage.rules`, không có Cloud Functions.
+>
+>   Các mục có chữ ~~gạch~~ dưới đây không còn áp dụng.
 
 ## 0. Nguyên tắc khi chỉ có 7 ngày
 
@@ -15,7 +23,7 @@
 |---|---|---|---|---|
 | **1** | `Ken` | **Khung + đăng nhập**: S1, S19 (Google Sign-In), S6 (hồ sơ, Sign out) | **Authentication**; `firebase/firestore.rules` | MVVM + Riverpod, `go_router` 3 tab, `lib/theme/`, `lib/widgets/` dùng chung, `flutterfire configure`, `docs/architecture.md`, `docs/data-model.md`, README |
 | **2** | `Dan` | **Flow A**: S2, S22, S23, S3, S4, S7, S8, S18 | **Remote Config**, **Cloud Messaging** | `ClassService` (import **CSV**), `MatchingService` (ghép theo ngành), `NotificationService`, trung tâm thông báo, script seed dữ liệu; dựng video |
-| **3** | `Cuong` | **Flow B**: S9, S10, S11, S12, S13, S14, S24, S25 | **Crashlytics**, **Cloud Storage** (gói Blaze, `storage.rules`) | `ProposalService`, `ReportService` (PDF), mục **Firebase demo** ở S6 |
+| **3** | `Cuong` | **Flow B**: S9, S10, S11, S12, S13, S14, S24, S25 | **Crashlytics**, **lưu file PDF** (trong Firestore, gói Spark; ~~Cloud Storage, gói Blaze, `storage.rules`~~) | `ProposalService`, `ReportService` (PDF), mục **Firebase demo** ở S6 |
 | **4** | `Khang` | **Flow C**: S5, S15, S16, S21, S20, S17 | **Analytics** | **QA lead**: `docs/test-plan.md`, `e2e_test/`, điều phối ARTEMIS, `docs/code-review.md`, `docs/design-traceability.md` (khung), tổng hợp báo cáo và slide |
 
 Nhiều màn là **trạng thái của cùng một màn**: S19/S1, S13/S11, S25/S10, S21/S16, S20/S10. Mỗi nhóm như vậy viết thành **một widget có nhiều state**, không làm thành màn riêng.
@@ -28,7 +36,7 @@ Nhiều màn là **trạng thái của cùng một màn**: S19/S1, S13/S11, S25/
 | `docs/analytics-plan.md` | Khang; mỗi người góp sự kiện của flow mình | Ngày 1 |
 | `docs/architecture.md`, `docs/data-model.md` | Ken; mỗi người thêm ViewModel/Service của mình | Ngày 1 (bản đầu), ngày 6 (bản cuối) |
 | `firebase/remote-config-defaults.json` | Dan | Ngày 3 |
-| `firebase/storage.rules` | Cuong | Ngày 3 |
+| ~~`firebase/storage.rules`~~ → rules `reports/{id}/files` trong `firestore.rules` | Cuong | Ngày 3 |
 | `docs/test-plan.md`, `e2e_test/` | Khang; mỗi người viết ≥ 3 ca cho màn mình | Ngày 3 (plan), ngày 5 (chạy) |
 | `docs/code-review.md` | Khang; chủ PR sửa | Ngày 5 |
 | `evidence/` | Người phụ trách từng dịch vụ | Ngày 5 |

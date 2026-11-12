@@ -153,13 +153,13 @@ class _StudentTopic extends ConsumerWidget {
 }
 
 /// Topic content shared by the student view and the mentor review.
-class TopicBody extends StatelessWidget {
+class TopicBody extends ConsumerWidget {
   const TopicBody({super.key, required this.topic});
 
   final ProjectTopic topic;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final text = Theme.of(context).textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -171,13 +171,16 @@ class TopicBody extends StatelessWidget {
         Text('Tech stack', style: text.titleSmall),
         const SizedBox(height: kSpaceXs),
         Text(topic.techStack),
-        if (topic.attachmentUrl != null) ...[
+        if (topic.attachmentName != null) ...[
           const SizedBox(height: kSpaceMd),
           AppButton(
-            label: topic.attachmentName ?? 'Open outline',
+            label: topic.attachmentName!,
             icon: Icons.attach_file,
             variant: AppButtonVariant.tonal,
-            onPressed: () => openLink(context, topic.attachmentUrl!),
+            onPressed: () => runWithFeedback(
+              context,
+              () => ref.read(topicActionProvider.notifier).openOutline(topic),
+            ),
           ),
         ],
       ],

@@ -88,7 +88,7 @@ class _TopicFormScreenState extends ConsumerState<TopicFormScreen> {
           ),
           const SizedBox(height: kSpaceSm),
           AppButton(
-            label: _file?.fileName ?? existing?.attachmentName ?? 'Attach outline (PDF/DOCX, max 10 MB)',
+            label: _file?.fileName ?? existing?.attachmentName ?? 'Attach outline (PDF/DOCX, max 900 KB)',
             icon: Icons.attach_file,
             variant: AppButtonVariant.tonal,
             onPressed: busy ? null : _pick,

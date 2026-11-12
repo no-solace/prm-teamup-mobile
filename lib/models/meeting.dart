@@ -167,7 +167,6 @@ class MeetingMinutes {
     required this.actionItems,
     this.mentorRating,
     this.isSignedByMentor = false,
-    this.pdfDownloadUrl,
   });
 
   static const maxActionItems = 20;
@@ -185,7 +184,6 @@ class MeetingMinutes {
   /// 1..5, set by the mentor when signing.
   final int? mentorRating;
   final bool isSignedByMentor;
-  final String? pdfDownloadUrl;
 
   factory MeetingMinutes.fromMap(String id, Map<String, dynamic> d) {
     final items = d['actionItems'];
@@ -207,7 +205,6 @@ class MeetingMinutes {
       actionItems: List.unmodifiable(items.map(ActionItem.fromMap)),
       mentorRating: rating as int?,
       isSignedByMentor: d['isSignedByMentor'] == true,
-      pdfDownloadUrl: DataValidation.optionalText(d, 'pdfDownloadUrl', max: 2048),
     );
   }
 }

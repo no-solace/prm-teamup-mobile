@@ -24,6 +24,11 @@ class _Live {
 class FakeTopicService implements TopicService {
   final _live = _Live();
   final Map<String, ProjectTopic> _topics = {};
+  final Map<String, List<int>> _outlines = {};
+
+  @override
+  Future<List<int>> downloadOutline(String topicId) async =>
+      _outlines[topicId] ?? (throw const NotFoundError('The outline file is missing'));
 
   @override
   Stream<List<ProjectTopic>> watchMentorTopics() =>
@@ -48,6 +53,10 @@ class FakeTopicService implements TopicService {
     if (title.trim().isEmpty || description.trim().isEmpty || techStack.trim().isEmpty) {
       throw const ValidationError('Fill in title, summary and tech stack');
     }
+    if (attachment != null &&
+        (attachment.bytes.isEmpty || attachment.bytes.length > TopicAttachment.maxBytes)) {
+      throw const ValidationError('Outline must be between 1 byte and 900 KB');
+    }
     final old = _topics[id];
     if (old?.status == TopicStatus.approved) {
       throw const ValidationError('An approved topic can no longer be changed');
@@ -69,8 +78,8 @@ class FakeTopicService implements TopicService {
       revisionCount: (old?.revisionCount ?? 0) + (resubmit ? 1 : 0),
       submittedAt: DateTime.now(),
       attachmentName: attachment?.fileName ?? old?.attachmentName,
-      attachmentUrl: attachment == null ? old?.attachmentUrl : 'https://example.com/outline.pdf',
     );
+    if (attachment != null) _outlines[id] = List.of(attachment.bytes);
     _live.changed();
   }
 
@@ -97,7 +106,6 @@ class FakeTopicService implements TopicService {
       revisionCount: t.revisionCount,
       submittedAt: t.submittedAt,
       attachmentName: t.attachmentName,
-      attachmentUrl: t.attachmentUrl,
       mentorFeedback: feedback.trim().isEmpty ? null : feedback.trim(),
     );
     _live.changed();
@@ -267,7 +275,7 @@ class FakeMeetingService implements MeetingService {
       _live.watch(() => _minutes[bookingId]);
 
   MeetingMinutes _copy(MeetingMinutes m, {String? summary, List<ActionItem>? items,
-      int? rating, bool? signed, String? pdf}) => MeetingMinutes(
+      int? rating, bool? signed}) => MeetingMinutes(
     id: m.id,
     mentorUid: m.mentorUid,
     classId: m.classId,
@@ -278,7 +286,6 @@ class FakeMeetingService implements MeetingService {
     actionItems: items ?? m.actionItems,
     mentorRating: rating ?? m.mentorRating,
     isSignedByMentor: signed ?? m.isSignedByMentor,
-    pdfDownloadUrl: pdf ?? m.pdfDownloadUrl,
   );
 
   @override
@@ -322,13 +329,10 @@ class FakeMeetingService implements MeetingService {
   }
 
   @override
-  Future<String> exportPdf(MeetingMinutes minutes) async {
+  Future<List<int>> exportPdf(MeetingMinutes minutes) async {
     if (!minutes.isSignedByMentor) {
       throw const ValidationError('Export after the mentor signs the minutes');
     }
-    const url = 'https://example.com/minutes.pdf';
-    _minutes[minutes.id] = _copy(minutes, pdf: url);
-    _live.changed();
-    return url;
+    return '%PDF-1.4 fake minutes ${minutes.id}'.codeUnits;
   }
 }

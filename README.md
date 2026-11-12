@@ -45,7 +45,7 @@ bash tool/check_layers.sh
    cd android && ./gradlew signingReport
    ```
    Copy dòng `SHA1` của biến thể `debug`, dán vào Firebase Console → Project settings → app Android → Add fingerprint. Sau đó tải lại `google-services.json`.
-3. Deploy rules: `firebase deploy --only firestore:rules,storage`.
+3. Deploy rules: `firebase deploy --only firestore:rules,remoteconfig` (gói Spark: không dùng Storage/Functions).
 
 ## Cấu trúc
 

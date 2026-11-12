@@ -1,12 +1,10 @@
-/// Metadata of an uploaded PDF report (reports/{id}); the file lives at
-/// Storage `reports/{ownerUid}/...`.
+/// Metadata of a saved PDF report (reports/{id}); the bytes live in
+/// reports/{id}/files/pdf so listing reports never downloads them.
 class Report {
   const Report({
     required this.id,
     required this.ownerUid,
     required this.classId,
-    required this.storagePath,
-    required this.downloadUrl,
     required this.sizeKb,
     required this.createdAt,
   });
@@ -14,8 +12,6 @@ class Report {
   final String id;
   final String ownerUid;
   final String classId;
-  final String storagePath;
-  final String downloadUrl;
   final int sizeKb;
   final DateTime createdAt;
 }

@@ -88,6 +88,17 @@ class FirebaseAuthService implements AuthService {
         );
       });
 
+  /// Read-only view of the signed-in profile (no ensure() write), for
+  /// background listeners that must not repeat the sign-in bookkeeping.
+  Stream<AppUser?> profileChanges() =>
+      switchDataStream(_auth.userChanges(), (User? user) {
+        if (user == null) return Stream<AppUser?>.value(null);
+        return _profiles
+            .watch(user.uid)
+            .handleError((Object _) {}) // Missing profile/rules: no activity.
+            .map((profile) => _auth.currentUser?.uid != user.uid ? null : _map(user, profile));
+      });
+
   Future<void> _ensureProfile(User user) async {
     try {
       await _profiles.ensure(user);

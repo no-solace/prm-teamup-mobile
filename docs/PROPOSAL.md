@@ -5,6 +5,14 @@
 
 **Thay đổi so với bản 31/10:** bản trước lấy các luồng mới D/E/F (proposal đề tài, đặt lịch, họp và biên bản) làm trọng tâm. Các luồng này không có trong Lab 2, và Lab 2 không có giao diện cho sinh viên. Đề Lab 3 lại chấm trên "mọi màn và cả 3 flow của Lab 2". Vì vậy bản này lấy **3 flow A/B/C của Lab 2 (25 màn)** làm phạm vi chính. D/E/F chuyển xuống mục 9 và chỉ làm khi giảng viên đồng ý.
 
+**Cập nhật 12/11/2026 (sửa lần 3):**
+- A/B/C đã xong. Nhóm làm thêm **D/E/F** và **vai sinh viên** (trưởng nhóm, thành viên), xem mục 9.
+- Dự án ở **gói Spark (miễn phí)**, không nâng Blaze. Vì vậy:
+  - không dùng Cloud Storage: file lưu ngay trong Firestore, tối đa 900 KB/file;
+  - không dùng Cloud Functions: thông báo D/E/F do app tự sinh từ Firestore.
+
+  Xem mục 5 và 10.
+
 ## 1. Tóm tắt
 
 TeamUp EXE là app Android (Flutter) cho **mentor/giảng viên môn EXE** (persona Cô Lan). App giúp ghép sinh viên chưa có nhóm vào các nhóm còn thiếu người, để mỗi nhóm có 5-6 người thuộc nhiều ngành:
@@ -15,14 +23,16 @@ TeamUp EXE là app Android (Flutter) cho **mentor/giảng viên môn EXE** (pers
 4. Mentor **thêm/bớt thành viên** rồi **duyệt**, hoặc **ghép tay** khi AI không ghép được.
 5. Mentor **xuất PDF** danh sách nhóm đã duyệt của lớp.
 
-Sinh viên không dùng app. Sinh viên chỉ là dữ liệu (đúng thiết kế Lab 2).
+Ở A/B/C, sinh viên chỉ là dữ liệu (đúng thiết kế Lab 2). Phần mở rộng D/E/F (mục 9) cho sinh viên dùng app:
+- trưởng nhóm nộp đề tài, đặt lịch họp với mentor;
+- cả nhóm xem kết quả và viết biên bản họp.
 
 ## 2. Người dùng
 
 | Vai | Ai | Dùng app ở Lab 3? |
 |---|---|---|
-| **Mentor / giảng viên** | Persona Cô Lan (P01, Primary) | Có, là người dùng duy nhất trên mobile |
-| Sinh viên | Đối tượng được ghép (P02, Supporting) | Không, chỉ là dữ liệu |
+| **Mentor / giảng viên** | Persona Cô Lan (P01, Primary) | Có: A/B/C và phía mentor của D/E/F |
+| Sinh viên (trưởng nhóm / thành viên) | P02, Supporting | Có, chỉ ở D/E/F. Tự onboard bằng **mã lớp + MSSV** (phải có trong danh sách lớp đã import và đã có nhóm) |
 | Điều phối khoa | P03 (giả định trong persona Lab 2) | Không ở Lab 3; dự kiến là vai web admin ở Final (mục 8) |
 
 ## 3. Phạm vi: 3 flow và 25 màn của Lab 2
@@ -62,37 +72,41 @@ Quy tắc nghiệp vụ lấy nguyên từ Lab 2 (`ux/persona.md` mục 0, `ux/u
 |---|---|
 | App | Flutter stable, Material 3, Android, chạy trên **thiết bị thật** |
 | Kiến trúc | **MVVM + Riverpod**: View → ViewModel → Service → Firebase SDK. View không gọi SDK. Mỗi ViewModel có state model rõ (sealed class loading / data / empty / error). Mỗi Service có interface và bản fake. |
-| Điều hướng | `go_router` + `StatefulShellRoute`, 3 tab **Classes / Proposals / Profile** (giữ nguyên Lab 2); chặn route theo trạng thái đăng nhập |
+| Điều hướng | `go_router` + `StatefulShellRoute`. Mentor: 5 tab **Classes / Proposals / Topics / Schedule / Profile** (3 tab của Lab 2 + 2 tab D/E/F). Sinh viên: 4 tab **My team / Topics / Schedule / Profile**. Chặn route theo đăng nhập, onboarding và vai |
 | Design system | Token từ `flutter-handoff.md` (Bảng 1) vào `lib/theme/`; component (Bảng 2) vào `lib/widgets/` |
 | Dữ liệu | Cloud Firestore + `firebase/firestore.rules` |
 | Import | Đọc `.xlsx`/`.csv` bằng `file_picker` + `excel`/`csv` |
 | PDF | `pdf` + `printing` |
 | Cấu trúc thư mục | `lib/` gồm `models/`, `services/`, `firebase/`, `viewmodels/`, `screens/`, `widgets/`, `theme/`, `utils/`. Model và service Firestore viết sao cho tách được thành `packages/core/` ở Final |
 
-**Service:** `AuthService`, `ClassService` (import, lớp, sinh viên), `TeamService`, `MatchingService`, `ProposalService` (đề xuất ghép nhóm), `ReportService` (tạo PDF), `StorageService`, `NotificationService`, `AnalyticsService`, `CrashService`, `ConfigService`.
+**Service:** `AuthService`, `ClassService` (import, lớp, sinh viên), `TeamService`, `MatchingService`, `ProposalService` (đề xuất ghép nhóm), `ReportService` (tạo PDF), `StorageService` (lưu PDF báo cáo), `NotificationService`, `AnalyticsService`, `CrashService`, `ConfigService`. D/E/F thêm `TopicService`, `BookingService`, `MeetingService`.
 
-**Collection Firestore (dự kiến, chốt ở `docs/data-model.md`):**
+**Collection Firestore (bản đang chạy; chi tiết ở `docs/architecture.md` mục 7 và `firebase/firestore.rules`):**
 
 | Collection | Nội dung chính |
 |---|---|
-| `users/{uid}` | `role: mentor`, `displayName` |
+| `users/{uid}` | `role` (mentor / leader / member), `displayName`; sinh viên thêm `classId`, `teamId`, `studentId`, `mentorUid` (không đổi sau onboarding) |
 | `classes/{classId}` | `mentorUid`, `name`, thống kê |
 | `classes/{classId}/students/{mssv}` | `fullName`, `major`, `teamId` hoặc null |
 | `classes/{classId}/teams/{teamId}` | `name`, `memberIds`, `majors`, `status` |
 | `classes/{classId}/proposals/{id}` | `teamId`, `addStudentIds`, `fit`, `reason`, `status` (pending / approved / discarded), `source` (ai / manual) |
-| `reports/{id}` | `ownerUid`, `classId`, `storagePath`, `sizeKb`, `createdAt` |
+| `reports/{id}` | `ownerUid`, `classId`, `sizeKb`, `createdAt`; bytes PDF ở `reports/{id}/files/pdf` |
 | `users/{uid}/notifications/{id}` | Thông báo đã nhận (trung tâm thông báo) |
+| `topics/{classId}_{teamId}` | D: đề tài của nhóm, `status` (pending / approved / rejected / revision_requested), `revisionCount`; file outline ở `files/outline` |
+| `mentors/{uid}/slots/{id}` | E: khung giờ rảnh, `status` (available / booked) |
+| `bookings/{id}` | E/F: lịch hẹn, `status` (requested / confirmed / cancelled / completed), `meetUrl` (Google Meet) |
+| `minutes/{bookingId}` | F: biên bản, việc cần làm, đánh giá 1-5 sao, `isSignedByMentor` |
 
 ## 5. Tích hợp 6 dịch vụ Firebase
 
 | Dịch vụ | Dùng ở đâu | Đường lỗi và bằng chứng |
 |---|---|---|
 | **Authentication** | Google Sign-In (S1); `authStateChanges` điều hướng S1 ↔ S2; Sign out ở S6 xóa state cục bộ | Hủy đăng nhập, mất mạng (S19); ảnh Console → Users |
-| **Cloud Storage** | Upload PDF danh sách nhóm vào `reports/{uid}/…`; hiện tiến độ và URL tải xuống; metadata lưu ở `reports` | `firebase/storage.rules` chỉ cho chủ `uid`; thử truy cập trái phép, mất mạng. Dự án dùng gói Blaze (đã có thành viên gắn thẻ), xem mục 10 |
-| **Cloud Messaging** | Xin quyền Android 13+; nhận ở 3 trạng thái app; lưu vào trung tâm thông báo (S6); payload `route` mở đúng màn (ví dụ `/proposals` → S9, `/classes/{id}` → S3) | Gửi thử từ Console; từ chối quyền; giải thích token trên slide (ai cấp, lưu ở đâu, gửi bằng gì) |
+| **Lưu file** (thay Cloud Storage) | Gói Spark không tạo được bucket Storage, nên file lưu trong Firestore dạng `bytes`, mỗi file một tài liệu ≤ 900 KB: PDF danh sách nhóm (`reports/{id}/files/pdf`), outline đề tài (`topics/{id}/files/outline`). PDF biên bản tạo lại trên máy, không lưu | `firestore.rules` chỉ cho chủ sở hữu (báo cáo) hoặc nhóm + mentor (outline); chặn file > 900 KB và sai kiểu; test trên emulator. Cần giảng viên xác nhận cách thay thế này (mục 11) |
+| **Cloud Messaging** | Xin quyền Android 13+; nhận ở 3 trạng thái app; lưu vào trung tâm thông báo (S6); payload `route` mở đúng màn (ví dụ `/proposals` → S9, `/classes/{id}` → S3). Thông báo D/E/F (đề tài mới, kết quả duyệt, lịch hẹn) do app tự sinh khi theo dõi Firestore, đi cùng đường xử lý với push | Gửi thử từ Console; từ chối quyền; giải thích token trên slide (ai cấp, lưu ở đâu, gửi bằng gì). Không có Cloud Functions: thông báo D/E/F chỉ đến khi app đang mở hoặc chạy nền |
 | **Analytics** | ≥ 7 sự kiện (bảng dưới); `setUserId` sau đăng nhập; không đưa email hay tên vào tham số | Ảnh DebugView cho từng sự kiện |
 | **Crashlytics** | `FlutterError.onError` + `PlatformDispatcher.onError`; non-fatal khi import lỗi (S22) và AI quá 30 giây (S8 → S18); `setUserIdentifier`; khóa `role`, `class_id`; nút crash thử ở S6 | Ảnh dashboard có non-fatal, crash, khóa, user ID |
-| **Remote Config** | `ai_matching_enabled` ẩn/hiện nút Match with AI (S3, S4, S5); `max_proposals_shown` giới hạn số thẻ ở S9; mặc định trong app và `firebase/remote-config-defaults.json` | Ảnh trước/sau; mất mạng thì dùng mặc định; giải thích fetch interval và cache |
+| **Remote Config** | `ai_matching_enabled` ẩn/hiện nút Match with AI (S3, S4, S5); `max_proposals_shown` giới hạn số thẻ ở S9; `max_topic_revisions` (số lần nộp lại đề tài, mặc định 3); `default_meeting_duration_minutes` (độ dài khung giờ, mặc định 30); mặc định trong app và `firebase/remote-config-defaults.json` | Ảnh trước/sau; mất mạng thì dùng mặc định; giải thích fetch interval và cache |
 
 ### Kế hoạch Analytics (bản nháp, chốt ở `docs/analytics-plan.md`)
 
@@ -107,7 +121,7 @@ Quy tắc nghiệp vụ lấy nguyên từ Lab 2 (`ux/persona.md` mục 0, `ux/u
 | `proposal_approve` | Duyệt (S12) | `member_count` (int), `major_count` (int), `source` (ai / manual), `edited` (bool) | Mentor có phải sửa đề xuất AI nhiều không? Tiêu chí 2 Lab 2 |
 | `proposal_discard` | Discard (S17) | `source` (string) | Đề xuất nào bị bỏ? |
 | `member_change_blocked` | Gặp S13 hoặc S25 | `reason` (max_6 / min_5) | Quy tắc 5-6 có gây vướng không? |
-| `report_export` | PDF upload xong | `team_count` (int), `file_size_kb` (int) | Tính năng xuất có được dùng không? |
+| `report_export` | PDF lưu xong | `team_count` (int), `file_size_kb` (int) | Tính năng xuất có được dùng không? |
 
 ## 6. Tiêu chí thành công (từ Lab 2)
 
@@ -136,15 +150,31 @@ Quy tắc nghiệp vụ lấy nguyên từ Lab 2 (`ux/persona.md` mục 0, `ux/u
 - **AI mức 2:** S8 gọi Gemini qua Firebase AI Logic, trả JSON đề xuất (Dart model), mentor xác nhận và chỉnh sửa; S15/S18 là đường dự phòng; model, prompt và cờ bật/tắt lấy từ Remote Config.
 - **Lưu ý:** Final để Cloud Storage và Cloud Functions ngoài phạm vi. PDF ở Final lưu trên máy, metadata lưu Firestore.
 
-## 9. Mở rộng (không làm ở Lab 3: chỉ còn 7 ngày)
+## 9. Mở rộng D/E/F (đã làm sau khi A/B/C xong)
 
-Các luồng của bản 31/10 không có trong Lab 2. Nếu làm thì phải thêm vai sinh viên, thiết kế mới trên Figma và ghi là "mở rộng ở Lab 3":
+Các luồng của bản 31/10 không có trong Lab 2, nên được ghi là "mở rộng ở Lab 3". Đề Final ghi "New features earn no points", vì vậy nhóm chỉ làm sau khi A/B/C và 6 dịch vụ đã xong.
 
-- **D. Đề tài dự án** (đổi tên từ "Proposal" để không trùng với Proposals S9/S10): trưởng nhóm nộp, mentor nhận và duyệt.
-- **E. Lịch rảnh và đặt lịch.**
-- **F. Họp (Google Meet qua Calendar API) và biên bản.**
+**Vai sinh viên:**
+- Đăng nhập Google, rồi onboard bằng **mã lớp** (mentor copy ở S3) + **MSSV** và chọn trưởng nhóm hoặc thành viên.
+- Rules kiểm MSSV có trong lớp và đúng nhóm. Vai và liên kết lớp/nhóm không đổi được sau đó.
 
-Đề Final ghi: "New features earn no points". Vì vậy nhóm chỉ làm mục này sau khi A/B/C và 6 dịch vụ đã xong.
+**D. Đề tài dự án** (đổi tên từ "Proposal" để không trùng S9/S10):
+- Trưởng nhóm nộp tên đề tài, tóm tắt, tech stack và outline PDF/DOCX (≤ 900 KB).
+- Mentor duyệt, từ chối hoặc yêu cầu sửa (bắt buộc góp ý).
+- Nộp lại sau khi bị trả về thì tính 1 lần sửa, tối đa theo Remote Config `max_topic_revisions`.
+
+**E. Lịch rảnh và đặt lịch:**
+- Mentor mở khung giờ (không được trùng hoặc chồng nhau).
+- Trưởng nhóm đặt một khung và chọn mục đích: duyệt đề tài, review sprint hoặc hướng dẫn kỹ thuật.
+- Mentor xác nhận và dán link Google Meet (kiểm đúng dạng `meet.google.com/xxx-xxxx-xxx`), hoặc từ chối.
+- Đặt lịch và giữ khung giờ diễn ra trong cùng một giao dịch, nên không đặt trùng được.
+
+**F. Họp và biên bản:**
+- Sau buổi họp đã xác nhận, cả hai bên viết biên bản: tóm tắt và tối đa 20 việc cần làm, mỗi việc có người phụ trách và hạn.
+- Mentor đánh giá 1-5 sao và ký; sau khi ký thì biên bản bị khóa.
+- Xuất PDF tiếng Việt và chia sẻ.
+
+**Không làm:** Google Calendar API (link Meet do mentor dán).
 
 ## 10. Rủi ro và xử lý
 
@@ -153,7 +183,8 @@ Các luồng của bản 31/10 không có trong Lab 2. Nếu làm thì phải th
 | Giảng viên muốn giữ D/E/F làm trọng tâm | Trung bình | Hỏi ngay (mục 11); nếu có thì chia lại việc, A/B/C vẫn phải đủ |
 | 25 màn trong 7 ngày | Cao | Chia đều theo flow, làm song song từ ngày 1; widget dùng chung xong trưa ngày 2; nhiều màn là trạng thái của cùng một màn (S13/S11, S19/S1, S21/S16, S25/S10); hạn chót tính năng cuối ngày 4; thứ tự cắt khi trễ ở `PHAN_CONG.md` mục 5 |
 | Google Sign-In lỗi trên máy thành viên khác | Trung bình | Thêm SHA-1 debug của cả 4 máy vào Firebase ở tuần 0 |
-| Phát sinh phí trên gói Blaze | Thấp | Bucket `us-central1` (trong hạn mức miễn phí), budget alert 1 USD (chỉ cảnh báo, không tự ngắt), chỉ upload PDF nhỏ; gỡ thẻ hoặc hạ về Spark sau khi chấm. Đã cân nhắc Cloudinary (giảng viên cho phép) nhưng không chọn vì không giới hạn được quyền theo `uid` khi không có server |
+| Không nâng được Blaze (cần giữ thẻ ~700k đồng) | Đã xảy ra | Ở lại gói Spark:<br>• File lưu trong Firestore, quyền theo `uid` vẫn do `firestore.rules` kiểm. Không dùng Cloudinary vì không giới hạn được quyền theo `uid` khi không có server.<br>• Thông báo D/E/F do app tự sinh.<br>Giới hạn: file ≤ 900 KB; app đã tắt hẳn thì không nhận thông báo D/E/F. Nếu sau này có Blaze: chuyển file sang Storage và gửi push bằng Cloud Functions (định dạng thông báo giữ nguyên) |
+| Sinh viên nhận nhầm MSSV của người khác | Trung bình | Rules chỉ kiểm MSSV có trong lớp và đúng nhóm; ai biết mã lớp + MSSV đều nhận được. Bản Final cần mentor xác nhận hoặc mời qua email |
 | Crashlytics chậm hiện trên Console | Thấp | Demo trước buổi chấm; mở lại app sau crash để báo cáo được gửi |
 | Lộ khóa bí mật | Trung bình | Không commit key ARTEMIS, service account, keystore; `google-services.json` được phép commit |
 
@@ -162,3 +193,4 @@ Các luồng của bản 31/10 không có trong Lab 2. Nếu làm thì phải th
 1. Phạm vi Lab 3 là 3 flow A/B/C (25 màn) của Lab 2; D/E/F không bắt buộc. Có đúng không?
 2. Ghi chú "admin phải dùng web" áp dụng cho Lab 3 hay chỉ Final?
 3. Đặt tên repo, báo cáo và slide (`<StudentID>`) thế nào khi làm theo nhóm?
+4. Lưu file trong Firestore (gói Spark) có được tính thay cho Cloud Storage không?

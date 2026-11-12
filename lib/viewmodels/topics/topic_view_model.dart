@@ -1,5 +1,8 @@
+import 'dart:typed_data';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:printing/printing.dart';
 
 import '../../models/project_topic.dart';
 import '../../providers/service_providers.dart';
@@ -84,7 +87,31 @@ class TopicActionViewModel extends Notifier<bool> {
 
   Future<void> review(String topicId, TopicStatus decision, String feedback) =>
       _run(() => ref.read(topicServiceProvider).review(topicId, decision, feedback));
+
+  /// Downloads the outline, then shares a PDF or saves a DOCX on the device.
+  /// Not a write, so it does not use the busy flag.
+  Future<void> openOutline(ProjectTopic topic) async {
+    try {
+      final bytes = Uint8List.fromList(
+        await ref.read(topicServiceProvider).downloadOutline(topic.id),
+      );
+      await ref.read(outlineOpenerProvider)(topic.attachmentName ?? 'outline.pdf', bytes);
+    } catch (e) {
+      throw toAppError(e);
+    }
+  }
 }
+
+/// Hands a downloaded outline to the OS; replace in widget tests.
+final outlineOpenerProvider = Provider<Future<void> Function(String name, Uint8List bytes)>(
+  (ref) => (name, bytes) async {
+    if (name.toLowerCase().endsWith('.pdf')) {
+      await Printing.sharePdf(bytes: bytes, filename: name);
+    } else {
+      await FilePicker.saveFile(fileName: name, bytes: bytes);
+    }
+  },
+);
 
 final topicActionProvider = NotifierProvider<TopicActionViewModel, bool>(
   TopicActionViewModel.new,

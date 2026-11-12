@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { after, before, beforeEach, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { initializeTestEnvironment, assertFails, assertSucceeds } from '@firebase/rules-unit-testing';
-import { collection, collectionGroup, deleteDoc, deleteField, doc, getDoc, getDocs,
+import { Bytes, collection, collectionGroup, deleteDoc, deleteField, doc, getDoc, getDocs,
   query, runTransaction, serverTimestamp, setDoc, Timestamp, updateDoc, where, writeBatch } from 'firebase/firestore';
 
 const projectId = 'demo-teamup-data';
@@ -410,15 +410,25 @@ test('FCM token register/refresh/delete restricted to owner mentor and valid sch
   await assertFails(updateDoc(ref, { extra: true, updatedAt: serverTimestamp() }));
   await assertSucceeds(deleteDoc(ref));
 });
-test('reports restricted by owner/class/path/range/immutable timestamp', async () => {
-  const ref = doc(db(), 'reports/r');
-  const report = { ownerUid: 'alice', classId: 'a', storagePath: 'reports/alice/r.pdf',
-    downloadUrl: 'https://example.test/r.pdf', sizeKb: 20, createdAt: serverTimestamp() };
-  await assertSucceeds(setDoc(ref, report));
+test('reports restricted by owner/class/range/immutable timestamp; PDF bytes owner-only', async () => {
+  const alice = db();
+  const ref = doc(alice, 'reports/r');
+  const report = { ownerUid: 'alice', classId: 'a', sizeKb: 20, createdAt: serverTimestamp() };
+  const pdf = (n) => ({ bytes: Bytes.fromUint8Array(new Uint8Array(n).fill(37)) });
+  const batch = writeBatch(alice);
+  batch.set(ref, report);
+  batch.set(doc(alice, 'reports/r/files/pdf'), pdf(1024));
+  await assertSucceeds(batch.commit());
+  await assertSucceeds(getDoc(doc(db(), 'reports/r/files/pdf')));
   await assertFails(getDoc(doc(db('bob'), 'reports/r')));
-  for (const patch of [{ ownerUid: 'bob' }, { storagePath: 'reports/bob/r.pdf' },
-    { sizeKb: -1 }, { sizeKb: 10241 }, { downloadUrl: 'javascript:bad' },
-    { createdAt: Timestamp.fromMillis(0) }]) await assertFails(updateDoc(ref, patch));
+  await assertFails(getDoc(doc(db('bob'), 'reports/r/files/pdf')));
+  await assertFails(setDoc(doc(db(), 'reports/r/files/pdf'), pdf(921601)));
+  await assertFails(setDoc(doc(db(), 'reports/r/files/other'), pdf(10)));
+  await assertFails(setDoc(doc(db('bob'), 'reports/r/files/pdf'), pdf(10)));
+  for (const patch of [{ ownerUid: 'bob' }, { sizeKb: -1 }, { sizeKb: 901 },
+    { storagePath: 'reports/alice/r.pdf' }, { createdAt: Timestamp.fromMillis(0) }]) {
+    await assertFails(updateDoc(ref, patch));
+  }
 });
 test('notifications private; updates may only mark read; parent role required', async () => {
   const ref = doc(db(), 'users/alice/notifications/n');
@@ -489,6 +499,27 @@ test('topics: leader submits own team only; member and other teams cannot; only 
     title: 'v3', status: 'pending', submittedAt: serverTimestamp(), revisionCount: 2 }));
 });
 
+test('topic outline file: leader writes before approval; team and mentor read; others cannot', async () => {
+  await seedStudents();
+  const outline = (uid) => doc(db(uid), 'topics/a_1/files/outline');
+  const file = (n, contentType = 'application/pdf') =>
+    ({ contentType, bytes: Bytes.fromUint8Array(new Uint8Array(n).fill(1)) });
+  // First submission: the file goes in before the topic exists.
+  await assertSucceeds(setDoc(outline('lead'), file(2048)));
+  await assertFails(setDoc(outline('mem'), file(10)));
+  await assertFails(setDoc(doc(db('lead2'), 'topics/a_1/files/outline'), file(10)));
+  await assertFails(setDoc(outline('lead'), file(921601)));
+  await assertFails(setDoc(outline('lead'), file(10, 'text/html')));
+  await assertFails(setDoc(doc(db('lead'), 'topics/a_1/files/other'), file(10)));
+  await assertSucceeds(setDoc(doc(db('lead'), 'topics/a_1'), topic({ attachmentName: 'outline.pdf' })));
+  await assertSucceeds(getDoc(outline('mem')));
+  await assertSucceeds(getDoc(outline()));
+  await assertFails(getDoc(outline('lead2')));
+  await assertFails(getDoc(outline('bob')));
+  await assertSucceeds(updateDoc(doc(db(), 'topics/a_1'), { status: 'approved', reviewedAt: serverTimestamp() }));
+  await assertFails(setDoc(outline('lead'), file(10)));
+});
+
 test('slots and bookings: atomic booking, no double booking, cancel frees the slot', async () => {
   await seedStudents();
   const slotRef = (c) => doc(c, 'mentors/alice/slots/s1');
@@ -496,7 +527,9 @@ test('slots and bookings: atomic booking, no double booking, cancel frees the sl
   await assertSucceeds(setDoc(slotRef(db()), { startTime: in1h(), endTime: in90m(), status: 'available', bookingId: null }));
   await assertSucceeds(getDocs(collection(db('mem'), 'mentors/alice/slots')));
   await assertFails(getDocs(collection(db('bob'), 'mentors/alice/slots')));
-  const slot = (await env.withSecurityRulesDisabled(async (c) => (await getDoc(slotRef(c.firestore()))).data()));
+  // withSecurityRulesDisabled does not return the callback's value.
+  let slot;
+  await env.withSecurityRulesDisabled(async (c) => { slot = (await getDoc(slotRef(c.firestore()))).data(); });
   const book = (uid, id) => {
     const c = db(uid);
     const batch = writeBatch(c);
@@ -542,8 +575,8 @@ test('minutes: both sides draft, only mentor signs, signed minutes are frozen', 
   await assertFails(updateDoc(ref(), { isSignedByMentor: true, mentorRating: 6, updatedAt: serverTimestamp() }));
   await assertSucceeds(updateDoc(ref(), { isSignedByMentor: true, mentorRating: 4, updatedAt: serverTimestamp() }));
   await assertFails(updateDoc(ref('lead'), { summary: 'After sign', updatedAt: serverTimestamp() }));
-  await assertSucceeds(updateDoc(ref('lead'), { pdfStoragePath: 'minutes/b1/minutes.pdf',
-    pdfDownloadUrl: 'https://example.test/m.pdf' }));
+  // The PDF is built on the device; nothing may be attached after signing.
+  await assertFails(updateDoc(ref('lead'), { pdfStoragePath: 'minutes/b1/minutes.pdf' }));
 });
 
 // Review finding F3: importClass writes the class, every student and every team in one batch.

@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 
 import '../models/app_user.dart';
 import '../models/project_topic.dart';
@@ -10,21 +9,18 @@ import '../services/app_error.dart';
 import '../services/topic_service.dart';
 import 'firestore_codec.dart';
 
-/// topics/{classId}_{teamId}; outlines in Storage topics/{topicId}/...
+/// topics/{classId}_{teamId}; the outline bytes in topics/{id}/files/outline.
 class FirestoreTopicService implements TopicService {
-  FirestoreTopicService({
-    FirebaseFirestore? db,
-    FirebaseAuth? auth,
-    FirebaseStorage? storage,
-  }) : _db = db ?? FirebaseFirestore.instance,
-       _auth = auth ?? FirebaseAuth.instance,
-       _storage = storage ?? FirebaseStorage.instance;
+  FirestoreTopicService({FirebaseFirestore? db, FirebaseAuth? auth})
+    : _db = db ?? FirebaseFirestore.instance,
+      _auth = auth ?? FirebaseAuth.instance;
 
   final FirebaseFirestore _db;
   final FirebaseAuth _auth;
-  final FirebaseStorage _storage;
 
   CollectionReference<Map<String, dynamic>> get _topics => _db.collection('topics');
+  DocumentReference<Map<String, dynamic>> _outline(String topicId) =>
+      _topics.doc(topicId).collection('files').doc('outline');
 
   static const _contentTypes = {
     'pdf': 'application/pdf',
@@ -97,13 +93,16 @@ class FirestoreTopicService implements TopicService {
       final type = _contentTypes[ext];
       if (type == null) throw const ValidationError('Attach a .pdf or .docx outline');
       if (attachment.bytes.isEmpty || attachment.bytes.length > TopicAttachment.maxBytes) {
-        throw const ValidationError('Outline must be between 1 byte and 10 MB');
+        throw const ValidationError('Outline must be between 1 byte and 900 KB');
       }
-      final file = _storage.ref('topics/$topicId/outline_${DateTime.now().millisecondsSinceEpoch}.$ext');
-      await file.putData(Uint8List.fromList(attachment.bytes), SettableMetadata(contentType: type));
+      // Written before the topic; a failed topic write just leaves the file
+      // to be replaced by the next submission.
+      await _outline(topicId).set({
+        'contentType': type,
+        'bytes': Blob(Uint8List.fromList(attachment.bytes)),
+      });
       final name = attachment.fileName.trim();
       fields['attachmentName'] = name.length > 200 ? name.substring(name.length - 200) : name;
-      fields['attachmentUrl'] = await file.getDownloadURL();
     }
 
     fields['status'] = 'pending';
@@ -152,4 +151,11 @@ class FirestoreTopicService implements TopicService {
           'reviewedAt': FieldValue.serverTimestamp(),
         });
       });
+
+  @override
+  Future<List<int>> downloadOutline(String topicId) => guardWrite('topic', () async {
+    final bytes = (await _outline(topicId).get()).data()?['bytes'];
+    if (bytes is! Blob) throw const NotFoundError('The outline file is missing');
+    return bytes.bytes;
+  });
 }

@@ -33,7 +33,6 @@ class ProjectTopic {
     required this.revisionCount,
     required this.submittedAt,
     this.attachmentName,
-    this.attachmentUrl,
     this.mentorFeedback,
   });
 
@@ -50,8 +49,8 @@ class ProjectTopic {
   /// Resubmissions so far; capped by Remote Config max_topic_revisions.
   final int revisionCount;
   final DateTime submittedAt;
+  /// Set when an outline is attached (bytes in topics/{id}/files/outline).
   final String? attachmentName;
-  final String? attachmentUrl;
   final String? mentorFeedback;
 
   /// The leader may edit while waiting or after the mentor asks for changes.
@@ -73,7 +72,6 @@ class ProjectTopic {
       revisionCount: count,
       submittedAt: DataValidation.time(d['submittedAt']),
       attachmentName: DataValidation.optionalText(d, 'attachmentName', max: 200),
-      attachmentUrl: DataValidation.optionalText(d, 'attachmentUrl', max: 2048),
       mentorFeedback: DataValidation.optionalText(d, 'mentorFeedback', max: 2000),
     );
   }
