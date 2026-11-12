@@ -281,12 +281,17 @@ yêu cầu. **Kiểm tra lại số trang** sau khi dựng (report 8–12 trang,
 Đề §3: sai lệch Figma ↔ app **không ghi** = lỗi. Còn D1–D4 chưa cập nhật (xem
 `docs/design-traceability.md` §5).
 
-### 3.7 Mở pull request & nộp (10 phút)
+### 3.7 Mở pull request & nộp — **ĐÃ LÀM**
 
-```bash
-git push origin feature/lab3-complete-gaps
-gh pr create --base main --title "Lab 3: Firebase + ARTEMIS + AI code review"
-```
+Nhánh `feature/lab3-complete-gaps` đã được **push** lên GitHub và pull request đã
+mở:
+
+> **https://github.com/no-solace/prm-teamup-mobile/pull/2**
+
+PR đã ghi đầy đủ: những gì thêm vào, bảng kiểm chứng, và **các khoản trống còn
+lại** (Firebase thật, ảnh Console, video, Figma D1–D4).
+
+Còn lại: **review + merge** PR, rồi thay `<MSSV>` trong tên file PDF (mục 3.5).
 
 ---
 
