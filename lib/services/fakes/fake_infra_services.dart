@@ -214,9 +214,6 @@ class FakeStorageService implements StorageService {
       id: 'r-${_reports.length + 1}',
       ownerUid: SampleData.mentorUid,
       classId: classId,
-      storagePath:
-          'reports/${SampleData.mentorUid}/r-${_reports.length + 1}.pdf',
-      downloadUrl: 'https://example.com/class-a.pdf',
       sizeKb: (bytes.length / 1024).ceil(),
       createdAt: DateTime.now(),
     );

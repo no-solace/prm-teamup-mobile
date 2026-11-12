@@ -2,7 +2,7 @@ import 'data_validation.dart';
 import 'major.dart';
 
 /// "Proposal" here is a team-matching proposal (Lab 2 S9/S10), NOT a project topic.
-enum ProposalStatus { pending, approved, discarded }
+enum ProposalStatus { pending, approved, discarded, superseded }
 
 enum ProposalSource { ai, manual }
 

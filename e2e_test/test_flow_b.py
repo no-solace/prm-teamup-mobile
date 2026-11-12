@@ -1,4 +1,4 @@
-"""TC-09 … TC-11 — Flow B: add a member, the 6-member cap and the blocked approval.
+"""Flow B: add a member, the 6-member cap and the blocked approval.
 
 These tests cover the two error paths of Flow B: S13 (more than six members)
 and S25 (fewer than five members).
@@ -6,7 +6,9 @@ and S25 (fewer than five members).
 
 from __future__ import annotations
 
-from conftest import run
+import pytest
+
+from conftest import IMPORT_DEMO, run
 
 
 def test_tc09_add_member_to_proposal(artemis):
@@ -73,3 +75,24 @@ def test_tc11_approve_blocked_below_five_members(artemis):
     assert result.ok, result.error
     assert result.contains("Needs at least 5 members"), result.text
     assert result.contains("disabled"), result.text
+
+
+@pytest.mark.error_path
+async def test_tc06_remove_members_blocks_approve_below_five(artemis, fixture_on_device):
+    """TC-06 (Flow B, error path S24 → S25) in the JSON style.
+
+    Expected: removing two added members drops the team below five, the error
+    banner shows the current count and the Approve button is disabled.
+    """
+    got = await artemis(
+        IMPORT_DEMO
+        + "Tap 'Match with AI' and wait. Open one proposal named 'Group 2'. Remove two of the "
+        "added members: tap the remove button of one added member, tap 'Remove' in the 'Remove "
+        "member?' dialog, and repeat once more. Report banner_text (the exact error banner text "
+        "shown, or null) and approve_enabled (true if the 'Approve proposal' button can be "
+        "tapped). Do not approve. Finally scroll down, tap 'Discard proposal' and tap 'Confirm' "
+        "so this test leaves no pending proposal behind.",
+        ["banner_text", "approve_enabled"],
+    )
+    assert got.values["banner_text"] == "Needs at least 5 members (now 4)"
+    assert got.values["approve_enabled"] is False

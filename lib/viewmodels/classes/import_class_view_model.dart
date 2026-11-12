@@ -75,7 +75,7 @@ class ImportClassViewModel extends Notifier<ImportClassState> {
     } catch (error, stack) {
       // A rejected file is a real error path (S22 error state): the mentor
       // sees the message and Crashlytics gets one non-fatal report.
-      await ref.trackNonFatal(error, stack, reason: 'class_import_file_rejected');
+      await ref.trackNonFatal(error, stack, reason: 'class_import_failed_file');
       if (ref.mounted) state = ImportClassState(error: toAppError(error));
     }
   }
@@ -120,13 +120,13 @@ class ImportClassViewModel extends Notifier<ImportClassState> {
       // uploaded and how many students stayed available for matching.
       await ref.trackAnalytics(
         (analytics) => analytics.logClassImport(
-          rowCount: preview.rowCount,
+          rowCount: result.imported,
           availableCount: result.available,
         ),
       );
       return result;
     } catch (error, stack) {
-      await ref.trackNonFatal(error, stack, reason: 'class_import_write_failed');
+      await ref.trackNonFatal(error, stack, reason: 'class_import_failed_write');
       if (ref.mounted) {
         state = ImportClassState(preview: preview, error: toAppError(error));
       }

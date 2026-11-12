@@ -41,9 +41,30 @@ abstract final class Routes {
   static String addMember(String proposalId) =>
       '/proposals/$proposalId/add-member'; // S11 (S13)
 
-  // Tab 3: Profile
+  // Tab 3: Topics (Flow D)
+  static const topics = '/topics'; // mentor queue / student status
+  static const topicSubmit = '/topics/submit'; // leader form
+  static String topic(String topicId) => '/topics/$topicId'; // mentor review
+
+  // Tab 4: Schedule & meetings (Flow E + F)
+  static const schedule = '/schedule';
+  static const bookSlot = '/schedule/book'; // leader
+  static String meeting(String bookingId) => '/schedule/$bookingId';
+  static String minutesForm(String bookingId) => '/schedule/$bookingId/minutes';
+
+  // Tab 5: Profile
   static const profile = '/profile'; // S6
   static const notifications = '/profile/notifications';
+
+  /// First sign-in: choose Mentor or link to a student record.
+  static const onboarding = '/onboarding';
+
+  /// Students see only their own team, topic and meetings.
+  static bool isMentorOnly(String path) =>
+      path == proposals || path.startsWith('$proposals/') ||
+      path.startsWith('$classes/');
+
+  static bool isStudentOnly(String path) => path == topicSubmit || path == bookSlot;
 
   /// Debug widget gallery, only registered by main_fake.dart.
   static const gallery = '/_gallery';
@@ -55,6 +76,10 @@ abstract final class Routes {
     RegExp(r'^/classes/[\w-]+/(no-team|need-members|no-match)$'),
     RegExp(r'^/proposals$'),
     RegExp(r'^/proposals/[\w-]+$'),
+    RegExp(r'^/topics$'),
+    RegExp(r'^/topics/[\w-]+$'),
+    RegExp(r'^/schedule$'),
+    RegExp(r'^/schedule/[\w-]+$'),
     RegExp(r'^/profile$'),
     RegExp(r'^/profile/notifications$'),
   ];

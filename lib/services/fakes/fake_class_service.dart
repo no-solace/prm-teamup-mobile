@@ -166,6 +166,19 @@ class FakeClassService implements ClassService {
   }
 
   @override
+  Stream<({Team team, List<Student> members})> watchMyTeam(
+    String classId,
+    String teamId,
+  ) => watchTeams(classId).map((teams) {
+    final team = teams.where((t) => t.id == teamId).firstOrNull;
+    if (team == null) throw const NotFoundError('Team not found');
+    return (
+      team: team,
+      members: studentsFor(classId).where((s) => s.teamId == teamId).toList(),
+    );
+  });
+
+  @override
   Future<Student> getStudent(String classId, String mssv) async {
     await Future<void>.delayed(latency);
     return _students.firstWhere(

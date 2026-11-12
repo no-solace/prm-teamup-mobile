@@ -45,6 +45,7 @@ class ClassDetailViewModel extends Notifier<ViewState<ClassRoom>> {
   }
 
   /// docs/analytics-plan.md: view_item opens once per class detail visit.
+  /// The Crashlytics `class_id` custom key is set on the same visit.
   void _trackView(ClassRoom room) {
     if (_viewTracked) return;
     _viewTracked = true;
@@ -54,6 +55,16 @@ class ClassDetailViewModel extends Notifier<ViewState<ClassRoom>> {
             analytics.logViewItem(itemCategory: 'class', itemId: room.id),
       ),
     );
+    unawaited(_setCrashClass());
+  }
+
+  /// The Crashlytics `class_id` custom key follows the class being viewed.
+  Future<void> _setCrashClass() async {
+    try {
+      await ref.read(crashServiceProvider).setClass(classId);
+    } catch (_) {
+      // Crashlytics is best effort; the user still sees the in-app message.
+    }
   }
 
   void retry() {

@@ -1,11 +1,12 @@
 # TeamUp EXE (PRM393 Lab 3, nhóm 6)
 
-Ứng dụng Flutter + Firebase giúp mentor môn EXE ghép nhóm 5–6 sinh viên đủ ngành (SE / AI / MKT / GD), duyệt đề xuất và xuất báo cáo PDF. Phạm vi Lab 3: **Flow A, B, C** với **25 màn** của Lab 2 (xem [docs/PROPOSAL.md](docs/PROPOSAL.md) và [docs/workflow.md](docs/workflow.md)).
+Ứng dụng Flutter + Firebase giúp mentor môn EXE ghép nhóm 5–6 sinh viên đủ ngành (SE / AI / MKT / GD), duyệt đề xuất và xuất báo cáo PDF. Phạm vi Lab 3: **Flow A, B, C** (25 màn của Lab 2) cộng thêm **Flow D, E, F** (đề xuất đồ án, đặt lịch học, biên bản họp) — xem [docs/PROPOSAL.md](docs/PROPOSAL.md) và [docs/workflow.md](docs/workflow.md).
 
 | | |
 |---|---|
 | **Đề tài** | Lab 2 — *TeamUp EXE* (AI-Assisted UI/UX Design) |
-| **Nguồn dữ liệu** | Cloud Firestore (dữ liệu lớp của chính mentor) + Cloud Storage cho báo cáo PDF |
+| **Nguồn dữ liệu** | Cloud Firestore (dữ liệu lớp của chính mentor) + **Firestore subcollection** lưu bytes báo cáo PDF |
+| **Gói Firebase** | **Spark** (miễn phí) — không Cloud Storage bucket, không Cloud Functions; thông báo sinh ở client |
 | **Nền tảng** | Android — Flutter 3.47.9 (stable) · Material 3 |
 | **Cấu trúc** | MVVM + Riverpod 3 · 4 lớp · phụ thuộc chỉ đi xuống |
 
@@ -44,7 +45,11 @@ flutter test
 bash tool/check_layers.sh        # Windows: "C:\Program Files\Git\bin\bash.exe" tool/check_layers.sh
 ```
 
-## Cấu gình Firebase (làm một lần)
+## Cấu trúc
+
+Tóm tắt: `screens` → `viewmodels` (Riverpod Notifier) → `services` (interface) ← `firebase` (bản cài đặt). Chỉ `lib/providers/service_providers.dart` nối interface với bản cài đặt. Chi tiết: [docs/architecture.md](docs/architecture.md).
+
+## Cấu hình Firebase (làm một lần)
 
 > **Firebase CLI chưa được đăng nhập** trên máy này (`firebase login:list` →
 > "No authorized accounts"). Các bước dưới cần bạn chạy sau khi
@@ -63,9 +68,9 @@ bash tool/check_layers.sh        # Windows: "C:\Program Files\Git\bin\bash.exe" 
    cd android && ./gradlew signingReport
    ```
    Copy dòng `SHA1` của biến thể `debug`, dán vào Firebase Console → Project settings → app Android → Add fingerprint. Sau đó tải lại `google-services.json`.
-3. Deploy rules:
+3. Deploy rules và Remote Config (gói Spark: **không** deploy Storage hay Functions):
    ```bash
-   npx firebase-tools@15.35.0 deploy --only firestore:rules,storage
+   npx firebase-tools@15.35.0 deploy --only firestore:rules,remoteconfig
    ```
 
 ### Chạy test Firestore rules cục bộ (không cần đăng nhập)
@@ -77,7 +82,6 @@ npm install
 npx firebase-tools@15.35.0 emulators:exec --only firestore \
      --project demo-teamup-data "node --test firebase/test/firestore.rules.test.mjs"
 ```
-Kết quả hiện tại: **21/21 pass**.
 
 ## Chạy bộ test E2E (Google ARTEMIS)
 
@@ -115,16 +119,16 @@ Kết quả: `report/Lab03_<StudentID>.pdf` và `slides/Lab03_<StudentID>_slides
 
 | Tài liệu | Đường dẫn | Nội dung |
 |---|---|---|
-| Truy vết thiết kế | [docs/design-traceability.md](docs/design-traceability.md) | 25 màn Lab 2 → route, widget, nguồn dữ liệu; 5 sai lệch kèm lý do; ma trận component và token |
-| Kiến trúc | [docs/architecture.md](docs/architecture.md) | Cây thư mục, sơ đồ layer, sequence diagram Flow A, bảng ViewModel → Service, trạng thái 6 dịch vụ Firebase bắt buộc (+ Firestore) |
-| Data model | [docs/data-model.md](docs/data-model.md) | 8 collection Firestore + Storage, trường và ràng buộc từng trường, state machine của `Proposal`, quy tắc nghiệp vụ R1–R7, index cần thiết |
-| Đặc tả workflow | [docs/workflow.md](docs/workflow.md) | 3 workflow lõi đủ 7 thành phần, activity diagram, state machine, registry BR-01…BR-07 |
+| Truy vết thiết kế | [docs/design-traceability.md](docs/design-traceability.md) | 25 màn Lab 2 → route, widget, nguồn dữ liệu; sai lệch kèm lý do; ma trận component và token |
+| Kiến trúc | [docs/architecture.md](docs/architecture.md) | Cây thư mục, sơ đồ layer, sequence diagram Flow A, bảng ViewModel → Service, trạng thái dịch vụ Firebase (Spark) |
+| Data model | [docs/data-model.md](docs/data-model.md) | Collection Firestore, trường và ràng buộc từng trường, state machine của `Proposal`, quy tắc nghiệp vụ, index cần thiết |
+| Đặc tả workflow | [docs/workflow.md](docs/workflow.md) | Workflow lõi đủ 7 thành phần, activity diagram, state machine, registry BR-01…BR-07 |
 | Kế hoạch Analytics | [docs/analytics-plan.md](docs/analytics-plan.md) | 10 event: trigger, tham số có kiểu, câu hỏi sản phẩm, ánh xạ flow, quy tắc không PII |
-| Kế hoạch kiểm thử | [docs/test-plan.md](docs/test-plan.md) | 18 ca ARTEMIS + 1 phiên khám phá, bảng kết quả, giải thích ca flaky |
-| Rà soát mã AI | [docs/code-review.md](docs/code-review.md) | 12 phát hiện (tool, file:line, loại, quyết định, lý do, commit) + công bố công cụ |
+| Kế hoạch kiểm thử | [docs/test-plan.md](docs/test-plan.md) | Ca ARTEMIS + unit/widget test, bảng kết quả, giải thích ca flaky |
+| Rà soát mã AI | [docs/code-review.md](docs/code-review.md) | 22 phát hiện (tool, file:line, loại, quyết định, lý do, commit) + công bố công cụ |
 | Nhật ký làm việc | [docs/WORKLOG.md](docs/WORKLOG.md) | Những gì đã làm và vì sao, cách kiểm chứng lại, việc còn lại theo thứ tự ưu tiên |
-| Bàn giao & hướng dẫn nộp bài | [docs/BAN_GIAO_HUONG_DAN_NOP_BAI.md](docs/BAN_GIAO_HUONG_DAN_NOP_BAI.md) | Trạng thái 30 giây · 4 lỗi đã sửa · việc còn lại theo thứ tự · lệnh kiểm chứng lại |
-| Bộ test E2E | [e2e_test/](e2e_test/) | `conftest.py`, `pyproject.toml`, 5 module test + phiên khám phá |
+| Bàn giao & hướng dẫn nộp bài | [docs/BAN_GIAO_HUONG_DAN_NOP_BAI.md](docs/BAN_GIAO_HUONG_DAN_NOP_BAI.md) | Trạng thái 30 giây · lỗi đã sửa · việc còn lại theo thứ tự · lệnh kiểm chứng lại |
+| Bộ test E2E | [e2e_test/](e2e_test/) | `conftest.py`, `pyproject.toml`, các module test + phiên khám phá |
 | Bằng chứng | [evidence/](evidence/) | Checklist và danh mục ảnh Console / DebugView / Crashlytics / ARTEMIS |
 | Báo cáo | [report/](report/) | `Lab03_<StudentID>.pdf` (nguồn Markdown + script dựng) |
 | Slide | [slides/](slides/) | `Lab03_<StudentID>_slides.pdf` (nguồn Markdown + script dựng) |
@@ -138,11 +142,12 @@ Kết quả: `report/Lab03_<StudentID>.pdf` và `slides/Lab03_<StudentID>_slides
 | Claude Code trong Cursor | Sinh `docs/*.md`, `e2e_test/*.py`, `report/`, `slides/`, commit theo mã phát hiện |
 | GitHub Copilot Chat | Gợi ý refactor trong `lib/viewmodels/` |
 | GitHub Copilot Code Review | Rà soát pull request, sinh danh sách phát hiện (CR-01…CR-08) |
-| Cursor Agent (Claude Opus 4.5) — vòng 2 | Rà soát theo checklist Lab 3 §5–§10, phát hiện CR-09 (API ARTEMIS sai) và CR-10 (S13 chưa khoá nút) |
-| Cursor Agent (Claude Opus 4.5) — vòng 3 | Dựng & chạy hạ tầng ARTEMIS thật trên emulator, phát hiện CR-11 (client không nhận báo cáo) và CR-12 (app crash khi build bằng JDK 26) |
+| Cursor Agent — vòng 2 | Rà soát theo checklist Lab 3 §5–§10, phát hiện CR-09 (API ARTEMIS sai) và CR-10 (S13 chưa khoá nút) |
+| Cursor Agent — vòng 3 | Dựng & chạy hạ tầng ARTEMIS thật trên emulator, phát hiện CR-11 (client không nhận báo cáo) và CR-12 (app crash khi build bằng JDK 26) |
+| Codex (OpenAI) | Viết phần lớn mã app, Firestore rules và test rules |
 | Mermaid CLI (`mmdc`) | Vẽ sơ đồ activity / state / sequence / layer cho báo cáo và slide |
 
-Chi tiết và quyết định cho từng phát hiện: [docs/code-review.md](docs/code-review.md) §5.
+Chi tiết và quyết định cho từng phát hiện: [docs/code-review.md](docs/code-review.md).
 
 ## Demo video
 
@@ -160,14 +165,12 @@ Chi tiết và quyết định cho từng phát hiện: [docs/code-review.md](do
 | Hạng mục | Trạng thái | Ghi chú |
 |---|---|---|
 | `flutter analyze` | ✅ **No issues found** | 0 cảnh báo |
-| `flutter test` | ✅ **150/150 pass** | unit + widget |
-| Firestore rules test | ✅ **21/21 pass** | `npx firebase-tools@15.35.0 emulators:exec --only firestore "node --test firebase/test/firestore.rules.test.mjs"` |
+| `flutter test` | ✅ **175/175 pass** | unit + widget |
+| Firestore rules test | ✅ **30/30 pass** | `npx firebase-tools@15.35.0 emulators:exec --only firestore "node --test firebase/test/firestore.rules.test.mjs"` |
 | `tool/check_layers.sh` | ✅ **Layers OK** | 0 vi phạm layer |
-| Báo cáo PDF | ✅ 10 trang | rubric yêu cầu 8–12 |
-| Slide PDF | ✅ 15 slide chính + 5 slide phụ | rubric yêu cầu 12–15 |
-| 18 ca ARTEMIS | ⚠️ **đã chạy thật 1 ca** (TC-02 pass 110.82s, 22 ảnh trong `evidence/artemis/`) | cần chạy ≥ 3 lần/ca trên build release + thiết bị thật → điền `docs/test-plan.md` §6 |
-| Ảnh Console (6 dịch vụ) | ⚠️ **chưa chụp** | checklist trong `evidence/README.md` |
-| `android/app/google-services.json` | ⚠️ **chưa có trong repo** | chạy `flutterfire configure` rồi commit (đề §9 cho phép commit) |
+| Ca ARTEMIS | ⚠️ **đã chạy thật 1 ca** (TC-02 pass 110.82s, 22 ảnh trong `evidence/artemis/`) | cần chạy ≥ 3 lần/ca trên build release + thiết bị thật → điền `docs/test-plan.md` §6 |
+| Ảnh Console (dịch vụ Firebase) | ⚠️ **chưa chụp** | checklist trong `evidence/README.md` |
+| `android/app/google-services.json` | ✅ **đã commit** | sinh bởi `flutterfire configure` (đề §9 cho phép commit) |
 | Video demo | ⚠️ **chưa quay** | xem mục trên |
 
 > 📖 **Chi tiết toàn bộ quá trình làm việc — đã làm gì, vì sao, kiểm chứng lại
@@ -176,6 +179,22 @@ Chi tiết và quyết định cho từng phát hiện: [docs/code-review.md](do
 >
 > 🖥️ **Bàn giao nhanh — bảng trạng thái, việc còn lại, cách làm từng bước:
 > [docs/BAN_GIAO_HUONG_DAN_NOP_BAI.md](docs/BAN_GIAO_HUONG_DAN_NOP_BAI.md).**
+
+## Kiểm thử tự động trên thiết bị (ARTEMIS)
+
+Bộ pytest nằm ở [e2e_test/](e2e_test/), kế hoạch và kết quả ở [docs/test-plan.md](docs/test-plan.md).
+
+| Công cụ | Phiên bản ghim |
+|---|---|
+| Google ARTEMIS | commit `351ca8422f7b5b54e80a9c1ce03a222e02415b6b` |
+| Python | 3.12 (qua `uv`) |
+| firebase-tools (test rules) | 14.27.0 (bản 15 đòi JDK 21) |
+
+```bash
+cd e2e_test && export ARTEMIS_DEVICE=<adb serial> && bash run_suite.sh
+```
+
+Khóa API của mô hình nằm ở `.env` của máy chủ ARTEMIS và tài khoản Google test lấy từ thiết bị; không có thứ nào trong repo.
 
 ## Không commit
 

@@ -4,6 +4,8 @@ class AppConfig {
   const AppConfig({
     required this.aiMatchingEnabled,
     required this.maxProposalsShown,
+    this.maxTopicRevisions = 3,
+    this.defaultMeetingDurationMinutes = 30,
   });
 
   static const defaults = AppConfig(
@@ -18,7 +20,20 @@ class AppConfig {
     maxProposalsShown: values['max_proposals_shown'] is num
         ? (values['max_proposals_shown'] as num).toInt().clamp(1, 20)
         : defaults.maxProposalsShown,
+    maxTopicRevisions: values['max_topic_revisions'] is num
+        ? (values['max_topic_revisions'] as num).toInt().clamp(0, 10)
+        : defaults.maxTopicRevisions,
+    defaultMeetingDurationMinutes:
+        values['default_meeting_duration_minutes'] is num
+        ? (values['default_meeting_duration_minutes'] as num).toInt().clamp(15, 120)
+        : defaults.defaultMeetingDurationMinutes,
   );
+
+  /// Flow D: how many times a leader may resubmit a topic.
+  final int maxTopicRevisions;
+
+  /// Flow E: length of a new availability slot.
+  final int defaultMeetingDurationMinutes;
 
   /// Shows or hides "Match with AI" on S3, S4, S5.
   final bool aiMatchingEnabled;

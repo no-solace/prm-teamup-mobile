@@ -2,8 +2,8 @@ import { readFileSync } from 'node:fs';
 import { after, before, beforeEach, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { initializeTestEnvironment, assertFails, assertSucceeds } from '@firebase/rules-unit-testing';
-import { collection, collectionGroup, deleteDoc, deleteField, doc, getDoc, getDocs,
-  query, serverTimestamp, setDoc, Timestamp, updateDoc, where, writeBatch } from 'firebase/firestore';
+import { Bytes, collection, collectionGroup, deleteDoc, deleteField, doc, getDoc, getDocs,
+  query, runTransaction, serverTimestamp, setDoc, Timestamp, updateDoc, where, writeBatch } from 'firebase/firestore';
 
 const projectId = 'demo-teamup-data';
 let env;
@@ -206,6 +206,78 @@ test('approve requires atomic roster updates, undo reverts roster; discarded sta
   await assertDeniedByRule(updateDoc(ref, { status: 'pending' }));
 });
 
+test('matching replaces an AI draft atomically and can reuse a superseded ID', async () => {
+  const client = db();
+  const draft = doc(client, 'classes/a/proposals/p');
+  const replacement = doc(client, 'classes/a/proposals/replacement');
+  const manual = doc(client, 'classes/a/proposals/manual');
+  const guard = doc(client, 'classes/a/matching/state');
+  await assertSucceeds(getDoc(guard));
+  await assertFails(getDoc(doc(db('bob'), guard.path)));
+  await assertFails(setDoc(doc(db('bob'), guard.path), { updatedAt: serverTimestamp() }));
+  await assertFails(setDoc(guard, { updatedAt: Timestamp.now(), extra: true }));
+  await assertSucceeds(setDoc(draft, pending()));
+  await assertSucceeds(setDoc(manual, { ...pending(), source: 'manual' }));
+  await assertDeniedByRule(updateDoc(manual, { status: 'superseded' }));
+  await assertDeniedByRule(updateDoc(draft, { status: 'superseded', teamId: '2' }));
+
+  await assertSucceeds(runTransaction(client, async (tx) => {
+    assert.equal((await tx.get(guard)).exists(), false);
+    assert.equal((await tx.get(draft)).data().status, 'pending');
+    assert.equal((await tx.get(replacement)).exists(), false);
+    tx.update(draft, { status: 'superseded' });
+    tx.set(replacement, pending());
+    tx.set(guard, { updatedAt: serverTimestamp() });
+  }));
+  const open = await assertSucceeds(getDocs(query(collection(client, 'classes/a/proposals'),
+    where('status', '==', 'pending'))));
+  assert.deepEqual(open.docs.map((entry) => entry.id).sort(), ['manual', 'replacement']);
+  await assertDeniedByRule(updateDoc(draft, { status: 'pending', teamId: '2' }));
+  await assertDeniedByRule(updateDoc(draft, { status: 'pending', addStudentIds: ['S1', 'S4'] }));
+  const restore = writeBatch(client);
+  restore.set(draft, pending());
+  restore.update(replacement, { status: 'superseded' });
+  restore.set(guard, { updatedAt: serverTimestamp() });
+  await assertSucceeds(restore.commit());
+});
+
+test('a replacement can fill place six after a previous approval', async () => {
+  await seedProposalRoster();
+  const client = db();
+  const teamRef = doc(client, 'classes/a/teams/1');
+  const first = doc(client, 'classes/a/proposals/first');
+  const next = doc(client, 'classes/a/proposals/next');
+  const sixth = doc(client, 'classes/a/students/S6');
+  const five = ['S1', 'S2', 'S3', 'S4', 'S5'];
+  const fiveMajors = ['SE', 'SE', 'AI', 'MKT', 'GD'];
+  await assertSucceeds(setDoc(sixth, student));
+  await assertSucceeds(setDoc(first, pending()));
+  const approveFirst = writeBatch(client);
+  approveFirst.update(teamRef, { memberIds: five, majors: fiveMajors, rosterChangeProposalId: first.id });
+  for (const id of ['S4', 'S5']) approveFirst.update(doc(client, `classes/a/students/${id}`), { teamId: '1' });
+  approveFirst.update(first, { status: 'approved', approvedAt: serverTimestamp() });
+  await assertSucceeds(approveFirst.commit());
+
+  await assertSucceeds(setDoc(next, {
+    ...pending(), currentMemberIds: five, currentMajors: fiveMajors,
+    addStudentIds: ['S6'], addMajors: ['SE'],
+  }));
+  const approveNext = writeBatch(client);
+  approveNext.update(teamRef, {
+    memberIds: [...five, 'S6'], majors: [...fiveMajors, 'SE'], rosterChangeProposalId: next.id,
+  });
+  approveNext.update(sixth, { teamId: '1' });
+  approveNext.update(next, { status: 'approved', approvedAt: serverTimestamp() });
+  await assertSucceeds(approveNext.commit());
+  const undoNext = writeBatch(client);
+  undoNext.update(teamRef, { memberIds: five, majors: fiveMajors, rosterChangeProposalId: null });
+  undoNext.update(sixth, { teamId: null });
+  undoNext.update(next, { status: 'pending', approvedAt: deleteField() });
+  await assertSucceeds(undoNext.commit());
+  assert.equal((await getDoc(first)).data().status, 'approved');
+  assert.deepEqual((await getDoc(teamRef)).data().memberIds, five);
+});
+
 test('approval rejects a partially updated roster and changing an assigned major', async () => {
   await seedProposalRoster();
   const client = db();
@@ -338,15 +410,25 @@ test('FCM token register/refresh/delete restricted to owner mentor and valid sch
   await assertFails(updateDoc(ref, { extra: true, updatedAt: serverTimestamp() }));
   await assertSucceeds(deleteDoc(ref));
 });
-test('reports restricted by owner/class/path/range/immutable timestamp', async () => {
-  const ref = doc(db(), 'reports/r');
-  const report = { ownerUid: 'alice', classId: 'a', storagePath: 'reports/alice/r.pdf',
-    downloadUrl: 'https://example.test/r.pdf', sizeKb: 20, createdAt: serverTimestamp() };
-  await assertSucceeds(setDoc(ref, report));
+test('reports restricted by owner/class/range/immutable timestamp; PDF bytes owner-only', async () => {
+  const alice = db();
+  const ref = doc(alice, 'reports/r');
+  const report = { ownerUid: 'alice', classId: 'a', sizeKb: 20, createdAt: serverTimestamp() };
+  const pdf = (n) => ({ bytes: Bytes.fromUint8Array(new Uint8Array(n).fill(37)) });
+  const batch = writeBatch(alice);
+  batch.set(ref, report);
+  batch.set(doc(alice, 'reports/r/files/pdf'), pdf(1024));
+  await assertSucceeds(batch.commit());
+  await assertSucceeds(getDoc(doc(db(), 'reports/r/files/pdf')));
   await assertFails(getDoc(doc(db('bob'), 'reports/r')));
-  for (const patch of [{ ownerUid: 'bob' }, { storagePath: 'reports/bob/r.pdf' },
-    { sizeKb: -1 }, { sizeKb: 10241 }, { downloadUrl: 'javascript:bad' },
-    { createdAt: Timestamp.fromMillis(0) }]) await assertFails(updateDoc(ref, patch));
+  await assertFails(getDoc(doc(db('bob'), 'reports/r/files/pdf')));
+  await assertFails(setDoc(doc(db(), 'reports/r/files/pdf'), pdf(921601)));
+  await assertFails(setDoc(doc(db(), 'reports/r/files/other'), pdf(10)));
+  await assertFails(setDoc(doc(db('bob'), 'reports/r/files/pdf'), pdf(10)));
+  for (const patch of [{ ownerUid: 'bob' }, { sizeKb: -1 }, { sizeKb: 901 },
+    { storagePath: 'reports/alice/r.pdf' }, { createdAt: Timestamp.fromMillis(0) }]) {
+    await assertFails(updateDoc(ref, patch));
+  }
 });
 test('notifications private; updates may only mark read; parent role required', async () => {
   const ref = doc(db(), 'users/alice/notifications/n');
@@ -357,4 +439,168 @@ test('notifications private; updates may only mark read; parent role required', 
   await assertFails(setDoc(doc(db('orphan'), 'users/orphan/notifications/n'), {
     title: 'TeamUp', body: '', receivedAt: Timestamp.now(), read: false,
   }));
+});
+
+// ---- Flow D/E/F: student roles, topics, slots, bookings, minutes ----
+const studentUser = (role, teamId = '1', studentId = 'S1') => ({ displayName: role, role,
+  lastSignInAt: Timestamp.now(), classId: 'a', teamId, studentId, mentorUid: 'alice' });
+const seedStudents = () => env.withSecurityRulesDisabled(async (context) => {
+  const admin = context.firestore();
+  await setDoc(doc(admin, 'classes/a/students/S1'), { ...student, teamId: '1' });
+  await setDoc(doc(admin, 'classes/a/students/S2'), { ...student, teamId: '2' });
+  await setDoc(doc(admin, 'classes/a/teams/2'), { name: 'Group 2', memberIds: ['S2'], majors: ['SE'] });
+  await setDoc(doc(admin, 'users/lead'), studentUser('leader'));
+  await setDoc(doc(admin, 'users/mem'), studentUser('member'));
+  await setDoc(doc(admin, 'users/lead2'), studentUser('leader', '2', 'S2'));
+});
+const topic = (over = {}) => ({ classId: 'a', teamId: '1', teamName: 'Group 1', mentorUid: 'alice',
+  leaderUid: 'lead', title: 'Tutor app', description: 'Idea', techStack: 'Flutter',
+  status: 'pending', revisionCount: 0, submittedAt: serverTimestamp(), ...over });
+const in1h = () => Timestamp.fromMillis(Date.now() + 3600e3);
+const in90m = () => Timestamp.fromMillis(Date.now() + 5400e3);
+
+test('student onboarding only links an MSSV that is in that team', async () => {
+  await seedStudents();
+  const fresh = (uid, over) => setDoc(doc(db(uid), `users/${uid}`), {
+    ...studentUser('leader'), lastSignInAt: serverTimestamp(), ...over });
+  await assertSucceeds(getDoc(doc(db('fresh'), 'classes/a/students/S1')));
+  await assertSucceeds(fresh('fresh'));
+  await assertFails(fresh('wrongteam', { teamId: '2' }));
+  await assertFails(fresh('wrongmentor', { mentorUid: 'bob' }));
+  await assertFails(fresh('mentorstudent', { role: 'mentor' }));
+  // A profiled student cannot read the roster or change links.
+  await assertFails(getDoc(doc(db('lead'), 'classes/a/students/S2')));
+  await assertFails(updateDoc(doc(db('lead'), 'users/lead'), { teamId: '2', lastSignInAt: serverTimestamp() }));
+  await assertSucceeds(getDocs(query(collection(db('lead'), 'classes/a/students'), where('teamId', '==', '1'))));
+  await assertSucceeds(getDoc(doc(db('mem'), 'classes/a/teams/1')));
+  await assertFails(getDoc(doc(db('mem'), 'classes/a/teams/2')));
+});
+
+test('topics: leader submits own team only; member and other teams cannot; only mentor decides', async () => {
+  await seedStudents();
+  await assertSucceeds(getDoc(doc(db('lead'), 'topics/a_1'))); // not created yet
+  await assertFails(setDoc(doc(db('mem'), 'topics/a_1'), topic({ leaderUid: 'mem' })));
+  await assertFails(setDoc(doc(db('lead2'), 'topics/a_1'), topic({ leaderUid: 'lead2' })));
+  await assertFails(setDoc(doc(db('lead'), 'topics/a_1'), topic({ status: 'approved' })));
+  await assertSucceeds(setDoc(doc(db('lead'), 'topics/a_1'), topic()));
+  await assertFails(getDoc(doc(db('lead2'), 'topics/a_1')));
+  await assertFails(updateDoc(doc(db('lead'), 'topics/a_1'), { status: 'approved' }));
+  await assertFails(updateDoc(doc(db('bob'), 'topics/a_1'), { status: 'approved', reviewedAt: serverTimestamp() }));
+  await assertFails(updateDoc(doc(db(), 'topics/a_1'), { status: 'rejected', reviewedAt: serverTimestamp() }));
+  await assertSucceeds(updateDoc(doc(db(), 'topics/a_1'), {
+    status: 'revision_requested', mentorFeedback: 'Narrow the scope', reviewedAt: serverTimestamp() }));
+  // Resubmission must count one revision and clear the feedback.
+  await assertFails(updateDoc(doc(db('lead'), 'topics/a_1'), {
+    title: 'v2', status: 'pending', submittedAt: serverTimestamp(), mentorFeedback: deleteField() }));
+  await assertSucceeds(updateDoc(doc(db('lead'), 'topics/a_1'), { title: 'v2', status: 'pending',
+    submittedAt: serverTimestamp(), revisionCount: 1, mentorFeedback: deleteField() }));
+  await assertSucceeds(updateDoc(doc(db(), 'topics/a_1'), { status: 'approved', reviewedAt: serverTimestamp() }));
+  await assertFails(updateDoc(doc(db('lead'), 'topics/a_1'), {
+    title: 'v3', status: 'pending', submittedAt: serverTimestamp(), revisionCount: 2 }));
+});
+
+test('topic outline file: leader writes before approval; team and mentor read; others cannot', async () => {
+  await seedStudents();
+  const outline = (uid) => doc(db(uid), 'topics/a_1/files/outline');
+  const file = (n, contentType = 'application/pdf') =>
+    ({ contentType, bytes: Bytes.fromUint8Array(new Uint8Array(n).fill(1)) });
+  // First submission: the file goes in before the topic exists.
+  await assertSucceeds(setDoc(outline('lead'), file(2048)));
+  await assertFails(setDoc(outline('mem'), file(10)));
+  await assertFails(setDoc(doc(db('lead2'), 'topics/a_1/files/outline'), file(10)));
+  await assertFails(setDoc(outline('lead'), file(921601)));
+  await assertFails(setDoc(outline('lead'), file(10, 'text/html')));
+  await assertFails(setDoc(doc(db('lead'), 'topics/a_1/files/other'), file(10)));
+  await assertSucceeds(setDoc(doc(db('lead'), 'topics/a_1'), topic({ attachmentName: 'outline.pdf' })));
+  await assertSucceeds(getDoc(outline('mem')));
+  await assertSucceeds(getDoc(outline()));
+  await assertFails(getDoc(outline('lead2')));
+  await assertFails(getDoc(outline('bob')));
+  await assertSucceeds(updateDoc(doc(db(), 'topics/a_1'), { status: 'approved', reviewedAt: serverTimestamp() }));
+  await assertFails(setDoc(outline('lead'), file(10)));
+});
+
+test('slots and bookings: atomic booking, no double booking, cancel frees the slot', async () => {
+  await seedStudents();
+  const slotRef = (c) => doc(c, 'mentors/alice/slots/s1');
+  await assertFails(setDoc(slotRef(db('lead')), { startTime: in1h(), endTime: in90m(), status: 'available', bookingId: null }));
+  await assertSucceeds(setDoc(slotRef(db()), { startTime: in1h(), endTime: in90m(), status: 'available', bookingId: null }));
+  await assertSucceeds(getDocs(collection(db('mem'), 'mentors/alice/slots')));
+  await assertFails(getDocs(collection(db('bob'), 'mentors/alice/slots')));
+  // withSecurityRulesDisabled does not return the callback's value.
+  let slot;
+  await env.withSecurityRulesDisabled(async (c) => { slot = (await getDoc(slotRef(c.firestore()))).data(); });
+  const book = (uid, id) => {
+    const c = db(uid);
+    const batch = writeBatch(c);
+    batch.update(slotRef(c), { status: 'booked', bookingId: id });
+    batch.set(doc(c, `bookings/${id}`), { slotId: 's1', mentorUid: 'alice', classId: 'a',
+      teamId: uid === 'lead2' ? '2' : '1', teamName: uid === 'lead2' ? 'Group 2' : 'Group 1',
+      purpose: 'topic_review', status: 'requested', startTime: slot.startTime, endTime: slot.endTime,
+      requestedBy: uid, createdAt: serverTimestamp() });
+    return batch.commit();
+  };
+  await assertFails(book('mem', 'b0'));
+  await assertSucceeds(book('lead', 'b1'));
+  await assertFails(book('lead2', 'b2'));
+  await assertFails(getDoc(doc(db('lead2'), 'bookings/b1')));
+  await assertFails(updateDoc(doc(db(), 'bookings/b1'), { status: 'confirmed', meetUrl: 'https://evil.com/x' }));
+  await assertSucceeds(updateDoc(doc(db(), 'bookings/b1'), { status: 'confirmed', meetUrl: 'https://meet.google.com/abc-defg-hij' }));
+  // Cancelling without freeing the slot is denied; together it succeeds.
+  await assertFails(updateDoc(doc(db('lead'), 'bookings/b1'), { status: 'cancelled' }));
+  const c = db('lead');
+  const batch = writeBatch(c);
+  batch.update(doc(c, 'bookings/b1'), { status: 'cancelled' });
+  batch.update(slotRef(c), { status: 'available', bookingId: null });
+  await assertSucceeds(batch.commit());
+  await assertSucceeds(book('lead2', 'b2'));
+});
+
+test('minutes: both sides draft, only mentor signs, signed minutes are frozen', async () => {
+  await seedStudents();
+  await env.withSecurityRulesDisabled(async (context) => setDoc(doc(context.firestore(), 'bookings/b1'), {
+    slotId: 's1', mentorUid: 'alice', classId: 'a', teamId: '1', teamName: 'Group 1',
+    purpose: 'sprint_review', status: 'confirmed', startTime: Timestamp.fromMillis(0),
+    endTime: Timestamp.fromMillis(1800e3), requestedBy: 'lead', createdAt: Timestamp.now(),
+    meetUrl: 'https://meet.google.com/abc-defg-hij' }));
+  const ref = (uid) => doc(db(uid), 'minutes/b1');
+  await assertSucceeds(getDoc(ref('mem')));
+  await assertFails(getDoc(ref('lead2')));
+  await assertSucceeds(setDoc(ref('mem'), { bookingId: 'b1', mentorUid: 'alice', classId: 'a', teamId: '1',
+    teamName: 'Group 1', meetingDate: Timestamp.fromMillis(0), summary: 'Sprint 1 done',
+    actionItems: [{ task: 'Login', assignee: 'An', deadline: '2026-12-01' }], mentorRating: null,
+    isSignedByMentor: false, createdBy: 'mem', updatedAt: serverTimestamp() }));
+  await assertSucceeds(updateDoc(ref('lead'), { summary: 'Edited', updatedAt: serverTimestamp() }));
+  await assertFails(updateDoc(ref('lead'), { isSignedByMentor: true, mentorRating: 5, updatedAt: serverTimestamp() }));
+  await assertFails(updateDoc(ref(), { isSignedByMentor: true, mentorRating: 6, updatedAt: serverTimestamp() }));
+  await assertSucceeds(updateDoc(ref(), { isSignedByMentor: true, mentorRating: 4, updatedAt: serverTimestamp() }));
+  await assertFails(updateDoc(ref('lead'), { summary: 'After sign', updatedAt: serverTimestamp() }));
+  // The PDF is built on the device; nothing may be attached after signing.
+  await assertFails(updateDoc(ref('lead'), { pdfStoragePath: 'minutes/b1/minutes.pdf' }));
+});
+
+// Review finding F3: importClass writes the class, every student and every team in one batch.
+const importBatch = (client, id, students, groups) => {
+  const batch = writeBatch(client);
+  batch.set(doc(client, `classes/${id}`), room());
+  const majors = ['SE', 'AI', 'MKT', 'GD'];
+  const rows = Array.from({ length: students }, (_, i) => ({
+    id: `M${String(i + 1).padStart(6, '0')}`, major: majors[i % 4] }));
+  groups.forEach((size, g) => {
+    const members = rows.splice(0, size);
+    batch.set(doc(client, `classes/${id}/teams/${g + 1}`), {
+      name: `Group ${g + 1}`, memberIds: members.map((m) => m.id), majors: members.map((m) => m.major) });
+    for (const m of members) {
+      batch.set(doc(client, `classes/${id}/students/${m.id}`), { ...student, major: m.major, teamId: String(g + 1) });
+    }
+  });
+  for (const m of rows) batch.set(doc(client, `classes/${id}/students/${m.id}`), { ...student, major: m.major, teamId: null });
+  return batch.commit();
+};
+
+test('import of the 12-student demo class commits in one batch', async () => {
+  await assertSucceeds(importBatch(db(), 'demo12', 12, [6, 3]));
+});
+test('import of a 42-student class (6 groups of 5, 12 free) commits in one batch', async () => {
+  await assertSucceeds(importBatch(db(), 'full42', 42, [5, 5, 5, 5, 5, 5]));
 });

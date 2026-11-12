@@ -20,6 +20,7 @@ class StudentDetailViewModel extends Notifier<ViewState<StudentProfile>> {
   StudentDetailViewModel(this.key);
   final StudentKey key;
   int _generation = 0;
+  bool _viewLogged = false;
 
   @override
   ViewState<StudentProfile> build() {
@@ -45,12 +46,15 @@ class StudentDetailViewModel extends Notifier<ViewState<StudentProfile>> {
       if (ref.mounted && generation == _generation) {
         state = Data(StudentProfile(student: student, className: room.name));
         // docs/analytics-plan.md: view_item on every kind of detail screen.
-        await ref.trackAnalytics(
-          (analytics) => analytics.logViewItem(
-            itemCategory: 'student',
-            itemId: student.mssv,
-          ),
-        );
+        if (!_viewLogged) {
+          _viewLogged = true;
+          await ref.trackAnalytics(
+            (analytics) => analytics.logViewItem(
+              itemCategory: 'student',
+              itemId: student.mssv,
+            ),
+          );
+        }
       }
     } catch (error) {
       if (ref.mounted && generation == _generation) {

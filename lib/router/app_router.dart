@@ -16,9 +16,17 @@ import '../screens/flow_b/proposals_screen.dart';
 import '../screens/flow_c/add_student_screen.dart';
 import '../screens/flow_c/need_members_screen.dart';
 import '../screens/flow_c/no_match_screen.dart';
+import '../screens/flow_d/topic_detail_screen.dart';
+import '../screens/flow_d/topic_form_screen.dart';
+import '../screens/flow_d/topics_screen.dart';
+import '../screens/flow_e/book_slot_screen.dart';
+import '../screens/flow_e/schedule_screen.dart';
+import '../screens/flow_f/meeting_screen.dart';
+import '../screens/flow_f/minutes_form_screen.dart';
 import '../screens/gallery/gallery_screen.dart';
-import '../screens/my_classes/my_classes_screen.dart';
+import '../screens/my_team/my_team_screen.dart';
 import '../screens/notifications/inbox_screen.dart';
+import '../screens/onboarding/onboarding_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../screens/sign_in/sign_in_screen.dart';
 import '../viewmodels/auth/session_view_model.dart';
@@ -53,18 +61,29 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       if (session.isLoading && !session.hasValue) {
         return atSignIn ? null : Routes.signIn;
       }
-      final signedIn = !session.hasError && session.asData?.value != null;
-      if (!signedIn) return atSignIn ? null : Routes.signIn;
+      final user = session.hasError ? null : session.asData?.value;
+      if (user == null) return atSignIn ? null : Routes.signIn;
+      final path = state.uri.path;
+      final atOnboarding = path == Routes.onboarding;
+      if (user.needsOnboarding) return atOnboarding ? null : Routes.onboarding;
       if (pendingNotificationRoute != null) {
         final destination = pendingNotificationRoute!;
         pendingNotificationRoute = null;
-        if (state.uri.path != destination) return destination;
+        // go_router re-runs redirect on it, so the role guard below applies.
+        if (path != destination) return destination;
       }
-      if (atSignIn) return Routes.classes;
-      return null;
+      if (atSignIn || atOnboarding) return Routes.classes;
+      final denied = user.isStudent
+          ? Routes.isMentorOnly(path)
+          : Routes.isStudentOnly(path);
+      return denied ? Routes.classes : null;
     },
     routes: [
       GoRoute(path: Routes.signIn, builder: (_, _) => const SignInScreen()),
+      GoRoute(
+        path: Routes.onboarding,
+        builder: (_, _) => const OnboardingScreen(),
+      ),
       if (gallery)
         GoRoute(path: Routes.gallery, builder: (_, _) => const GalleryScreen()),
       StatefulShellRoute.indexedStack(
@@ -74,7 +93,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: Routes.classes,
-                builder: (_, _) => const MyClassesScreen(),
+                // Mentor: My classes (S2). Student: My team.
+                builder: (_, _) => const ClassesTab(),
                 routes: [
                   GoRoute(
                     path: 'import',
@@ -163,6 +183,58 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                         path: 'add-member',
                         builder: (_, s) => AddMemberScreen(
                           proposalId: s.pathParameters['proposalId']!,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.topics,
+                builder: (_, _) => const TopicsScreen(),
+                routes: [
+                  // Literal paths before the :topicId parameter.
+                  GoRoute(
+                    path: 'submit',
+                    parentNavigatorKey: rootKey,
+                    builder: (_, _) => const TopicFormScreen(),
+                  ),
+                  GoRoute(
+                    path: ':topicId',
+                    builder: (_, s) => TopicDetailScreen(
+                      topicId: s.pathParameters['topicId']!,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.schedule,
+                builder: (_, _) => const ScheduleScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'book',
+                    parentNavigatorKey: rootKey,
+                    builder: (_, _) => const BookSlotScreen(),
+                  ),
+                  GoRoute(
+                    path: ':bookingId',
+                    builder: (_, s) => MeetingScreen(
+                      bookingId: s.pathParameters['bookingId']!,
+                    ),
+                    routes: [
+                      GoRoute(
+                        path: 'minutes',
+                        parentNavigatorKey: rootKey,
+                        builder: (_, s) => MinutesFormScreen(
+                          bookingId: s.pathParameters['bookingId']!,
                         ),
                       ),
                     ],

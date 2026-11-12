@@ -1,4 +1,4 @@
-"""TC-12 … TC-14 — Flow C: manual grouping, the no-result state and the discard dialog.
+"""Flow C: manual grouping, the no-result state and the discard dialog.
 
 Flow C is the alternative path of the product: when the matching finds
 nothing, the mentor groups the students by hand.
@@ -6,7 +6,9 @@ nothing, the mentor groups the students by hand.
 
 from __future__ import annotations
 
-from conftest import run
+import pytest
+
+from conftest import IMPORT_DEMO, run
 
 
 def test_tc12_need_members_shows_major_gaps(artemis):
@@ -73,3 +75,24 @@ def test_tc14_discard_dialog(artemis):
     assert result.contains("Discard proposal?"), result.text
     assert result.contains("Discard"), result.text
     assert result.contains("Cancel"), result.text
+
+
+@pytest.mark.error_path
+async def test_tc07_discard_then_manual_add_search_empty(artemis, fixture_on_device):
+    """TC-07 (Flow C, S17 → S5 → S16 → S21) in the JSON style.
+
+    Expected: discarding the AI proposal frees the card, and the manual
+    search shows the empty state.
+    """
+    got = await artemis(
+        IMPORT_DEMO
+        + "Tap 'Match with AI' and wait; the Proposals tab opens. Report group2_before (how many "
+        "cards are named 'Group 2'). Open one 'Group 2' card, scroll down, tap 'Discard proposal' "
+        "and tap 'Confirm'. Go to the Proposals tab and report group2_after. Then open Classes, "
+        "open the class 'EXE101 Demo' you imported most recently, open the list of teams needing "
+        "members, choose 'Add student' for Group 2 and type 'ZZZ' in the search field. Report "
+        "empty_title (the exact empty-state title shown, or null).",
+        ["group2_before", "group2_after", "empty_title"],
+    )
+    assert got.values["group2_after"] == got.values["group2_before"] - 1
+    assert got.values["empty_title"] == "No student results"

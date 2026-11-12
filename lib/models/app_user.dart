@@ -1,4 +1,14 @@
-/// The signed-in mentor (users/{uid}).
+/// users/{uid}.role. A student is a leader or a member of one team.
+enum UserRole {
+  mentor,
+  leader,
+  member;
+
+  static UserRole? fromName(Object? value) =>
+      values.where((r) => r.name == value).firstOrNull;
+}
+
+/// The signed-in user (users/{uid}).
 class AppUser {
   const AppUser({
     required this.uid,
@@ -6,7 +16,11 @@ class AppUser {
     this.email,
     this.photoUrl,
     this.phoneNumber,
-    this.role = 'mentor',
+    this.role = UserRole.mentor,
+    this.classId,
+    this.teamId,
+    this.studentId,
+    this.mentorUid,
   });
 
   final String uid;
@@ -16,7 +30,31 @@ class AppUser {
   final String? email;
   final String? photoUrl;
   final String? phoneNumber;
-  final String role;
+
+  /// Null until onboarding picks a role (no users/{uid} document yet).
+  final UserRole? role;
+
+  /// Student only: the class, team, MSSV and mentor they were linked to.
+  final String? classId;
+  final String? teamId;
+  final String? studentId;
+  final String? mentorUid;
+
+  bool get needsOnboarding => role == null;
+  bool get isMentor => role == UserRole.mentor;
+  bool get isStudent => role == UserRole.leader || role == UserRole.member;
+  bool get isLeader => role == UserRole.leader;
+
+  /// Students' topic document ID (topics/{classId}_{teamId}).
+  String? get topicId =>
+      isStudent && classId != null && teamId != null ? '${classId}_$teamId' : null;
+
+  String get roleLabel => switch (role) {
+    UserRole.mentor => 'Mentor',
+    UserRole.leader => 'Team leader',
+    UserRole.member => 'Team member',
+    null => 'New account',
+  };
 
   /// Avatar initials on S6 (for example "LN").
   String get initials {

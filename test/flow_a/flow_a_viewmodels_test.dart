@@ -12,6 +12,7 @@ import 'package:teamup_exe/providers/service_providers.dart';
 import 'package:teamup_exe/services/app_error.dart';
 import 'package:teamup_exe/services/class_service.dart';
 import 'package:teamup_exe/services/fakes/fake_class_service.dart';
+import 'package:teamup_exe/services/fakes/fake_infra_services.dart';
 import 'package:teamup_exe/services/fakes/fake_matching_service.dart';
 import 'package:teamup_exe/services/fakes/fake_proposal_service.dart';
 import 'package:teamup_exe/services/fakes/sample_data.dart';
@@ -77,9 +78,16 @@ class _PendingMatcher extends FakeMatchingService {
 class _Proposals extends FakeProposalService {
   _Proposals() : super(empty: true);
   final saved = <List<Proposal>>[];
+  List<Proposal>? persisted;
+
   @override
-  Future<void> savePending(List<Proposal> proposals) async =>
-      saved.add(proposals);
+  Future<List<Proposal>> savePending(
+    String classId,
+    List<Proposal> proposals,
+  ) async {
+    saved.add(proposals);
+    return persisted ?? proposals;
+  }
 }
 
 ProviderContainer _container({_Classes? classes}) {
@@ -100,7 +108,11 @@ Future<void> _waitForMatcherCalls(
   _PendingMatcher matcher,
   int count,
 ) async {
-  for (var attempt = 0; attempt < 20 && matcher.calls.length < count; attempt++) {
+  for (
+    var attempt = 0;
+    attempt < 20 && matcher.calls.length < count;
+    attempt++
+  ) {
     await tester.pump(const Duration(milliseconds: 1));
   }
   expect(matcher.calls, hasLength(count));
@@ -278,6 +290,8 @@ void main() {
         classServiceProvider.overrideWithValue(_Classes()),
         matchingServiceProvider.overrideWithValue(matcher),
         proposalServiceProvider.overrideWithValue(proposals),
+        analyticsServiceProvider.overrideWithValue(FakeAnalyticsService()),
+        crashServiceProvider.overrideWithValue(FakeCrashService()),
       ],
     );
     addTearDown(container.dispose);
@@ -290,10 +304,12 @@ void main() {
     expect(proposals.saved.single, hasLength(3));
     final retry = container.read(provider.notifier).start();
     await _waitForMatcherCalls(tester, matcher, 2);
-    matcher.calls.last.complete([]);
+    proposals.persisted = [];
+    matcher.calls.last.complete(_sampleProposals());
     await retry;
     expect(container.read(provider), isA<Empty<List<Proposal>>>());
-    expect(proposals.saved, hasLength(1));
+    expect(proposals.saved, hasLength(2));
+    expect(proposals.saved.last, isNotEmpty);
   });
 
   testWidgets('S8 reaches S18 at 30 seconds, drops late results and retries', (
@@ -306,6 +322,8 @@ void main() {
         classServiceProvider.overrideWithValue(_Classes()),
         matchingServiceProvider.overrideWithValue(matcher),
         proposalServiceProvider.overrideWithValue(proposals),
+        analyticsServiceProvider.overrideWithValue(FakeAnalyticsService()),
+        crashServiceProvider.overrideWithValue(FakeCrashService()),
       ],
     );
     addTearDown(container.dispose);
@@ -338,6 +356,8 @@ void main() {
           classServiceProvider.overrideWithValue(_Classes()),
           matchingServiceProvider.overrideWithValue(matcher),
           proposalServiceProvider.overrideWithValue(proposals),
+          analyticsServiceProvider.overrideWithValue(FakeAnalyticsService()),
+          crashServiceProvider.overrideWithValue(FakeCrashService()),
         ],
       );
       addTearDown(container.dispose);

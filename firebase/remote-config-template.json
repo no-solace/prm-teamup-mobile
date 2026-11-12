@@ -9,6 +9,16 @@
       "defaultValue": { "value": "3" },
       "description": "Number of proposal cards on S9",
       "valueType": "NUMBER"
+    },
+    "max_topic_revisions": {
+      "defaultValue": { "value": "3" },
+      "description": "Flow D: how many times a leader may resubmit a topic",
+      "valueType": "NUMBER"
+    },
+    "default_meeting_duration_minutes": {
+      "defaultValue": { "value": "30" },
+      "description": "Flow E: length of a new mentor availability slot (30/45)",
+      "valueType": "NUMBER"
     }
   }
 }

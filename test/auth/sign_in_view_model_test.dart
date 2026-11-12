@@ -105,6 +105,16 @@ void main() {
     expect(auth.currentUser?.phoneNumber, '+84912345678');
     expect(container.read(signInViewModelProvider).error, isNull);
   });
+  // Review finding F9: the 60 s resend countdown must stop once sign-in succeeded.
+  test('phone sign-in stops the resend countdown', () async {
+    auth.autoVerifyPhone = true;
+    final vm = container.read(signInViewModelProvider.notifier)..selectMethod(SignInMethod.phone);
+    vm.requestPhoneCode('+84912345678', consent: true);
+    await pumpEventQueue();
+    final state = container.read(signInViewModelProvider);
+    expect(state.resendSeconds, 0);
+    expect(state.codeSent, isFalse);
+  });
   test('phone cancel suppresses a late SMS callback and clears pending verification', () async {
     final vm = container.read(signInViewModelProvider.notifier)..selectMethod(SignInMethod.phone);
     vm.requestPhoneCode('+84912345678', consent: true);

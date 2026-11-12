@@ -17,6 +17,10 @@ abstract final class NotificationRoutes {
     RegExp(r'^/classes/[\w-]+/(no-team|need-members|no-match)$'),
     RegExp(r'^/proposals$'),
     RegExp(r'^/proposals/[\w-]+$'),
+    RegExp(r'^/topics$'),
+    RegExp(r'^/topics/[\w-]+$'),
+    RegExp(r'^/schedule$'),
+    RegExp(r'^/schedule/[\w-]+$'),
     RegExp(r'^/profile$'),
   ];
 

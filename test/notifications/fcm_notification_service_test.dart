@@ -20,6 +20,9 @@ class MemoryStore implements NotificationStore {
   final tokens = <String, Set<String>>{};
   final changes = <String, StreamController<List<AppNotification>>>{};
   bool failWrites = false;
+
+  /// Number of upcoming saveToken calls that fail (profile not created yet, F2).
+  int tokenFailures = 0;
   @override
   Stream<List<AppNotification>> watch(String uid) async* {
     yield items[uid]?.values.toList() ?? [];
@@ -43,8 +46,13 @@ class MemoryStore implements NotificationStore {
   }
 
   @override
-  Future<void> saveToken(String uid, String token) async =>
-      (tokens[uid] ??= {}).add(token);
+  Future<void> saveToken(String uid, String token) async {
+    if (tokenFailures > 0) {
+      tokenFailures--;
+      throw StateError('permission-denied: profile not created yet');
+    }
+    (tokens[uid] ??= {}).add(token);
+  }
   @override
   Future<void> removeToken(String uid, String token) async =>
       tokens[uid]?.remove(token);
@@ -141,6 +149,7 @@ void main() {
       currentUserId: () => uid,
       foregroundMessages: foreground.stream,
       openedMessages: opened.stream,
+      tokenRetryDelays: const [Duration.zero, Duration.zero, Duration.zero],
     );
     subscriptions = [
       service.watchInbox().listen((value) => inbox = value),
@@ -160,6 +169,22 @@ void main() {
     await opened.close();
   });
 
+  // Review finding F2: the first write can be denied until users/{uid} exists.
+  test('token registration retries until the profile exists', () async {
+    store.tokenFailures = 2;
+    await service.start();
+    await signIn('alice');
+    expect(store.tokens['alice'], {'token1'});
+    expect(issues.whereType<String>(), isEmpty);
+  });
+  test('token registration gives up after the retries and reports it', () async {
+    store.tokenFailures = 10;
+    await service.start();
+    await signIn('alice');
+    expect(store.tokens['alice'], isNull);
+    expect(issues.whereType<String>(), isNotEmpty);
+  });
+
   test('registers only after authenticated UID, rotates token, removes before sign-out', () async {
     await service.start();
     await signIn(null);
@@ -174,6 +199,20 @@ void main() {
     await signIn(null);
     expect(inbox, isEmpty);
     verify(() => messaging.deleteToken()).called(greaterThanOrEqualTo(1));
+  });
+
+  test('silent activity is saved to the inbox without a system popup', () async {
+    await service.start();
+    await signIn('alice');
+    final m = message(id: 'topic:a_1:1');
+    foreground.add(RemoteMessage(
+      data: {...m.data, 'silent': '1'},
+      notification: m.notification,
+      sentTime: m.sentTime,
+    ));
+    await pumpEventQueue();
+    expect(inbox.single.read, isFalse);
+    expect(presenter.shown, isEmpty);
   });
 
   test(

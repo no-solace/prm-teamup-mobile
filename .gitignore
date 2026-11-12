@@ -80,3 +80,8 @@ node_modules/
 __pycache__/
 .pytest_cache/
 e2e_test/artifacts/
+
+# ARTEMIS suite
+e2e_test/.venv/
+e2e_test/__pycache__/
+e2e_test/.pytest_cache/

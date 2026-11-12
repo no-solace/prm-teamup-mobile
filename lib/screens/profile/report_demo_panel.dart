@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -26,8 +27,8 @@ class _ReportDemoPanelState extends ConsumerState<ReportDemoPanel> {
   double? _progress;
   String? _status;
 
-  /// Lab 3 rubric: the download URL of the uploaded file must be visible.
-  String? _downloadUrl;
+  /// Lab 3 rubric: the path of the uploaded file must be visible.
+  String? _filePath;
 
   void _feedback(String message) {
     if (mounted) setState(() => _status = message);
@@ -38,17 +39,13 @@ class _ReportDemoPanelState extends ConsumerState<ReportDemoPanel> {
       _busy = true;
       _progress = null;
       _status = null;
-      _downloadUrl = null;
+      _filePath = null;
     });
     try {
       final actions = ref.read(reportDemoActionsProvider);
       final built = await actions.buildPdf(classId);
       Report? saved;
-      await for (final event in actions.upload(
-        classId,
-        built.bytes,
-        teamCount: built.teamCount,
-      )) {
+      await for (final event in actions.upload(classId, built.bytes)) {
         if (!mounted) return;
         if (event is UploadProgress) {
           setState(() => _progress = event.fraction);
@@ -58,16 +55,21 @@ class _ReportDemoPanelState extends ConsumerState<ReportDemoPanel> {
       if (saved == null) {
         throw const UnknownError('Report upload was interrupted');
       }
-      _feedback(
-        'Uploaded ${saved.sizeKb} KB to ${saved.storagePath}. '
-        'Opening the PDF share dialog.',
+      unawaited(
+        actions.logExported(classId, saved, teamCount: built.teamCount),
       );
-      setState(() => _downloadUrl = saved!.downloadUrl);
+      _feedback('Uploaded ${saved.sizeKb} KB to ${saved.filePath}.');
+      setState(() => _filePath = saved!.filePath);
       await Printing.sharePdf(
         bytes: Uint8List.fromList(built.bytes),
         filename: 'teamup_$classId.pdf',
       );
-    } catch (error) {
+    } catch (error, stack) {
+      unawaited(
+        ref
+            .read(reportDemoActionsProvider)
+            .reportFailure(error, stack, 'report_export_failed'),
+      );
       _feedback(toAppError(error).message);
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -137,13 +139,13 @@ class _ReportDemoPanelState extends ConsumerState<ReportDemoPanel> {
           const SizedBox(height: kSpaceSm),
           Text(_status!, style: text.bodyMedium),
         ],
-        if (_downloadUrl != null) ...[
+        if (_filePath != null) ...[
           const SizedBox(height: kSpaceSm),
-          Text('Download URL', style: text.titleSmall),
+          Text('Storage path', style: text.titleSmall),
           SelectableText(
-            _downloadUrl!,
+            _filePath!,
             style: text.bodySmall,
-            semanticsLabel: 'Download URL of the uploaded report',
+            semanticsLabel: 'Storage path $_filePath',
           ),
         ],
         const SizedBox(height: kSpaceMd),
@@ -171,15 +173,9 @@ class _ReportDemoPanelState extends ConsumerState<ReportDemoPanel> {
               children: [
                 Text('${report.sizeKb} KB · ${report.createdAt.toLocal()}'),
                 Text(
-                  report.storagePath,
+                  report.filePath,
                   style: text.bodySmall,
-                  semanticsLabel: 'Storage path ${report.storagePath}',
-                ),
-                SelectableText(
-                  report.downloadUrl,
-                  style: text.bodySmall,
-                  semanticsLabel:
-                      'Download URL of ${report.storagePath}',
+                  semanticsLabel: 'Storage path ${report.filePath}',
                 ),
               ],
             ),

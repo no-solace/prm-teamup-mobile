@@ -12,9 +12,21 @@ class FakeAuthService implements AuthService {
     bool signedIn = false,
     this.failWith,
     this.latency = const Duration(milliseconds: 400),
+    AppUser? user,
   }) {
-    _current = signedIn ? _lan : null;
+    _current = user ?? (signedIn ? _lan : null);
   }
+
+  /// Leader of Tutor Match in class-a (Flow D/E/F demos and tests).
+  static const leader = AppUser(
+    uid: 'fake-leader',
+    displayName: 'An Pham',
+    role: UserRole.leader,
+    classId: 'class-a',
+    teamId: 'team-tutor',
+    studentId: '190501',
+    mentorUid: SampleData.mentorUid,
+  );
 
   AppError? failWith;
   AppError? signOutError;
@@ -132,6 +144,46 @@ class FakeAuthService implements AuthService {
   void cancelPhoneVerification() {
     _phoneAttempt++;
     _phoneNumber = null;
+  }
+
+  @override
+  Future<void> completeMentorProfile() async {
+    final user = _current;
+    if (user == null) throw const PermissionDeniedError('Sign in first');
+    _signedIn(AppUser(uid: user.uid, displayName: user.displayName, email: user.email));
+  }
+
+  @override
+  Future<void> completeStudentProfile({
+    required String classId,
+    required String studentId,
+    required bool leader,
+  }) async {
+    final user = _current;
+    if (user == null) throw const PermissionDeniedError('Sign in first');
+    final student = SampleData.students()
+        .where((s) => s.classId == classId.trim() && s.mssv == studentId.trim())
+        .firstOrNull;
+    if (student == null) {
+      throw const ValidationError('Class code or student ID not found');
+    }
+    if (student.teamId == null) {
+      throw const ValidationError(
+        'You are not in a team yet. Ask your mentor to approve your team first.',
+      );
+    }
+    _signedIn(
+      AppUser(
+        uid: user.uid,
+        displayName: user.displayName,
+        email: user.email,
+        role: leader ? UserRole.leader : UserRole.member,
+        classId: student.classId,
+        teamId: student.teamId,
+        studentId: student.mssv,
+        mentorUid: SampleData.mentorUid,
+      ),
+    );
   }
 
   @override

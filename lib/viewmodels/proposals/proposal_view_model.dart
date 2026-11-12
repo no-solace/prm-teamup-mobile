@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../models/major.dart';
 import '../../models/proposal.dart';
 import '../../models/student.dart';
 import '../../models/team.dart';
@@ -9,6 +10,7 @@ import '../../providers/service_providers.dart';
 import '../../services/app_error.dart';
 import '../config/app_config_view_model.dart';
 import '../instrumentation.dart';
+import '../telemetry.dart';
 
 final pendingProposalsProvider = StreamProvider.autoDispose<List<Proposal>>(
   (ref) => ref.watch(proposalServiceProvider).watchAllPending(),
@@ -26,10 +28,25 @@ final visibleProposalsProvider = StreamProvider.autoDispose<List<Proposal>>((ref
       .map((items) => items.take(limit).toList(growable: false));
 });
 
+/// Streams one proposal and logs view_item for it on the first emission.
 final proposalDetailProvider = StreamProvider.autoDispose
-    .family<Proposal, String>(
-      (ref, id) => ref.watch(proposalServiceProvider).watchProposal(id),
-    );
+    .family<Proposal, String>((ref, id) async* {
+      var viewLogged = false;
+      await for (final proposal
+          in ref.watch(proposalServiceProvider).watchProposal(id)) {
+        if (!viewLogged && ref.mounted) {
+          viewLogged = true;
+          unawaited(
+            bestEffort(
+              () => ref
+                  .read(analyticsServiceProvider)
+                  .logViewItem(itemCategory: 'proposal', itemId: id),
+            ),
+          );
+        }
+        yield proposal;
+      }
+    });
 
 /// Logs `view_item` once per proposal detail visit (docs/analytics-plan.md).
 /// The proposal stream emits on every roster change, so the event is guarded
@@ -108,23 +125,33 @@ class ProposalActionViewModel extends Notifier<bool> {
     );
   });
 
-  Future<Proposal> updateMembers(Proposal proposal, List<String> ids) => _run(
-    () async {
-      try {
-        return await ref
-            .read(proposalServiceProvider)
-            .updateMembers(
-              proposal.id,
-              addStudentIds: ids,
-              currentMemberIds: proposal.currentMemberIds,
+  Future<Proposal> updateMembers(Proposal proposal, List<String> ids) =>
+      _run(() async {
+        try {
+          final updated = await ref
+              .read(proposalServiceProvider)
+              .updateMembers(
+                proposal.id,
+                addStudentIds: ids,
+                currentMemberIds: proposal.currentMemberIds,
+              );
+          // S25: the edit leaves the team under 5, so Approve is blocked.
+          if (updated.resultingSize < TeamRules.minMembers) {
+            await ref.trackAnalytics(
+              (analytics) => analytics.logMemberChangeBlocked(reason: 'min_5'),
             );
-      } catch (error, stack) {
-        // Rejected by Firestore rules or the network: a real handled error.
-        await ref.trackNonFatal(error, stack, reason: 'proposal_members_update');
-        rethrow;
-      }
-    },
-  );
+          }
+          return updated;
+        } catch (error, stack) {
+          // Rejected by Firestore rules or the network: a real handled error.
+          await ref.trackNonFatal(
+            error,
+            stack,
+            reason: 'proposal_members_update',
+          );
+          rethrow;
+        }
+      });
 
   Future<Proposal> createManual(
     String classId,

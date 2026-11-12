@@ -67,8 +67,7 @@ class MatchingViewModel extends Notifier<ViewState<List<Proposal>>> {
         );
         // A timeout, Cancel or Back may have happened while propose was awaiting.
         if (!_active(generation)) return <Proposal>[];
-        if (result.isNotEmpty) await proposals.savePending(result);
-        return result;
+        return proposals.savePending(classId, result);
       })().timeout(ref.read(matchingTimeoutProvider));
       if (_active(generation)) {
         state = result.isEmpty ? const Empty() : Data(result);
@@ -83,7 +82,7 @@ class MatchingViewModel extends Notifier<ViewState<List<Proposal>>> {
     } on TimeoutException catch (error, stack) {
       // A handled timeout is a real error path: report it as non-fatal so the
       // console shows it next to the user ID and the custom keys.
-      await ref.trackNonFatal(error, stack, reason: 'ai_match_timeout');
+      await ref.trackNonFatal(error, stack, reason: 'ai_matching_timeout');
       if (_active(generation)) {
         _running = false;
         _generation++;
@@ -94,7 +93,7 @@ class MatchingViewModel extends Notifier<ViewState<List<Proposal>>> {
         );
       }
     } catch (error, stack) {
-      await ref.trackNonFatal(error, stack, reason: 'ai_match_failed');
+      await ref.trackNonFatal(error, stack, reason: 'ai_matching_failed');
       if (_active(generation)) state = Failure(toAppError(error));
     } finally {
       if (_active(generation)) _running = false;

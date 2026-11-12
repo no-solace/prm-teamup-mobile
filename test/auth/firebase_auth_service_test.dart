@@ -6,6 +6,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:teamup_exe/firebase/firebase_auth_service.dart';
 import 'package:teamup_exe/firebase/firestore_mentor_profile_service.dart';
+import 'package:teamup_exe/models/app_user.dart';
 import 'package:teamup_exe/services/app_error.dart';
 import 'package:teamup_exe/services/auth_service.dart';
 
@@ -58,6 +59,9 @@ void main() {
     when(() => auth.userChanges()).thenAnswer((_) => Stream.value(user));
     when(() => auth.currentUser).thenReturn(user);
     when(() => profile.ensure(user)).thenAnswer((_) => ready.future);
+    when(() => profile.watch('test-uid')).thenAnswer(
+      (_) => Stream.value({'displayName': 'Lan', 'role': 'mentor'}),
+    );
 
     var emitted = false;
     final session = service.authStateChanges().first.then((value) {
@@ -68,8 +72,37 @@ void main() {
     expect(emitted, false);
 
     ready.complete();
-    expect((await session)?.uid, 'test-uid');
+    final restored = await session;
+    expect(restored?.uid, 'test-uid');
+    expect(restored?.role, UserRole.mentor);
     verify(() => profile.ensure(user)).called(1);
+  });
+  test('an account without a profile needs onboarding; a student profile maps its team', () async {
+    final profiles = StreamController<Map<String, dynamic>?>();
+    when(() => auth.userChanges()).thenAnswer((_) => Stream.value(user));
+    when(() => auth.currentUser).thenReturn(user);
+    when(() => profile.ensure(user)).thenAnswer((_) async {});
+    when(() => profile.watch('test-uid')).thenAnswer((_) => profiles.stream);
+
+    final seen = <AppUser?>[];
+    final sub = service.authStateChanges().listen(seen.add);
+    profiles.add(null);
+    await pumpEventQueue();
+    expect(seen.single?.needsOnboarding, isTrue);
+
+    profiles.add({
+      'displayName': 'An',
+      'role': 'leader',
+      'classId': 'c1',
+      'teamId': 't1',
+      'studentId': 'S1',
+      'mentorUid': 'm1',
+    });
+    await pumpEventQueue();
+    expect(seen.last?.isLeader, isTrue);
+    expect(seen.last?.topicId, 'c1_t1');
+    await sub.cancel();
+    await profiles.close();
   });
   test(
     'a sign-out during profile provisioning cannot expose an old user',
@@ -78,6 +111,9 @@ void main() {
       when(() => auth.userChanges()).thenAnswer((_) => Stream.value(user));
       when(() => auth.currentUser).thenReturn(user);
       when(() => profile.ensure(user)).thenAnswer((_) => ready.future);
+      when(() => profile.watch('test-uid')).thenAnswer(
+        (_) => Stream.value({'displayName': 'Lan', 'role': 'mentor'}),
+      );
 
       final session = service.authStateChanges().first;
       await pumpEventQueue();
@@ -89,6 +125,7 @@ void main() {
   test('a missing mentor permission blocks session routing', () async {
     when(() => auth.userChanges()).thenAnswer((_) => Stream.value(user));
     when(() => auth.currentUser).thenReturn(user);
+    when(() => auth.signOut()).thenAnswer((_) async {});
     when(() => profile.ensure(user))
         .thenThrow(const PermissionDeniedError('This account is not a mentor'));
 
@@ -96,6 +133,21 @@ void main() {
       service.authStateChanges().first,
       throwsA(isA<PermissionDeniedError>()),
     );
+    // Review finding F1: a non-mentor must not stay signed in to Firebase.
+    verify(() => auth.signOut()).called(1);
+  });
+  // Review finding F1: an offline profile check must not look like a sign-out.
+  test('a transient profile error keeps the signed-in session', () async {
+    when(() => auth.userChanges()).thenAnswer((_) => Stream.value(user));
+    when(() => auth.currentUser).thenReturn(user);
+    when(() => profile.watch('test-uid')).thenAnswer(
+      (_) => Stream.value({'displayName': 'Lan', 'role': 'mentor'}),
+    );
+    for (final error in [const NetworkError(), const TimeoutAppError()]) {
+      when(() => profile.ensure(user)).thenThrow(error);
+      expect((await service.authStateChanges().first)?.uid, 'test-uid');
+    }
+    verifyNever(() => auth.signOut());
   });
   test(
     'email login uses normalized email and preserves password bytes',

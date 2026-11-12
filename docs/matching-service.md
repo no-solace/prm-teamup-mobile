@@ -1,8 +1,8 @@
 # Rule-based matching — Lab 3
 
-Phạm vi: `RuleBasedMatchingService` triển khai nguyên interface `MatchingService`;
-không đổi model, fake, UI, Firebase hoặc dữ liệu nhóm. Kết quả chỉ là đề xuất
-`pending`, `source: ai`; nhãn AI ở đây là quy tắc, không có mô hình học máy.
+`RuleBasedMatchingService` triển khai interface `MatchingService`. Thuật toán
+trả về đề xuất `pending`, `source: ai` và không ghi dữ liệu nhóm. Nhãn AI ở
+đây chỉ thuật toán dựa trên quy tắc.
 
 ## Chính sách R1–R3
 
@@ -18,9 +18,10 @@ không đổi model, fake, UI, Firebase hoặc dữ liệu nhóm. Kết quả ch
   phương án đạt ít nhất 3 ngành, rồi cần ít người bổ sung hơn, rồi ID nhóm.
   Các nhóm vốn có 5 người được xét sau nhóm thiếu; không cấp đề xuất rỗng.
 
-Kết quả xếp theo ID nhóm; member IDs và ngành hiện tại được sắp theo MSSV theo
-cặp. ID đề xuất ổn định theo cặp lớp/nhóm. Tên sinh viên, thứ tự input và lịch sử
-lần gọi không quyết định phân bổ. Snapshot đề xuất là bản sao không cho sửa list.
+Kết quả xếp theo ID nhóm. ID đề xuất là hash ổn định của lớp, nhóm và dãy MSSV
+hiện tại và được chọn. Thuật toán xét thành viên hiện tại theo thứ tự MSSV,
+còn snapshot đề xuất giữ thứ tự roster đã lưu để đối chiếu khi duyệt. Tên sinh
+viên và lịch sử lần gọi không quyết định phân bổ. Snapshot là bản sao bất biến.
 
 `strong` nghĩa là kết quả có ít nhất 3 ngành; `good` nghĩa là đủ 5–6 người nhưng
 chưa đạt 3 ngành. Lý do ghi số người, các ngành kết quả, ngành mới bổ sung và
@@ -51,10 +52,24 @@ toàn lớp khi nguồn ngành khan hiếm. Ba ngành là ưu tiên; giới hạ
 trùng người là điều kiện cứng. Mentor xem các đề xuất `good` và sửa/ghép tay khi
 cần. Không di chuyển thành viên cũ để tăng độ đa dạng.
 
-Service không đọc trạng thái discarded/pending, không lưu Firestore và không
-chặn tranh chấp từ hai lần duyệt đồng thời. Caller/ProposalService chịu trách
-nhiệm R4 (Discard/Approve/Undo), kiểm tra roster mới nhất và lưu giao dịch.
-ID ổn định không thay cho việc kiểm tra trạng thái đã discard.
+Bản ghi sinh viên có MSSV rỗng hoặc chỉ gồm khoảng trắng bị bỏ qua có chủ đích:
+không có định danh thì không thể đề xuất hay kiểm tra trùng người một cách an
+toàn, và Firestore Rules không cho tạo tài liệu sinh viên với ID như vậy. Một
+nhóm có `memberIds` rỗng vẫn bị đánh dấu xung đột (xem `team.memberIds.any(...)`).
+Ghi nhận theo finding F10 trong `docs/code-review.md`.
+
+Thuật toán chỉ tính đề xuất. `ProposalService.savePending` đối chiếu roster và
+sinh viên hiện tại trước khi lưu. S8 chuyển trang theo danh sách `pending` do
+service trả về. Cùng ID thì giữ bản nháp hợp lệ đã được mentor sửa, bỏ qua
+`discarded` và `approved`.
+
+Khi một bản nháp AI thay thế xuất hiện, các bản nháp AI `pending` khác của
+cùng nhóm chuyển sang `superseded` trong cùng giao dịch. Bản nháp AI đã lỗi
+thời cũng được rút khi lần chạy không tìm được bản thay thế. Nếu thuật toán
+sinh lại ID đã `superseded`, service có thể lưu kết quả mới dưới ID đó. Các bản
+nháp thủ công do mentor quản lý riêng. Firestore dùng tài liệu
+`classes/{classId}/matching/state` để các lần matching đồng thời chạy lại giao
+dịch khi danh sách bản nháp thay đổi.
 
 ## Kiểm tra
 
@@ -71,11 +86,6 @@ flutter test --no-pub
 
 Không cần khởi tạo Firebase hoặc kết nối mạng để kiểm thử thuật toán.
 
-Đã chạy ngày 06/11/2026 với Flutter 3.47.3 / Dart 3.13.3:
-
-- `flutter analyze --no-pub`: **No issues found**, 29,5 giây.
-- `flutter test --no-pub`: **34 tests passed** (31 matching, 3 ViewModel có sẵn).
-- `git diff --check`: sạch.
-
-Chưa kiểm tra UI, thiết bị thật, dữ liệu Firestore hoặc giao dịch duyệt; những
-phần này nằm ngoài phạm vi triển khai matching thuần Dart.
+Ca tích hợp của `savePending` nằm trong
+`test/services/fake_proposal_integration_test.dart`. Ca kiểm thử chuyển trạng
+thái trên Firestore Emulator nằm trong `firebase/test/firestore.rules.test.mjs`.

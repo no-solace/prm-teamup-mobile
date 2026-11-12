@@ -4,9 +4,12 @@
 > và nguồn dữ liệu. Mọi **sai lệch** so với thiết kế đều được ghi lại kèm lý do.
 > Nguồn thiết kế: `docs/prm323-lab2-group6/` (Figma Final UI, `design/screen-spec.md`,
 > `handoff/flutter-handoff.md`, `ux/user-flow.md`).
-
-**Bảng trạng thái**: `Done` = dựng đúng và đã có test · `Partial` = dựng nhưng còn
-khác thiết kế (xem cột *Ghi chú / sai lệch*) · `Deviation` = cố ý khác, đã ghi lý do.
+>
+> **Cập nhật 12/11/2026**: hợp nhất với nhánh `integration/lab3-complete` —
+> bổ sung **Flow D/E/F** (đề xuất đồ án, đặt lịch, biên bản) và vai sinh viên.
+>
+> **Bảng trạng thái**: `Done` = dựng đúng và đã có test · `Partial` = dựng nhưng còn
+> khác thiết kế (xem cột *Ghi chú / sai lệch*) · `Deviation` = cố ý khác, đã ghi lý do.
 
 ---
 
@@ -16,14 +19,14 @@ khác thiết kế (xem cột *Ghi chú / sai lệch*) · `Deviation` = cố ý 
 |---|---|---|---|---|---|---|
 | S1 Sign in | A | `/sign-in` | `screens/sign_in/sign_in_screen.dart` | `AuthService.signInWithGoogle()` | Done | **Sai lệch D1**: Lab 2 là email không mã; Lab 3 yêu cầu Google Sign-In → dùng Google, email/password/phone vẫn còn trong `SignInViewModel`. |
 | S19 Sign in - error | A | `/sign-in` (state) | `SignInViewModel.state.error` + `AppTextField` | `AuthService` | Done | Ô viền đỏ + "Enter a valid email" khi format sai. |
-| S2 My classes | A | `/classes` | `screens/my_classes/my_classes_screen.dart` | `ClassService.watchMyClasses()` (Firestore `classes`) | Done | |
+| S2 My classes | A | `/classes` | `screens/my_classes/my_classes_screen.dart` | `ClassService.watchMyClasses()` (Firestore `classes`) | Done | Ở vai sinh viên, tab này hiện **My team**. |
 | S22 Import class list | A | `/classes/import` | `screens/flow_a/import_class_screen.dart` | `ClassService.parseImportFile()` | Partial | **Sai lệch D2**: Lab 2 dùng `class_A.xlsx`; app nhận **CSV** (`.csv`) vì `csv` package không đọc XLSX. Xem §5. |
 | S23 Import result | A | `/classes/import/result` | `screens/flow_a/import_result_screen.dart` | `ClassService.importClass()` → `ImportResult` | Done | 3 số + 2 hàng điều hướng + "Filtered automatically". |
 | S3 Class detail | A, C | `/classes/{classId}` | `screens/flow_a/class_detail_screen.dart` | `ClassService.watchClass()` | Done | Nút "Match with AI" bị ẩn khi `ai_matching_enabled = false` (Remote Config). |
 | S4 No team | A | `/classes/{classId}/no-team` | `screens/flow_a/no_team_screen.dart` | `ClassService.watchStudents()` | Done | |
 | S7 Student detail | B | `/classes/{classId}/students/{studentId}` | `screens/flow_a/student_detail_screen.dart` | `ClassService.getStudent()` + `watchClass()` | Done | |
 | S8 AI matching | A, C | `/classes/{classId}/matching` | `screens/flow_a/matching_screen.dart` | `MatchingViewModel` → `MatchingService.propose()` | Done | Timeout 30 s → S18. |
-| S18 Offline | A | `/classes/{classId}/no-match`? không — S18 là error state của S8 | `StatusView.error` trong `matching_screen.dart` | `AppError` (NetworkError / TimeoutAppError) | Done | Nút "Try again" gọi lại `MatchingViewModel.start()`. |
+| S18 Offline | A | state lỗi của S8 (cùng route `/classes/{id}/matching`) | `StatusView.error` trong `matching_screen.dart` | `AppError` (NetworkError / TimeoutAppError) | Done | Nút "Try again" gọi lại `MatchingViewModel.start()`. |
 | S9 Proposals | A, B | `/proposals` | `screens/flow_b/proposals_screen.dart` | `ProposalService.watchAllPending()` (Firestore `collectionGroup('proposals')`) | Done | Badge số đề xuất trên tab Proposals (`app_shell.dart`). Số thẻ bị giới hạn bởi `max_proposals_shown`. |
 | S14 Proposals - All matched | A, B, C | trạng thái empty của `/proposals` | `StatusView` + snackbar "Approved" + Undo | `ProposalService.watchAllPending()` | Done | Snackbar 5 s rồi Undo (transaction `undoApprove`). |
 | S10 Proposal detail | A, B, C | `/proposals/{proposalId}` | `screens/flow_b/proposal_detail_screen.dart` | `ProposalService.watchProposal(id)` | Done | Hàng ngành 48 dp (`kMajorSlotLarge`), `FitChip`, `showConfirmDialog`. |
@@ -33,26 +36,48 @@ khác thiết kế (xem cột *Ghi chú / sai lệch*) · `Deviation` = cố ý 
 | S17 Discard dialog | C | dialog trên S10 | `showConfirmDialog(destructive: true, confirmLabel: 'Discard')` | — | Done | |
 | S24 Remove member dialog | B | dialog trên S10 | `showConfirmDialog(destructive: true, confirmLabel: 'Remove')` | — | Done | "Team will have N members." |
 | S11 Add member | B | `/proposals/{proposalId}/add-member` | `screens/flow_b/add_member_screen.dart` + `widgets/proposal_student_picker.dart` | `ClassService.watchStudents()` | Done | |
-| S13 Add member - Error | B | state của S11 | `ErrorBanner("Max 6 members")` trong `proposal_student_picker.dart` | `TeamRules.maxMembers` | Done | Lỗi hiện **tại chỗ**, không chỉ snackbar. |
+| S13 Add member - Error | B | state của S11 | `ErrorBanner("Max 6 members")` trong `proposal_student_picker.dart` | `TeamRules.maxMembers` | Done | Lỗi hiện **tại chỗ**, không chỉ snackbar; nút lưu bị khoá. |
 | S5 Need members | C | `/classes/{classId}/need-members` | `screens/flow_c/need_members_screen.dart` | `ProposalService.watchTeams()` | Done | `MajorSlotRow` 40 dp + dòng "Needs SE, AI, MKT to reach 5". |
 | S16 Add student | C | `/classes/{classId}/add-student` | `screens/flow_c/add_student_screen.dart` | `ClassService.watchStudents()` | Done | Dòng "In a team" bị khoá. |
 | S21 Add student - no results | C | state empty của S16 | `StatusView` trong `add_student_screen.dart` | `ClassService.watchStudents()` | Done | |
 | S15 No match | C | `/classes/{classId}/no-match` | `screens/flow_c/no_match_screen.dart` | `MatchingViewModel` → `Empty` | Done | Nút "Add manually" + "See teams". |
 | S6 Profile | (tab) | `/profile` | `screens/profile/profile_screen.dart` | `AuthService.currentUser` | Done | **Sai lệch D4**: thêm khu demo Firebase (bắt buộc theo Lab 3 §3). |
 | (demo) Config & FCM | — | `/profile/notifications` | `screens/notifications/config_demo_panel.dart` | `ConfigService.watch()` + `NotificationService` | Done | Khu demo bắt buộc Lab 3: Remote Config values, FCM token, notification center. |
-| (demo) Export PDF | — | `/profile` | `screens/profile/report_demo_panel.dart` | `ReportService.buildClassTeamsPdf()` + `StorageService.uploadReport()` | Done | Hiện progress **và** download URL. |
+| (demo) Export PDF | — | `/profile` | `screens/profile/report_demo_panel.dart` | `ReportService.buildClassTeamsPdf()` + `StorageService.uploadReport()` | Done | Hiện progress **và** đường dẫn file trong Firestore. |
 
-**Tổng: 25 màn Lab 2 → 25 route/state đã dựng, 4 sai lệch có ghi lý do.**
+**Tổng: 25 màn Lab 2 → 25 route/state đã dựng, 5 sai lệch có ghi lý do.**
 
 ---
 
-## 2. Ma trận 3 flow
+## 1b. Màn Flow D / E / F (thêm sau, không có trong thiết kế Lab 2)
+
+Ba flow này là **phần mở rộng** do nhóm xây trên cùng hệ thiết kế Lab 2: tái
+dùng đúng bộ component, token và quy tắc trạng thái của Lab 2.
+
+| Màn | Flow | Route Flutter | Widget / màn hiện thực | Nguồn dữ liệu | Trạng thái |
+|---|---|---|---|---|---|
+| Onboarding vai trò | (đầu phiên) | `/onboarding` | `screens/onboarding/onboarding_screen.dart` | `users/{uid}.role` | Done |
+| My team (sinh viên) | — | `/classes` (nhánh sinh viên) | `screens/my_team/my_team_screen.dart` | Firestore `classes/{id}/teams` | Done |
+| D — Danh sách đề tài | D | `/topics` | `screens/flow_d/topics_screen.dart` | `TopicService.watchAll()` | Done |
+| D — Nộp đề tài | D | `/topics/submit` | `screens/flow_d/topic_form_screen.dart` | `TopicService.submit()` → `topics/{classId}_{teamId}` | Done |
+| D — Duyệt đề tài | D | `/topics/{topicId}` | `screens/flow_d/topic_detail_screen.dart` | `TopicService.watch(id)` | Done |
+| E — Lịch mentor | E | `/schedule` | `screens/flow_e/schedule_screen.dart` | `BookingService.watchSlots()` | Done |
+| E — Đặt lịch | E | `/schedule/book` | `screens/flow_e/book_slot_screen.dart` | `BookingService.book()` → `bookings/{id}` | Done |
+| F — Biên bản họp | F | `/schedule/{bookingId}` | `screens/flow_f/meeting_screen.dart` | `MeetingService.watch(bookingId)` | Done |
+| F — Ký & xuất biên bản | F | `/schedule/{bookingId}/minutes` | `screens/flow_f/minutes_form_screen.dart` | `MeetingService.saveMinutes()` | Done |
+
+---
+
+## 2. Ma trận 6 flow
 
 | Flow | Bước (route) | Nhánh lỗi | Nguồn dữ liệu | Test tự động |
 |---|---|---|---|---|
 | **A** — Duyệt gợi ý AI cho một lớp | `/sign-in` → `/classes` → `/classes/import` → `/classes/import/result` → `/classes/{id}` → `/classes/{id}/matching` → `/proposals` → `/proposals/{id}` | S19 (email sai), S18 (mất mạng khi AI chạy) | Firestore `classes/{id}/students`, `teams`, `proposals` | `test/flow_a/flow_a_viewmodels_test.dart`, `test/demo/full_demo_smoke_test.dart` |
 | **B** — Thêm thành viên vào đề xuất | `/proposals` → `/proposals/{id}` → `/proposals/{id}/add-member` → (S11) → S10 | S13 (vượt 6), S25 (dưới 5) | Firestore `proposals/{id}` + transaction approve | `test/flow_b/flow_b_viewmodels_test.dart` |
 | **C** — AI không ghép được, mentor ghép tay | `/classes/{id}` → `/classes/{id}/need-members` → `/classes/{id}/add-student` → `/proposals/{id}` (manual) | S21 (không tìm ra SV), SV đã có nhóm bị khoá, S17 (discard) | Firestore `teams/{id}` + transaction `createManual` | `test/flow_c/flow_c_viewmodels_test.dart` |
+| **D** — Đề tài nhóm | `/topics` → `/topics/submit` → `/topics/{id}` | Duyệt lại (revision), từ chối | Firestore `topics/{classId}_{teamId}` | `test/flow_def/flow_def_test.dart` |
+| **E** — Đặt lịch hẹn | `/schedule` → `/schedule/book` → `/schedule/{id}` | Khung giờ đã bị đặt (rules chặn trùng) | Firestore `mentors/{uid}/slots`, `bookings` | `test/flow_def/flow_def_test.dart` |
+| **F** — Biên bản họp | `/schedule/{id}` → `/schedule/{id}/minutes` | Chưa ký | Firestore `minutes/{bookingId}` | `test/flow_def/flow_def_test.dart` |
 
 ---
 
@@ -60,14 +85,14 @@ khác thiết kế (xem cột *Ghi chú / sai lệch*) · `Deviation` = cố ý 
 
 | Component Figma | Widget Flutter | Trạng thái (params) | Dùng ở màn |
 |---|---|---|---|
-| Button primary / tonal / destructive | `widgets/app_button.dart` → `AppButton` | `variant`, `icon`, `loading`, `onPressed` | S2, S3, S5, S10, S11, S22, S23 |
-| Text field | `widgets/app_text_field.dart` → `AppTextField` | `errorText`, `hint`, `onChanged`, `label` | S1, S4, S11, S16 |
-| Card | `widgets/app_card.dart` → `AppCard` | `onTap`, `semanticsLabel`, `padding` | S2, S5, S9, S10 |
-| Navigation bar | `screens/app_shell.dart` → `NavigationBar` | 3 tab, badge Proposals | S2 / S9 / S6 |
+| Button primary / tonal / destructive | `widgets/app_button.dart` → `AppButton` | `variant`, `icon`, `loading`, `onPressed` | S2, S3, S5, S10, S11, S22, S23, D/E/F |
+| Text field | `widgets/app_text_field.dart` → `AppTextField` | `errorText`, `hint`, `onChanged`, `label` | S1, S4, S11, S16, D/E/F |
+| Card | `widgets/app_card.dart` → `AppCard` | `onTap`, `semanticsLabel`, `padding` | S2, S5, S9, S10, D/E/F |
+| Navigation bar | `screens/app_shell.dart` → `NavigationBar` | 5 tab, badge Proposals | S2 / S9 / Topics / Schedule / S6 |
 | App bar | `MaterialApp` `AppBar` + `screens/flow_a/flow_a_layout.dart` → `FlowAScaffold` | `title`, back | mọi màn có app bar |
 | Dialog confirm / destructive | `widgets/confirm_dialog.dart` → `showConfirmDialog` | `title`, `message`, `confirmLabel`, `destructive` | S12, S17, S24 |
 | Loading | `CircularProgressIndicator` + `LinearProgressIndicator` | — | S3, S8, S22, S6 demo |
-| Empty / Error state | `widgets/status_view.dart` → `StatusView` | `icon`, `title`, `message`, `actionLabel`, `onRetry` | S4, S9, S14, S15, S18, S21 |
+| Empty / Error state | `widgets/status_view.dart` → `StatusView` | `icon`, `title`, `message`, `actionLabel`, `onRetry` | S4, S9, S14, S15, S18, S21, D/E/F |
 | Error banner | `widgets/error_banner.dart` → `ErrorBanner` | `message` | S13, S22, S25 |
 | Chip lọc ngành | `widgets/major_filter_chips.dart` → `MajorFilterChips` | `selected`, `onSelected` | S4, S11, S16 |
 | Fit chip | `widgets/fit_chip.dart` → `FitChip` | `fit` (strong/good) | S9, S10 |
@@ -78,6 +103,7 @@ khác thiết kế (xem cột *Ghi chú / sai lệch*) · `Deviation` = cố ý 
 | Badge | `Badge` (NavigationBar) + `ProposalsBadge` | `count` | S9 (tab Proposals) |
 | Stat triple | `widgets/stat_triple.dart` → `StatTriple` | 3 số + nhãn | S3, S23 |
 | Student picker (dùng chung S11/S16) | `widgets/proposal_student_picker.dart` | `capacity`, `onLimit` | S11, S16 |
+| Trạng thái / hành động | `widgets/status_chip.dart`, `widgets/action_feedback.dart` | `status`, `message` | D/E/F |
 
 ---
 
@@ -104,6 +130,9 @@ khác thiết kế (xem cột *Ghi chú / sai lệch*) · `Deviation` = cố ý 
 | **D3** | Nút xác nhận trong S12/S17/S24 ghi **"Approve" / "Discard" / "Remove"** thay vì "Confirm". | Dialog dùng chung (`showConfirmDialog`) phải nêu đúng hành động; nhãn "Confirm" chung chung gây rủi ro bấm nhầm. Nhãn tiếng Anh đúng ngữ nghĩa. | Không đổi bố cục, chỉ đổi chữ trên nút. | Chưa — cần sửa nhãn nút trong Figma. |
 | **D4** | S6 Profile có thêm **khu demo Firebase** (Remote Config, FCM token, export PDF, Crashlytics). | Lab 3 §3: "Provide a Firebase demo area, usually on the Profile screen". | Profile dài hơn; dùng `ExpansionTile`/card chia khu rõ ràng. | Chưa — cần thêm frame demo trong Figma. |
 | **D5** | S9 giới hạn số thẻ đề xuất theo Remote Config `max_proposals_shown` (mặc định 3). | Lab 3 §6 yêu cầu ≥ 2 tham số thay đổi hành vi hiển thị. Mặc định 3 khớp thiết kế Lab 2 (3 thẻ). | Khi hạ giá trị trong Console, mentor chỉ thấy N thẻ đầu. | Không cần (giá trị mặc định khớp thiết kế). |
+| **D6** | S9/S11/S13: giới hạn nhóm **5–6 người** do `TeamRules` chốt, không cho mentor chọn số người tuỳ ý. | Lab 2 §"Business rules" chốt 5–6; S13 là màn lỗi riêng. | Nút lưu ở S11 bị khoá khi đủ 6 người (đã sửa ở CR-10). | Không cần. |
+| **D7** | Báo cáo PDF lưu trong **Firestore** (`reports/{id}/files/pdf`) thay vì Cloud Storage bucket. | Gói Firebase **Spark** (miễn phí) không có Cloud Storage bucket; đề chỉ yêu cầu "Firebase". Dữ liệu mentor vẫn nằm trong Firestore nên vẫn theo đúng câu "Cloud Firestore when the app stores the user's own data". | UI hiện đường dẫn file trong Firestore (`Report.filePath`) thay cho download URL. | Chưa — cần cập nhật frame demo trong Figma. |
+| **D8** | Thêm **Flow D/E/F** và vai **sinh viên** (leader/member) ngoài 25 màn Lab 2. | Mở rộng chức năng cho nhóm: đề tài → đặt lịch → biên bản; cần vai trò để route đúng người. | Thêm 9 màn (xem §1b); tất cả tái dùng component Lab 2. | Chưa — chưa có frame Lab 3 trong Figma. |
 
 ---
 
@@ -113,9 +142,12 @@ khác thiết kế (xem cột *Ghi chú / sai lệch*) · `Deviation` = cố ý 
 |---|---|---|
 | Danh sách lớp, sinh viên, nhóm | Cloud Firestore `classes/{classId}/{students,teams}` | "Cloud Firestore when the app stores the user's own data" — hợp lệ. |
 | Đề xuất (proposals) | Cloud Firestore `classes/{classId}/proposals` + `collectionGroup` | Ghi bằng batch, duyệt bằng transaction. |
-| File PDF | `pdf` package → Cloud Storage `reports/{uid}/{id}.pdf` | File sinh ra **phản ánh đúng** dữ liệu mentor đang xem (`PdfReportService` đọc cùng stream Firestore). |
+| File PDF | `pdf` package → Firestore `reports/{id}/files/pdf` (≤ 900 KB) | Gói Spark không có Cloud Storage; file sinh ra **phản ánh đúng** dữ liệu mentor đang xem (`PdfReportService` đọc cùng stream Firestore). |
+| Đề tài (Flow D) | Firestore `topics/{classId}_{teamId}` + `files/outline` | Mỗi nhóm một đề tài; trạng thái `pending/approved/rejected/revision_requested`. |
+| Lịch hẹn (Flow E) | Firestore `mentors/{uid}/slots`, `bookings/{id}` | Đặt + huỷ ghi trong cùng một giao dịch; rules chặn trùng khung giờ. |
+| Biên bản (Flow F) | Firestore `minutes/{bookingId}` | PDF biên bản tạo lại trên máy, không upload. |
 | FCM token | `users/{uid}/fcmTokens/{tokenId}` | |
-| Hồ sơ mentor | `users/{uid}` (`FirestoreMentorProfileService`) | |
+| Hồ sơ người dùng | `users/{uid}` (`FirestoreMentorProfileService`) | `role` = mentor / leader / member. |
 | Analytics / Crashlytics / Remote Config | Firebase Analytics, Crashlytics, Remote Config | Không hard-code trong bản nộp. |
 
 > **Không có mock data trong bản nộp**: `lib/main.dart` chỉ dùng service thật.
@@ -135,6 +167,7 @@ Mọi màn nạp dữ liệu dùng `ViewState<T>` (`viewmodels/view_state.dart`)
 | S1 | ✔ (nút loading) | — | ✔ (S19) |
 | S8 | ✔ (chính là màn loading) | — | ✔ (S18) |
 | S6 | ✔ | ✔ (chưa có báo cáo) | ✔ (nạp danh sách báo cáo hỏng) |
+| Flow D/E/F | ✔ | ✔ | ✔ |
 
 Không màn nào có trạng thái "spinner vô hạn": mọi `Stream` đều có nhánh `error` và
 `StatusView.error(onRetry: ...)`.

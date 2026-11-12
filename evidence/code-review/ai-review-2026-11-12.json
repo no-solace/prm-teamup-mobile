@@ -1,0 +1,72 @@
+[
+  {
+    "id": "F1",
+    "file": "lib/firebase/firebase_auth_service.dart",
+    "line": 67,
+    "summary": "authStateChanges() runs the Firestore mentor-profile transaction on every userChanges() event, and any failure becomes a session stream error with no sign-out or retry.",
+    "failure_scenario": "A transient offline error or permission-denied in profiles.ensure() puts the session provider in an error state. The router treats that as signed out, so the user sits on the sign-in screen while Firebase still holds a valid session. Nothing retries until another userChanges event arrives. A non-mentor account (users doc with a different role) also stays signed in to Firebase instead of being signed out. userChanges() fires on token refresh and profile reloads, so each of those also does a Firestore write that sets lastSignInAt."
+  },
+  {
+    "id": "F2",
+    "file": "lib/firebase/fcm_notification_service.dart",
+    "line": 194,
+    "summary": "FCM token sync starts on the first auth event, before the users/{uid} mentor profile exists, and is never retried.",
+    "failure_scenario": "On a user's first sign-in, _bindUser calls _queueTokenSync as soon as authStateChanges emits. FirebaseAuthService only creates users/{uid} afterwards, via the asyncMap that runs profiles.ensure. The fcmTokens write requires isMentor(), which reads that doc, so it is denied. The catch only reports an issue string, so the device gets no push token until the app restarts or the user re-enables notifications."
+  },
+  {
+    "id": "F3",
+    "file": "lib/firebase/firestore_class_service.dart",
+    "line": 139,
+    "summary": "importClass commits up to 400 students and teams in one batch, but each create rule makes get/getAfter calls on many distinct documents, which probably exceeds Firestore's per-request rules access-call limit.",
+    "failure_scenario": "The student and team create rules call get/getAfter on the user doc, the class doc, the member's team doc and up to six student docs per team. Across one batch these are many distinct documents, and Firestore rules cap document-access calls at about 20 for a batched write. A realistic class (30-40 students, many groups) is likely rejected with permission-denied on commit, and importing any real class would fail. The tests and the 12-row demo CSV stay under the limit. The 400-write cap in CsvClassImporter only guards the 500-op batch limit, not this one."
+  },
+  {
+    "id": "F4",
+    "file": "lib/firebase/firestore_proposal_service.dart",
+    "line": 369,
+    "summary": "The undo window is checked against the device clock (DateTime.now() minus the server approvedAt), while the rules enforce 5 seconds against server time.",
+    "failure_scenario": "With device clock skew, undo is rejected on the client even though the server would allow it, or the client allows it and the rules then reject the write. With a clock running more than 5 seconds fast, undo never works."
+  },
+  {
+    "id": "F6",
+    "file": "lib/firebase/firestore_proposal_service.dart",
+    "line": 100,
+    "summary": "_locate queries all of the mentor's classes and issues one proposal doc get per class for every approve, discard, undo, update and watch call.",
+    "failure_scenario": "A mentor with N classes pays 1+N reads on every proposal action and every watchProposal subscription. The proposal ID is only unique per class, so a duplicate ID across classes makes the proposal unopenable with a 'Duplicate proposal ID' error. Passing classId in the route, or using a collection-group lookup, would avoid both the cost and the ambiguity."
+  },
+  {
+    "id": "F5",
+    "file": "lib/firebase/firebase_storage_service.dart",
+    "line": 50,
+    "summary": "uploadReport iterates snapshotEvents without wrapping errors, never validates classId, and leaves the Storage object orphaned on failure paths.",
+    "failure_scenario": "A failed or cancelled upload surfaces a raw FirebaseException instead of an AppError, unlike the other Firebase services. A non-ID classId is passed straight to collection('classes').doc() without validation. If getDownloadURL() fails after the upload, the PDF stays in Storage because file.delete() only runs on the Firestore set failure."
+  },
+  {
+    "id": "F7",
+    "file": "lib/viewmodels/classes/matching_view_model.dart",
+    "line": 71,
+    "summary": "A timeout or cancel only discards the result; the in-flight savePending transaction still commits drafts and retires old ones.",
+    "failure_scenario": "After the 30s timeout or a Back press, the mentor sees 'Matching timed out' or leaves the screen. The pending propose/savePending future later completes and writes new AI drafts and supersedes the previous ones. The UI shows failure while the proposals list silently changes, and a retry races the earlier run."
+  },
+  {
+    "id": "F8",
+    "file": "lib/firebase/firestore_proposal_service.dart",
+    "line": 62,
+    "summary": "Proposal.fromMap throws inside the snapshot map, so one malformed proposal doc fails the whole pending list.",
+    "failure_scenario": "A single stored proposal with an invalid field, such as an unexpected major code or a bad ID, throws a FormatException in watchPending/watchAllPending. The stream errors out and the Proposals tab shows a 'stored data invalid' failure for every proposal, with no way to skip or discard the bad doc from the UI."
+  },
+  {
+    "id": "F9",
+    "file": "lib/viewmodels/auth/sign_in_view_model.dart",
+    "line": 148,
+    "summary": "After a phone sign-in succeeds (auto-verified or confirmed), the resend timer and phone subscription stay active, and the _copy/info handling is inconsistent.",
+    "failure_scenario": "On PhoneSignedIn the 60s resend Timer.periodic keeps running and calling state updates. A later cancelPhone/selectMethod can then reset a state that has already signed in. cancelPhone() returns early when loading && codeSent, so a stuck verification cannot be cancelled."
+  },
+  {
+    "id": "F10",
+    "file": "lib/services/rule_based_matching_service.dart",
+    "line": 38,
+    "summary": "Students with a blank mssv are silently dropped from matching, and their roster conflicts are not quarantined.",
+    "failure_scenario": "A student record with an empty or whitespace-only mssv is skipped at the top of the loop with `continue`, so it is not counted in the pool, in occupied, or in conflictingStudents. Teams whose memberIds reference that student are not flagged as conflicting through this path. Input is silently ignored instead of being reported as a conflict, which contradicts the 'Conflicting records are quarantined' contract."
+  }
+]
