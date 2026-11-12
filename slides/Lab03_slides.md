@@ -272,8 +272,8 @@ Bốn phát hiện gần nhất là loại "mồi lỗi" — đều là thứ **
 |---|---|---|---|---|
 | CR-09 | Bộ ARTEMIS gọi `ArtemisClient(api_key=…)` và `run()` **đồng bộ** — SDK thật là `artemis-client`, remote-only, `run()` là coroutine. Sai `applicationId` nữa (`com.example` vs `com.group6`). | Accepted | §7 yêu cầu bộ test **chạy được**; 18/18 ca sẽ ném `TypeError` trước khi chạm thiết bị | `668ce5f` |
 | CR-10 | S13 hiện lỗi "Max 6 members" nhưng **nút lưu vẫn bấm được**; dòng đếm lệch Lab 2 (`places selected` thay vì `FinLite, 6 of 6`) | Accepted | Handoff Lab 2: *"Button primary (disabled)"*; §3 coi sai lệch Figma↔app là lỗi | `668ce5f` |
-| CR-11 | `artemis-client` **không trả báo cáo** cho client (`TaskResult.output` = `None`); báo cáo thật nằm ở step cuối `report_task_status` | Accepted | §7 đòi test **chạy được** và **trừ đúng được kiểm chứng** — 0/19 test trừ xác nhắng agent | `fix(lab3)` |
-| CR-12 | App **crash ngay khi khởi động**: `PrintFileProvider` ClassNotFound — do build bằng JDK 26 | Accepted | §11 đòi repo mở được không lỗi; sửa bằng **JDK 24 + `flutter clean`** | `fix(lab3)` |
+| CR-11 | `artemis-client` **không trả báo cáo** cho client (`TaskResult.output` = `None`); báo cáo thật nằm ở step cuối `report_task_status` | Accepted | §7 đòi test **chạy được** và **trừ đúng được kiểm chứng** — 0/19 test trừ xác nhắng agent | `11ccb53` |
+| CR-12 | App **crash ngay khi khởi động**: `PrintFileProvider` ClassNotFound — do build bằng JDK 26 | Accepted | §11 đòi repo mở được không lỗi; sửa bằng **JDK 24 + `flutter clean`** | `11ccb53` |
 
 > CR-01 → CR-08 (8 phát hiện trước đó) đã sửa ở 4 commit: `1b6fea8`, `9cf68f5`, `000f51b`, `7c0fc66`.
 
@@ -347,8 +347,8 @@ Tất cả gọi qua `lib/viewmodels/instrumentation.dart` (`trackAnalytics`) �
 | ID | Tool | File:line | Kind | Finding | Decision | Reason | Commit |
 |---|---|---|---|---|---|---|---|
 | CR-10 | Cursor Agent | `proposal_student_picker.dart:96` | Fidelity | S13 hiện lỗi nhưng nút vẫn bấm được | Accepted | Handoff: *"Button primary (disabled)"* | `668ce5f` |
-| CR-11 | Cursor Agent | `e2e_test/conftest.py:120` | Bug | Client không nhận báo cáo của agent (`TaskResult.output` luôn `None`) | Accepted | §7 đòi test **trừ đúng được kiểm chứng** | `fix(lab3)` |
-| CR-12 | Cursor Agent | `android/app/build.gradle.kts` | Build | App crash khi khởi động vì build bằng JDK 26 | Accepted | §11 đòi repo mở được không lỗi | `fix(lab3)` |
+| CR-11 | Cursor Agent | `e2e_test/conftest.py:120` | Bug | Client không nhận báo cáo của agent (`TaskResult.output` luôn `None`) | Accepted | §7 đòi test **trừ đúng được kiểm chứng** | `11ccb53` |
+| CR-12 | Cursor Agent | `android/app/build.gradle.kts` | Build | App crash khi khởi động vì build bằng JDK 26 | Accepted | §11 đòi repo mở được không lỗi | `11ccb53` |
 
 ## A4 · Công cụ AI đã dùng (công bố)
 

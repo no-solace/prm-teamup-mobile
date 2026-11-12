@@ -487,8 +487,8 @@ Mỗi phát hiện gắn với file và dòng cụ thể.
 | CR-08 | Fake `watchAllPending` không sort, lệch với production | Accepted | Test xanh nhưng app sai — loại "test gap" nguy hiểm nhất | `9cf68f5` |
 | CR-09 | Bộ ARTEMIS gọi API **không tồn tại** (`ArtemisClient(api_key=…)`, `run()` đồng bộ) và sai `applicationId` | Accepted | §7 yêu cầu bộ test **chạy được**; hiện 18/18 test ném `TypeError` trước khi chạm thiết bị | `668ce5f` |
 | CR-10 | S13 hiện lỗi "Max 6 members" nhưng **nút lưu vẫn bấm được**; dòng đếm lệch Lab 2 | Accepted | Lab 2 handoff: *"Button primary (disabled)"*; §3 coi sai lệch Figma↔app là lỗi | `668ce5f` |
-| CR-11 | `artemis-client` **không trả báo cáo** cho client (`TaskResult.output` luôn `None`); báo cáo thật nằm ở step cuối | Accepted | §7 đòi test **chạy được** và **trừ đúng được kiểm chứng**; 0/19 test trừ xác nhắng agent | `fix(lab3)` |
-| CR-12 | App **crash khi khởi động** (`PrintFileProvider` ClassNotFound) do build bằng JDK 26 | Accepted | §11 đòi repo mở được không lỗi; đã sửa bằng JDK 24 + `flutter clean` | `fix(lab3)` |
+| CR-11 | `artemis-client` **không trả báo cáo** cho client (`TaskResult.output` luôn `None`); báo cáo thật nằm ở step cuối | Accepted | §7 đòi test **chạy được** và **trừ đúng được kiểm chứng**; 0/19 test trừ xác nhắng agent | `11ccb53` |
+| CR-12 | App **crash khi khởi động** (`PrintFileProvider` ClassNotFound) do build bằng JDK 26 | Accepted | §11 đòi repo mở được không lỗi; đã sửa bằng JDK 24 + `flutter clean` | `11ccb53` |
 
 **5 phát hiện được sửa, mỗi cái một commit riêng có tên mã phát hiện** — yêu cầu
 "≥ 3 fixes, each in a commit that names the finding ID" (§8).
