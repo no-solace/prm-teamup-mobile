@@ -9,6 +9,7 @@ import '../models/proposal.dart';
 import '../models/student.dart';
 import '../models/team.dart';
 import '../services/app_error.dart';
+import '../services/matching_drafts.dart';
 import '../services/proposal_service.dart';
 import 'firestore_class_service.dart';
 
@@ -124,31 +125,70 @@ class FirestoreProposalService implements ProposalService {
   );
 
   @override
-  Future<void> savePending(List<Proposal> proposals) async {
-    if (proposals.isEmpty) return;
+  Future<List<Proposal>> savePending(
+    String classId,
+    List<Proposal> proposals,
+  ) async {
     try {
       final uid = _uid();
-      final classId = proposals.first.classId;
-      if (proposals.any(
-        (p) =>
-            p.classId != classId ||
-            p.status != ProposalStatus.pending ||
-            !DataValidation.isId(p.id),
-      )) {
-        throw const ValidationError('Invalid matching proposals');
-      }
-      await _ownsClass(classId, uid);
-      final existing = await _collection(classId).get();
-      final known = {for (final d in existing.docs) d.id: d.data()};
-      final batch = _db.batch();
-      for (final proposal in proposals) {
-        final previous = known[proposal.id];
-        // Re-running matching must not overwrite a mentor's draft edits.
-        if (previous != null) continue;
-        batch.set(_collection(classId).doc(proposal.id), proposal.toMap(uid));
-      }
-      if (_uid() != uid) throw const PermissionDeniedError('Account changed');
-      await batch.commit();
+      validateMatchingDrafts(classId, proposals);
+      final room = _class(classId);
+      final drafts = _collection(classId);
+      final guard = room.collection('matching').doc('state');
+      return await _db.runTransaction((tx) async {
+        // The SDK cannot query inside the transaction. Read the guard before
+        // the server query so competing matching runs retry even when they
+        // both find no existing draft and propose different IDs.
+        await tx.get(guard);
+        final pending = await drafts
+            .where('status', isEqualTo: ProposalStatus.pending.name)
+            .get(const GetOptions(source: Source.server));
+        final known = <String, Proposal>{};
+        for (final id in {
+          for (final doc in pending.docs)
+            if (doc.data()['source'] == ProposalSource.ai.name) doc.id,
+          for (final proposal in proposals) proposal.id,
+        }) {
+          final doc = await tx.get(drafts.doc(id));
+          if (doc.exists) known[id] = _parse(doc);
+        }
+
+        final snapshots = [
+          ...proposals,
+          for (final draft in known.values)
+            if (draft.status == ProposalStatus.pending) draft,
+        ];
+        final teams = <String, Team>{};
+        for (final id in snapshots.map((p) => p.teamId).toSet()) {
+          final doc = await tx.get(room.collection('teams').doc(id));
+          if (doc.exists) teams[id] = Team.fromMap(id, classId, doc.data()!);
+        }
+        final students = <String, Student>{};
+        for (final id in snapshots.expand((p) => p.addStudentIds).toSet()) {
+          final doc = await tx.get(room.collection('students').doc(id));
+          if (doc.exists) {
+            students[id] = Student.fromMap(id, classId, doc.data()!);
+          }
+        }
+
+        final plan = reconcileMatchingDrafts(
+          proposed: proposals,
+          existing: known,
+          teams: teams,
+          students: students,
+        );
+        if (_uid() != uid) throw const PermissionDeniedError('Account changed');
+        for (final draft in plan.writes) {
+          tx.set(drafts.doc(draft.id), draft.toMap(uid));
+        }
+        for (final id in plan.retire) {
+          tx.update(drafts.doc(id), {'status': ProposalStatus.superseded.name});
+        }
+        if (plan.writes.isNotEmpty || plan.retire.isNotEmpty) {
+          tx.set(guard, {'updatedAt': FieldValue.serverTimestamp()});
+        }
+        return plan.pending;
+      });
     } catch (error) {
       throw _error(error);
     }

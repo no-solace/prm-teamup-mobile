@@ -53,8 +53,7 @@ class MatchingViewModel extends Notifier<ViewState<List<Proposal>>> {
         );
         // A timeout, Cancel or Back may have happened while propose was awaiting.
         if (!_active(generation)) return <Proposal>[];
-        if (result.isNotEmpty) await proposals.savePending(result);
-        return result;
+        return proposals.savePending(classId, result);
       })().timeout(ref.read(matchingTimeoutProvider));
       if (_active(generation)) {
         state = result.isEmpty ? const Empty() : Data(result);

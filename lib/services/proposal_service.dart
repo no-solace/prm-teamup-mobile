@@ -9,7 +9,9 @@ abstract interface class ProposalService {
 
   Stream<Proposal> watchProposal(String proposalId);
 
-  Future<void> savePending(List<Proposal> proposals);
+  /// Reconcile AI drafts for the class and return the pending drafts selected
+  /// by this run. An empty run can still retire stale drafts.
+  Future<List<Proposal>> savePending(String classId, List<Proposal> proposals);
 
   /// Change the students added by a proposal (S11, S24). Throws
   /// [ValidationError] when the team would exceed 6 (S13).
