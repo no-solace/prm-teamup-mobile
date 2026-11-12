@@ -8,6 +8,7 @@ import '../services/fakes/fake_flow_def_services.dart';
 import '../services/fakes/fake_infra_services.dart';
 import '../services/fakes/fake_matching_service.dart';
 import '../services/fakes/fake_proposal_service.dart';
+import '../services/matching_service.dart';
 import 'service_providers.dart';
 
 /// Every service replaced by its fake. Used by main_fake.dart (D6) and tests.
@@ -17,6 +18,8 @@ List<Override> fakeOverrides({
   ClassService? classService,
   FakeAuthService? authService,
   FakeAnalyticsService? analyticsService,
+  FakeCrashService? crashService,
+  MatchingService? matchingService,
   FakeNotificationService? notificationService,
   FakeConfigService? configService,
 }) {
@@ -26,7 +29,9 @@ List<Override> fakeOverrides({
       authService ?? FakeAuthService(signedIn: signedIn),
     ),
     classServiceProvider.overrideWithValue(classes),
-    matchingServiceProvider.overrideWithValue(FakeMatchingService()),
+    matchingServiceProvider.overrideWithValue(
+      matchingService ?? FakeMatchingService(),
+    ),
     proposalServiceProvider.overrideWithValue(
       FakeProposalService(
         classes: classes is FakeClassService ? classes : null,
@@ -40,7 +45,7 @@ List<Override> fakeOverrides({
     analyticsServiceProvider.overrideWithValue(
       analyticsService ?? FakeAnalyticsService(),
     ),
-    crashServiceProvider.overrideWithValue(FakeCrashService()),
+    crashServiceProvider.overrideWithValue(crashService ?? FakeCrashService()),
     configServiceProvider.overrideWithValue(
       configService ?? FakeConfigService(),
     ),

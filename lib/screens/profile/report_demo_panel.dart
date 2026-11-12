@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -50,12 +51,18 @@ class _ReportDemoPanelState extends ConsumerState<ReportDemoPanel> {
       if (saved == null) {
         throw const UnknownError('Report upload was interrupted');
       }
+      unawaited(actions.logExported(classId, saved));
       _feedback('Uploaded ${saved.sizeKb} KB. Opening the PDF share dialog.');
       await Printing.sharePdf(
         bytes: Uint8List.fromList(bytes),
         filename: 'teamup_$classId.pdf',
       );
-    } catch (error) {
+    } catch (error, stack) {
+      unawaited(
+        ref
+            .read(reportDemoActionsProvider)
+            .reportFailure(error, stack, 'report_export_failed'),
+      );
       _feedback(toAppError(error).message);
     } finally {
       if (mounted) setState(() => _busy = false);

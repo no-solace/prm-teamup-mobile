@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/class_room.dart';
 import '../../models/student.dart';
 import '../../providers/service_providers.dart';
+import '../telemetry.dart';
 import '../view_state.dart';
 
 typedef StudentKey = ({String classId, String studentId});
@@ -19,6 +20,7 @@ class StudentDetailViewModel extends Notifier<ViewState<StudentProfile>> {
   StudentDetailViewModel(this.key);
   final StudentKey key;
   int _generation = 0;
+  bool _viewLogged = false;
 
   @override
   ViewState<StudentProfile> build() {
@@ -43,6 +45,16 @@ class StudentDetailViewModel extends Notifier<ViewState<StudentProfile>> {
       final room = values[1] as ClassRoom;
       if (ref.mounted && generation == _generation) {
         state = Data(StudentProfile(student: student, className: room.name));
+        if (!_viewLogged) {
+          _viewLogged = true;
+          unawaited(
+            bestEffort(
+              () => ref
+                  .read(analyticsServiceProvider)
+                  .logViewItem(itemCategory: 'student', itemId: key.studentId),
+            ),
+          );
+        }
       }
     } catch (error) {
       if (ref.mounted && generation == _generation) {

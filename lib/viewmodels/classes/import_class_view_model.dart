@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/service_providers.dart';
 import '../../services/app_error.dart';
 import '../../services/class_service.dart';
+import '../telemetry.dart';
 import '../view_state.dart';
 import 'my_classes_view_model.dart';
 
@@ -112,8 +113,21 @@ class ImportClassViewModel extends Notifier<ImportClassState> {
       if (!ref.mounted) return null;
       state = ImportClassState(preview: preview, result: result);
       ref.invalidate(myClassesViewModelProvider);
+      unawaited(
+        bestEffort(
+          () => ref
+              .read(analyticsServiceProvider)
+              .logClassImport(
+                rowCount: result.imported,
+                availableCount: result.available,
+              ),
+        ),
+      );
       return result;
-    } catch (error) {
+    } catch (error, stack) {
+      unawaited(
+        reportHandledError(ref, error, stack, reason: 'class_import_failed'),
+      );
       if (ref.mounted) {
         state = ImportClassState(preview: preview, error: toAppError(error));
       }

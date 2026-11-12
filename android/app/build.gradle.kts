@@ -8,6 +8,7 @@ plugins {
 // Keep the explicit main_fake.dart build usable before credentials are supplied.
 if (file("google-services.json").exists()) {
     apply(plugin = "com.google.gms.google-services")
+    apply(plugin = "com.google.firebase.crashlytics")
 }
 
 android {

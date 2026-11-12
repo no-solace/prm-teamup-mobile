@@ -24,6 +24,11 @@ class FcmNotificationService implements NotificationService {
     String? Function()? currentUserId,
     Stream<RemoteMessage>? foregroundMessages,
     Stream<RemoteMessage>? openedMessages,
+    this._tokenRetryDelays = const [
+      Duration(seconds: 1),
+      Duration(seconds: 2),
+      Duration(seconds: 4),
+    ],
   }) : _messaging = messaging ?? FirebaseMessaging.instance,
        _store = store ?? FirestoreNotificationStore(),
        _presenter = presenter ?? AndroidNotificationPresenter(),
@@ -40,6 +45,7 @@ class FcmNotificationService implements NotificationService {
   final NotificationPresenter _presenter;
   final Stream<String?> _userIds;
   final String? Function() _currentUserId;
+  final List<Duration> _tokenRetryDelays;
   final Stream<RemoteMessage> _foreground, _opened;
   final _taps = StreamController<String>.broadcast();
   final _changes = StreamController<List<AppNotification>>.broadcast();
@@ -133,9 +139,7 @@ class FcmNotificationService implements NotificationService {
           }
           if (!_isCurrent(uid, generation) || epoch != _tokenEpoch) return;
           _token = next;
-          await _store
-              .saveToken(uid, next)
-              .timeout(const Duration(seconds: 10));
+          await _saveTokenWithRetry(uid, next, generation, epoch);
         })
         .catchError((Object _) {
           _report(
@@ -143,6 +147,28 @@ class FcmNotificationService implements NotificationService {
           );
         });
     return _tokenWork;
+  }
+
+  /// On a first sign-in this listener fires on the raw FirebaseAuth stream,
+  /// before FirebaseAuthService has created users/{uid}; the fcmTokens rule then
+  /// denies the write. Retry a few times while the same session is current
+  /// (finding F2); the last failure is rethrown and reported to the user.
+  Future<void> _saveTokenWithRetry(
+    String uid,
+    String token,
+    int generation,
+    int epoch,
+  ) async {
+    for (var attempt = 0; ; attempt++) {
+      try {
+        await _store.saveToken(uid, token).timeout(const Duration(seconds: 10));
+        return;
+      } catch (_) {
+        if (attempt >= _tokenRetryDelays.length) rethrow;
+        await Future<void>.delayed(_tokenRetryDelays[attempt]);
+        if (!_isCurrent(uid, generation) || epoch != _tokenEpoch) return;
+      }
+    }
   }
 
   void _bindUser(String? uid) {

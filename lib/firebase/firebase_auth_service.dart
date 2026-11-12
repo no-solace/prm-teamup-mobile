@@ -81,12 +81,32 @@ class FirebaseAuthService implements AuthService {
         // Then follow users/{uid} live, so onboarding or a role change
         // re-routes without signing in again.
         return Stream.fromFuture(
-          _profiles.ensure(user),
+          _ensureProfile(user),
         ).asyncExpand((_) => _profiles.watch(user.uid)).map(
           // Sign-out/account switch can occur while Firestore is responding.
           (profile) => _auth.currentUser?.uid != user.uid ? null : _map(user, profile),
         );
       });
+
+  Future<void> _ensureProfile(User user) async {
+    try {
+      await _profiles.ensure(user);
+    } on NetworkError {
+      // Transient (finding F1): keep the valid Firebase session instead of
+      // showing the sign-in screen; the profile watch below still follows.
+    } on TimeoutAppError {
+      // Same as above.
+    } on PermissionDeniedError {
+      // The rules refuse the profile: do not leave the account signed in to
+      // Firebase while the app treats it as signed out.
+      try {
+        await _auth.signOut();
+      } catch (_) {
+        // The error below still blocks routing.
+      }
+      rethrow;
+    }
+  }
 
   User _signedInUser() =>
       _auth.currentUser ?? (throw const PermissionDeniedError('Sign in first'));

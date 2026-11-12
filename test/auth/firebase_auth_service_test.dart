@@ -125,6 +125,7 @@ void main() {
   test('a missing mentor permission blocks session routing', () async {
     when(() => auth.userChanges()).thenAnswer((_) => Stream.value(user));
     when(() => auth.currentUser).thenReturn(user);
+    when(() => auth.signOut()).thenAnswer((_) async {});
     when(() => profile.ensure(user))
         .thenThrow(const PermissionDeniedError('This account is not a mentor'));
 
@@ -132,6 +133,21 @@ void main() {
       service.authStateChanges().first,
       throwsA(isA<PermissionDeniedError>()),
     );
+    // Review finding F1: a non-mentor must not stay signed in to Firebase.
+    verify(() => auth.signOut()).called(1);
+  });
+  // Review finding F1: an offline profile check must not look like a sign-out.
+  test('a transient profile error keeps the signed-in session', () async {
+    when(() => auth.userChanges()).thenAnswer((_) => Stream.value(user));
+    when(() => auth.currentUser).thenReturn(user);
+    when(() => profile.watch('test-uid')).thenAnswer(
+      (_) => Stream.value({'displayName': 'Lan', 'role': 'mentor'}),
+    );
+    for (final error in [const NetworkError(), const TimeoutAppError()]) {
+      when(() => profile.ensure(user)).thenThrow(error);
+      expect((await service.authStateChanges().first)?.uid, 'test-uid');
+    }
+    verifyNever(() => auth.signOut());
   });
   test(
     'email login uses normalized email and preserves password bytes',

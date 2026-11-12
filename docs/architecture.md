@@ -1,71 +1,158 @@
-# Kiến trúc TeamUp EXE (bản đầu)
+# Kiến trúc TeamUp EXE
 
-> Bản khung. Mỗi người điền phần của mình vào bảng ở mục 4 khi làm xong màn.
+MVVM + Riverpod 3 (`Notifier` viết tay, không sinh mã). Lý do và các phương án đã cân nhắc nằm ở [skeleton-decisions.md](skeleton-decisions.md) (D3–D6). Cập nhật 12/11/2026 cho khớp code.
 
-## 1. Mô hình
+## 1. Sơ đồ lớp
 
-MVVM + Riverpod 3 (Notifier viết tay, không codegen). Lý do và các phương án đã cân nhắc nằm ở [skeleton-decisions.md](skeleton-decisions.md) (D3-D6).
+Phụ thuộc chỉ đi xuống. `tool/check_layers.sh` kiểm các quy tắc import và chạy trong CI.
 
 ```mermaid
-flowchart LR
-  subgraph UI
+flowchart TD
+  subgraph View
     S[screens/] --> W[widgets/]
+    S --> T[theme/]
+    W --> T
   end
-  S -->|ref.watch| VM[viewmodels/<br/>Notifier + ViewState]
-  VM -->|ref.read| P[providers/<br/>service_providers.dart]
-  P --> I[services/<br/>interface + AppError]
-  F[firebase/<br/>Firebase SDK] -. implements .-> I
-  K[services/fakes/] -. implements .-> I
-  M[models/] --- VM
-  M --- I
+  subgraph ViewModel
+    VM[viewmodels/<br/>Notifier + ViewState]
+  end
+  subgraph Service
+    P[providers/service_providers.dart]
+    I[services/<br/>interface + AppError]
+  end
+  subgraph Implementation
+    F[firebase/<br/>Firebase SDK]
+    K[services/fakes/<br/>dữ liệu giả cho test và main_fake]
+  end
+  M[models/]
+
+  S -->|ref.watch| VM
+  VM -->|ref.read| P
+  P --> I
+  F -. implements .-> I
+  K -. implements .-> I
+  VM --- M
+  I --- M
 ```
 
-- **View** (`screens/`, `widgets/`): chỉ dựng UI từ `ViewState`, không import Firebase, không gọi service trực tiếp.
-- **ViewModel** (`viewmodels/`): mỗi màn một `Notifier`, giữ `ViewState<T>` (Loading / Empty / Data / Failure).
-- **Service** (`services/`): interface thuần Dart. Lỗi luôn là `AppError`.
-- **Firebase** (`firebase/`): bản cài đặt thật. **Fake** (`services/fakes/`): chỉ nối trong `main_fake.dart` và test.
+| Quy tắc (Lab 3 mục 5) | Cách đảm bảo |
+|---|---|
+| Widget không gọi SDK | `screens/` và `widgets/` không import `firebase_*`, `cloud_firestore`; do `check_layers.sh` kiểm |
+| Logic nằm ở ViewModel/service, không nằm trong `build()` | Lọc, xếp hạng, kiểm tra ở `viewmodels/` và `services/` (ví dụ `RuleBasedMatchingService`, `reconcileMatchingDrafts`) |
+| Mỗi màn tải dữ liệu có state model | `ViewState<T>` = `Loading` / `Empty` / `Data` / `Failure`; `ViewStateBuilder` buộc xử lý đủ 4 nhánh |
+| Service được inject | `lib/providers/service_providers.dart` là nơi duy nhất nối interface với bản cài đặt; test ghi đè bằng `fakeOverrides(...)` |
 
-`tool/check_layers.sh` kiểm các quy tắc import trên, chạy trong CI.
-
-## 2. Cây thư mục
+## 2. Cấu trúc thư mục
 
 ```text
 lib/
-├── main.dart            bản nộp: Firebase, Crashlytics, FCM nền
-├── main_fake.dart       bản dev trên fake
-├── app.dart             MaterialApp.router + theme
-├── firebase_options.dart  sinh bởi flutterfire configure
-├── models/  services/  services/fakes/  firebase/  providers/
-├── viewmodels/  screens/  widgets/  router/  theme/
-firebase/                rules, indexes, Remote Config template
-firebase.json  .firebaserc
-tool/check_layers.sh
-test/                    unit test ViewModel (dùng fake)
+├── main.dart              bản nộp: Firebase thật, Crashlytics, FCM nền
+├── main_fake.dart         bản dev chạy trên fake, có trang /_gallery
+├── app.dart               MaterialApp.router + theme
+├── firebase_options.dart  cấu hình Firebase (Android + web) của prm-lab3-cc39e
+├── models/                kiểu dữ liệu thuần Dart: ClassRoom, Student, Team, Proposal, Report, AppUser, AppNotification
+├── services/              interface service + AppError; thuật toán thuần Dart (matching, CSV, đối chiếu bản nháp)
+├── services/fakes/        bản giả của từng service, chỉ dùng cho test và main_fake
+├── firebase/              bản cài đặt dùng Firebase SDK (Auth, Firestore, Storage, FCM, Analytics, Crashlytics, Remote Config, PDF)
+├── providers/             Riverpod provider nối interface với bản cài đặt; fake_overrides cho test
+├── viewmodels/            mỗi màn một Notifier giữ ViewState; telemetry.dart là helper Analytics/Crashlytics
+├── screens/               màn hình, nhóm theo flow (flow_a, flow_b, flow_c, profile, notifications...)
+├── widgets/               component dùng lại của Lab 2 (AppButton, StatusView, ConfirmDialog...)
+├── router/                go_router + hằng số route, redirect theo trạng thái đăng nhập
+└── theme/                 token: ColorScheme, TextTheme, spacing, radius
+firebase/                  firestore.rules, storage.rules, indexes, Remote Config defaults/template, test rules
+android/                   dự án Android (có google-services.json)
+test/                      unit, ViewModel, widget test (dùng fake)
+tool/check_layers.sh       kiểm tra quy tắc import giữa các lớp
+e2e_test/                  bộ test ARTEMIS (pytest)
+docs/                      tài liệu; evidence/ chứa ảnh bằng chứng
 ```
 
 ## 3. Điều hướng
 
-`go_router` + `StatefulShellRoute.indexedStack`, 3 tab Classes / Proposals / Profile. Bảng route ở [skeleton-decisions.md](skeleton-decisions.md) mục D7, hằng số ở `lib/router/routes.dart`. Redirect theo `sessionProvider`. Chạm thông báo FCM → `router.go(route)` nếu route nằm trong danh sách cho phép.
+`go_router` + `StatefulShellRoute.indexedStack`, 3 tab Classes / Proposals / Profile. Hằng số ở `lib/router/routes.dart`. Redirect theo `sessionProvider`: chưa đăng nhập thì chỉ vào được `/sign-in`. Chạm thông báo FCM gọi `router.go(route)` nếu route khớp danh sách cho phép (`Routes.isAllowedDeepLink`).
 
-## 4. ViewModel → Service
+## 4. Sequence: Flow A, ghép nhóm bằng AI (S3 → S8 → S9)
 
-| Màn | ViewModel | Service dùng | Người |
-|---|---|---|---|
-| S1/S19 | `SignInViewModel` | AuthService, AnalyticsService, CrashService | Ken |
-| S2 | `MyClassesViewModel` (mẫu tham chiếu) | ClassService | Dan |
-| S6 | `ProfileViewModel` | AuthService, AnalyticsService, CrashService | Ken / Cuong |
-| S3, S4, S7, S8, S18, S22, S23 | | | Dan |
-| S9-S14, S24, S25 | | | Cuong |
-| S5, S15, S16, S17, S20, S21 | | | Khang |
+```mermaid
+sequenceDiagram
+  actor Mentor
+  participant S as MatchingScreen (S8)
+  participant VM as MatchingViewModel
+  participant C as ClassService
+  participant M as MatchingService
+  participant P as ProposalService
+  participant A as AnalyticsService
+  participant X as CrashService
 
-## 5. Firebase
+  Mentor->>S: Match with AI (S3)
+  S->>VM: watch(matchingViewModelProvider(classId))
+  VM-->>S: Loading
+  VM->>C: watchStudents / watchTeams (first)
+  C-->>VM: students, teams
+  VM->>A: logAiMatchStart(studentCount, teamCount)
+  VM->>M: propose(classId, students, teams)
+  M-->>VM: List<Proposal> (pending, source ai)
+  VM->>P: savePending(classId, proposals)
+  Note over P: Firestore transaction: đối chiếu roster,<br/>giữ bản nháp đã sửa, đánh dấu bản cũ superseded
+  P-->>VM: pending drafts
+  alt có đề xuất
+    VM-->>S: Data(proposals) → mở S9
+    VM->>A: logAiMatchResult(proposalCount, noMatch=false, durationMs)
+  else rỗng
+    VM-->>S: Empty → S15 No match
+    VM->>A: logAiMatchResult(noMatch=true)
+  else lỗi hoặc quá 30 giây
+    VM-->>S: Failure → S18 Offline + Try again
+    VM->>X: recordNonFatal(reason ai_matching_failed / ai_matching_timeout)
+  end
+```
 
-| Dịch vụ | Bản cài đặt | Trạng thái |
+## 5. ViewModel → Service
+
+Bảng này sinh từ các `ref.read/watch(...ServiceProvider)` trong `lib/viewmodels/`.
+
+| ViewModel / provider | Màn | Service dùng |
 |---|---|---|
-| Auth (Google) | `FirebaseAuthService` | xong |
-| Analytics | `FirebaseAnalyticsService` | xong |
-| Crashlytics | `FirebaseCrashService` + `main.dart` | xong |
-| Remote Config | `FirebaseConfigService` (realtime) | xong |
-| FCM | `FcmNotificationService` | cơ bản, còn TODO(Dan) |
-| Firestore | `firestore_stubs.dart` | stub |
-| Storage | `FirebaseStorageService` stub | stub |
+| `SessionViewModel` (`sessionProvider`) | định tuyến theo đăng nhập | Auth |
+| `SignInViewModel` | S1, S19 | Auth, Analytics, Crash |
+| `MyClassesViewModel` | S2 | Class |
+| `ImportClassViewModel` | S22 | Class, Analytics, Crash |
+| `ClassDetailViewModel` | S3, S23 | Class, Analytics, Crash |
+| `NoTeamViewModel` | S4 | Class |
+| `StudentDetailViewModel` | S7 | Class, Analytics |
+| `MatchingViewModel` | S8, S18, S15 | Class, Matching, Proposal, Analytics, Crash |
+| `flow_a_config` (`aiMatchingEnabledProvider`) | S3, S4, S5 | Config |
+| `pendingProposalsProvider`, `proposalDetailProvider` | S9, S10, S14 | Proposal, Analytics |
+| `proposalStudentsProvider`, `proposalTeamsProvider` | S5, S11, S16 | Class |
+| `ProposalActionViewModel` | S10 đến S13, S16, S17, S20, S24, S25 | Proposal, Analytics |
+| `ProfileViewModel` | S6 | Auth, Notification, Analytics, Crash |
+| `ReportDemoActions` | S6 (xuất + upload PDF) | Report, Storage, Class, Analytics, Crash |
+| `config_demo_view_model` | S6 (Remote Config), S9 | Config, Class, Proposal |
+| `inboxProvider`, `InboxActions`, `notificationTapsProvider` | trung tâm thông báo | Notification |
+
+## 6. Firebase
+
+| Dịch vụ | Bản cài đặt | Ghi chú |
+|---|---|---|
+| Authentication | `FirebaseAuthService` | Google, email + mật khẩu, SĐT + OTP; lỗi map qua `AuthErrorMapper` |
+| Cloud Firestore | `FirestoreClassService`, `FirestoreProposalService`, `FirestoreMentorProfileService`, `FirestoreNotificationStore` | Rules ở `firebase/firestore.rules`, 23 test rules trên emulator |
+| Cloud Storage | `FirebaseStorageService` | Đường dẫn `reports/{uid}/…`, chỉ chủ sở hữu đọc/ghi, PDF ≤ 5 MiB (`storage.rules`) |
+| Cloud Messaging | `FcmNotificationService`, `background_notification_handler.dart` | Danh sách thông báo lưu ở `users/{uid}/notifications` |
+| Analytics | `FirebaseAnalyticsService` | Xem [analytics-plan.md](analytics-plan.md) |
+| Crashlytics | `FirebaseCrashService` + `main.dart` | Thu thập tắt khi debug, bật bằng `--dart-define=CRASHLYTICS_DEBUG=true` |
+| Remote Config | `FirebaseConfigService` (realtime) | `ai_matching_enabled`, `max_proposals_shown`; mặc định ở `firebase/remote-config-defaults.json` |
+
+## 7. Mô hình dữ liệu Firestore
+
+```text
+users/{uid}                          hồ sơ mentor
+  ├── notifications/{id}             thông báo đã nhận
+  └── fcmTokens/{id}                 token FCM của thiết bị
+classes/{classId}                    lớp (mentorUid)
+  ├── students/{mssv}                sinh viên (ngành, teamId)
+  ├── teams/{teamId}                 nhóm (memberIds, majors, rosterChangeProposalId)
+  ├── proposals/{id}                 đề xuất: status pending | approved | discarded | superseded; source ai | manual
+  └── matching/state                 tài liệu khóa để các lần matching đồng thời chạy lại giao dịch
+reports/{id}                         metadata PDF; tệp nằm ở Storage reports/{uid}/…
+```

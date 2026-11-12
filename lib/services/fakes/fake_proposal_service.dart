@@ -5,6 +5,7 @@ import '../../models/proposal.dart';
 import '../../models/student.dart' as imported;
 import '../../models/team.dart' as imported;
 import '../app_error.dart';
+import '../matching_drafts.dart';
 import '../proposal_service.dart';
 import 'fake_class_service.dart';
 import 'sample_data.dart';
@@ -84,15 +85,40 @@ class FakeProposalService implements ProposalService {
       _watch(() => _get(proposalId));
 
   @override
-  Future<void> savePending(List<Proposal> proposals) async {
-    for (final proposal in proposals) {
+  Future<List<Proposal>> savePending(
+    String classId,
+    List<Proposal> proposals,
+  ) async {
+    validateMatchingDrafts(classId, proposals);
+    final plan = reconcileMatchingDrafts(
+      proposed: proposals,
+      existing: {
+        for (final item in _items)
+          if (item.classId == classId) item.id: item,
+      },
+      teams: {for (final team in _teams(classId)) team.id: team},
+      students: {
+        for (final student in _students(classId)) student.mssv: student,
+      },
+    );
+    for (final proposal in plan.writes) {
       final existing = _items.indexWhere(
         (item) => item.id == proposal.id && item.classId == proposal.classId,
       );
-      // Regeneration retains a mentor-edited draft, a discard or an approval.
-      if (existing == -1) _items.add(proposal);
+      if (existing == -1) {
+        _items.add(proposal);
+      } else {
+        _items[existing] = proposal;
+      }
+    }
+    for (var i = 0; i < _items.length; i++) {
+      final item = _items[i];
+      if (item.classId == classId && plan.retire.contains(item.id)) {
+        _items[i] = _withStatus(item, ProposalStatus.superseded);
+      }
     }
     _changes.add(null);
+    return plan.pending;
   }
 
   @override

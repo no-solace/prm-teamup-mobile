@@ -4,6 +4,7 @@ import 'package:teamup_exe/services/app_error.dart';
 import 'package:teamup_exe/services/fakes/fake_class_service.dart';
 import 'package:teamup_exe/services/fakes/fake_proposal_service.dart';
 import 'package:teamup_exe/services/fakes/sample_data.dart';
+import 'package:teamup_exe/services/rule_based_matching_service.dart';
 
 void main() {
   late FakeClassService classes;
@@ -59,29 +60,97 @@ void main() {
         addStudentIds: ['190412'],
       );
       expect(updated.addStudentIds, ['190412']);
-      await proposals.savePending(
-        SampleData.proposals(
-          SampleData.students(),
-          SampleData.teams(SampleData.students()),
-        ),
+      final generated = SampleData.proposals(
+        SampleData.students(),
+        SampleData.teams(SampleData.students()),
       );
-      expect((await proposals.watchProposal('p-1').first).addStudentIds, [
+      final pending = await proposals.savePending('class-a', generated);
+      expect(pending.firstWhere((p) => p.id == 'p-1').addStudentIds, [
         '190412',
       ]);
 
       await proposals.discard('p-1');
-      await proposals.savePending(
-        SampleData.proposals(
-          SampleData.students(),
-          SampleData.teams(SampleData.students()),
-        ),
+      final rerun = await proposals.savePending(
+        'class-a',
+        generated.where((p) => p.id == 'p-1').toList(),
       );
+      expect(rerun, isEmpty);
       expect(
         (await proposals.watchProposal('p-1').first).status,
         ProposalStatus.discarded,
       );
     },
   );
+
+  test('rerun replaces a stale AI draft and preserves manual drafts', () async {
+    const classId = 'class-a';
+    const teamId = 'team-tutor';
+    final approved = await proposals.createManual(
+      classId: classId,
+      teamId: teamId,
+      addStudentIds: ['190402'],
+    );
+    await proposals.approve(approved.id);
+    final manual = await proposals.createManual(
+      classId: classId,
+      teamId: teamId,
+      addStudentIds: ['190412'],
+    );
+    final candidates = await RuleBasedMatchingService().propose(
+      classId: classId,
+      students: classes.studentsFor(classId),
+      teams: classes.teamsFor(classId).where((t) => t.id == teamId).toList(),
+    );
+    final pending = await proposals.savePending(classId, candidates);
+    final replacement = pending.single;
+    expect(replacement.id, isNot('p-1'));
+    expect(
+      (await proposals.watchPending(classId).first)
+          .where((p) => p.teamId == teamId)
+          .map((p) => p.id),
+      unorderedEquals([replacement.id, manual.id]),
+    );
+    expect(
+      (await proposals.watchProposal('p-1').first).status,
+      ProposalStatus.superseded,
+    );
+    await proposals.approve(replacement.id);
+    expect(classes.teamsFor(classId).firstWhere((t) => t.id == teamId).size, 6);
+    expect(await proposals.savePending(classId, candidates), isEmpty);
+    expect(
+      (await proposals.watchProposal(replacement.id).first).status,
+      ProposalStatus.approved,
+    );
+  });
+
+  test('empty run retires stale AI drafts without losing valid ones', () async {
+    final manual = await proposals.createManual(
+      classId: 'class-a',
+      teamId: 'team-tutor',
+      addStudentIds: ['190401', '190402'],
+    );
+    await proposals.approve(manual.id);
+
+    expect(await proposals.savePending('class-a', []), isEmpty);
+    expect(
+      (await proposals.watchProposal('p-1').first).status,
+      ProposalStatus.superseded,
+    );
+    expect(
+      (await proposals.watchProposal('p-2').first).status,
+      ProposalStatus.pending,
+    );
+    await proposals.undoApprove(manual.id);
+    final old = SampleData.proposals(
+      SampleData.students(),
+      SampleData.teams(SampleData.students()),
+    ).first;
+    expect((await proposals.savePending('class-a', [old])).single.id, 'p-1');
+    expect(
+      (await proposals.watchProposal('p-1').first).status,
+      ProposalStatus.pending,
+    );
+  });
 
   test(
     'manual proposal uses the current team and prevents duplicate assignment',

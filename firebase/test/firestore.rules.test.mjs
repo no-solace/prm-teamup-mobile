@@ -3,7 +3,7 @@ import { after, before, beforeEach, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { initializeTestEnvironment, assertFails, assertSucceeds } from '@firebase/rules-unit-testing';
 import { collection, collectionGroup, deleteDoc, deleteField, doc, getDoc, getDocs,
-  query, serverTimestamp, setDoc, Timestamp, updateDoc, where, writeBatch } from 'firebase/firestore';
+  query, runTransaction, serverTimestamp, setDoc, Timestamp, updateDoc, where, writeBatch } from 'firebase/firestore';
 
 const projectId = 'demo-teamup-data';
 let env;
@@ -204,6 +204,78 @@ test('approve requires atomic roster updates, undo reverts roster; discarded sta
   assert.equal((await getDoc(doc(client, 'classes/a/students/S5'))).data().teamId, null);
   await assertSucceeds(updateDoc(ref, { status: 'discarded' }));
   await assertDeniedByRule(updateDoc(ref, { status: 'pending' }));
+});
+
+test('matching replaces an AI draft atomically and can reuse a superseded ID', async () => {
+  const client = db();
+  const draft = doc(client, 'classes/a/proposals/p');
+  const replacement = doc(client, 'classes/a/proposals/replacement');
+  const manual = doc(client, 'classes/a/proposals/manual');
+  const guard = doc(client, 'classes/a/matching/state');
+  await assertSucceeds(getDoc(guard));
+  await assertFails(getDoc(doc(db('bob'), guard.path)));
+  await assertFails(setDoc(doc(db('bob'), guard.path), { updatedAt: serverTimestamp() }));
+  await assertFails(setDoc(guard, { updatedAt: Timestamp.now(), extra: true }));
+  await assertSucceeds(setDoc(draft, pending()));
+  await assertSucceeds(setDoc(manual, { ...pending(), source: 'manual' }));
+  await assertDeniedByRule(updateDoc(manual, { status: 'superseded' }));
+  await assertDeniedByRule(updateDoc(draft, { status: 'superseded', teamId: '2' }));
+
+  await assertSucceeds(runTransaction(client, async (tx) => {
+    assert.equal((await tx.get(guard)).exists(), false);
+    assert.equal((await tx.get(draft)).data().status, 'pending');
+    assert.equal((await tx.get(replacement)).exists(), false);
+    tx.update(draft, { status: 'superseded' });
+    tx.set(replacement, pending());
+    tx.set(guard, { updatedAt: serverTimestamp() });
+  }));
+  const open = await assertSucceeds(getDocs(query(collection(client, 'classes/a/proposals'),
+    where('status', '==', 'pending'))));
+  assert.deepEqual(open.docs.map((entry) => entry.id).sort(), ['manual', 'replacement']);
+  await assertDeniedByRule(updateDoc(draft, { status: 'pending', teamId: '2' }));
+  await assertDeniedByRule(updateDoc(draft, { status: 'pending', addStudentIds: ['S1', 'S4'] }));
+  const restore = writeBatch(client);
+  restore.set(draft, pending());
+  restore.update(replacement, { status: 'superseded' });
+  restore.set(guard, { updatedAt: serverTimestamp() });
+  await assertSucceeds(restore.commit());
+});
+
+test('a replacement can fill place six after a previous approval', async () => {
+  await seedProposalRoster();
+  const client = db();
+  const teamRef = doc(client, 'classes/a/teams/1');
+  const first = doc(client, 'classes/a/proposals/first');
+  const next = doc(client, 'classes/a/proposals/next');
+  const sixth = doc(client, 'classes/a/students/S6');
+  const five = ['S1', 'S2', 'S3', 'S4', 'S5'];
+  const fiveMajors = ['SE', 'SE', 'AI', 'MKT', 'GD'];
+  await assertSucceeds(setDoc(sixth, student));
+  await assertSucceeds(setDoc(first, pending()));
+  const approveFirst = writeBatch(client);
+  approveFirst.update(teamRef, { memberIds: five, majors: fiveMajors, rosterChangeProposalId: first.id });
+  for (const id of ['S4', 'S5']) approveFirst.update(doc(client, `classes/a/students/${id}`), { teamId: '1' });
+  approveFirst.update(first, { status: 'approved', approvedAt: serverTimestamp() });
+  await assertSucceeds(approveFirst.commit());
+
+  await assertSucceeds(setDoc(next, {
+    ...pending(), currentMemberIds: five, currentMajors: fiveMajors,
+    addStudentIds: ['S6'], addMajors: ['SE'],
+  }));
+  const approveNext = writeBatch(client);
+  approveNext.update(teamRef, {
+    memberIds: [...five, 'S6'], majors: [...fiveMajors, 'SE'], rosterChangeProposalId: next.id,
+  });
+  approveNext.update(sixth, { teamId: '1' });
+  approveNext.update(next, { status: 'approved', approvedAt: serverTimestamp() });
+  await assertSucceeds(approveNext.commit());
+  const undoNext = writeBatch(client);
+  undoNext.update(teamRef, { memberIds: five, majors: fiveMajors, rosterChangeProposalId: null });
+  undoNext.update(sixth, { teamId: null });
+  undoNext.update(next, { status: 'pending', approvedAt: deleteField() });
+  await assertSucceeds(undoNext.commit());
+  assert.equal((await getDoc(first)).data().status, 'approved');
+  assert.deepEqual((await getDoc(teamRef)).data().memberIds, five);
 });
 
 test('approval rejects a partially updated roster and changing an assigned major', async () => {
@@ -472,4 +544,30 @@ test('minutes: both sides draft, only mentor signs, signed minutes are frozen', 
   await assertFails(updateDoc(ref('lead'), { summary: 'After sign', updatedAt: serverTimestamp() }));
   await assertSucceeds(updateDoc(ref('lead'), { pdfStoragePath: 'minutes/b1/minutes.pdf',
     pdfDownloadUrl: 'https://example.test/m.pdf' }));
+});
+
+// Review finding F3: importClass writes the class, every student and every team in one batch.
+const importBatch = (client, id, students, groups) => {
+  const batch = writeBatch(client);
+  batch.set(doc(client, `classes/${id}`), room());
+  const majors = ['SE', 'AI', 'MKT', 'GD'];
+  const rows = Array.from({ length: students }, (_, i) => ({
+    id: `M${String(i + 1).padStart(6, '0')}`, major: majors[i % 4] }));
+  groups.forEach((size, g) => {
+    const members = rows.splice(0, size);
+    batch.set(doc(client, `classes/${id}/teams/${g + 1}`), {
+      name: `Group ${g + 1}`, memberIds: members.map((m) => m.id), majors: members.map((m) => m.major) });
+    for (const m of members) {
+      batch.set(doc(client, `classes/${id}/students/${m.id}`), { ...student, major: m.major, teamId: String(g + 1) });
+    }
+  });
+  for (const m of rows) batch.set(doc(client, `classes/${id}/students/${m.id}`), { ...student, major: m.major, teamId: null });
+  return batch.commit();
+};
+
+test('import of the 12-student demo class commits in one batch', async () => {
+  await assertSucceeds(importBatch(db(), 'demo12', 12, [6, 3]));
+});
+test('import of a 42-student class (6 groups of 5, 12 free) commits in one batch', async () => {
+  await assertSucceeds(importBatch(db(), 'full42', 42, [5, 5, 5, 5, 5, 5]));
 });
