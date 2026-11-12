@@ -111,7 +111,8 @@ Kết quả: `report/Lab03_<StudentID>.pdf` và `slides/Lab03_<StudentID>_slides
 | Đặc tả workflow | [docs/workflow.md](docs/workflow.md) | 3 workflow lõi đủ 7 thành phần, activity diagram, state machine, registry BR-01…BR-07 |
 | Kế hoạch Analytics | [docs/analytics-plan.md](docs/analytics-plan.md) | 10 event: trigger, tham số có kiểu, câu hỏi sản phẩm, ánh xạ flow, quy tắc không PII |
 | Kế hoạch kiểm thử | [docs/test-plan.md](docs/test-plan.md) | 18 ca ARTEMIS + 1 phiên khám phá, bảng kết quả, giải thích ca flaky |
-| Rà soát mã AI | [docs/code-review.md](docs/code-review.md) | 8 phát hiện (tool, file:line, loại, quyết định, lý do, commit) + công bố công cụ |
+| Rà soát mã AI | [docs/code-review.md](docs/code-review.md) | 10 phát hiện (tool, file:line, loại, quyết định, lý do, commit) + công bố công cụ |
+| Nhật ký làm việc | [docs/WORKLOG.md](docs/WORKLOG.md) | Những gì đã làm và vì sao, cách kiểm chứng lại, việc còn lại theo thứ tự ưu tiên |
 | Bộ test E2E | [e2e_test/](e2e_test/) | `conftest.py`, `pyproject.toml`, 5 module test + phiên khám phá |
 | Bằng chứng | [evidence/](evidence/) | Checklist và danh mục ảnh Console / DebugView / Crashlytics / ARTEMIS |
 | Báo cáo | [report/](report/) | `Lab03_<StudentID>.pdf` (nguồn Markdown + script dựng) |
@@ -126,6 +127,7 @@ Kết quả: `report/Lab03_<StudentID>.pdf` và `slides/Lab03_<StudentID>_slides
 | Claude Code trong Cursor | Sinh `docs/*.md`, `e2e_test/*.py`, `report/`, `slides/`, commit theo mã phát hiện |
 | GitHub Copilot Chat | Gợi ý refactor trong `lib/viewmodels/` |
 | GitHub Copilot Code Review | Rà soát pull request, sinh danh sách phát hiện (CR-01…CR-08) |
+| Cursor Agent (Claude Opus 4.5) — vòng 2 | Rà soát theo checklist Lab 3 §5–§10, phát hiện CR-09 (API ARTEMIS sai) và CR-10 (S13 chưa khoá nút) |
 | Mermaid CLI (`mmdc`) | Vẽ sơ đồ activity / state / sequence / layer cho báo cáo và slide |
 
 Chi tiết và quyết định cho từng phát hiện: [docs/code-review.md](docs/code-review.md) §5.
@@ -155,6 +157,10 @@ Chi tiết và quyết định cho từng phát hiện: [docs/code-review.md](do
 | Ảnh Console (6 dịch vụ) | ⚠️ **chưa chụp** | checklist trong `evidence/README.md` |
 | `android/app/google-services.json` | ⚠️ **chưa có trong repo** | chạy `flutterfire configure` rồi commit (đề §9 cho phép commit) |
 | Video demo | ⚠️ **chưa quay** | xem mục trên |
+
+> 📖 **Chi tiết toàn bộ quá trình làm việc — đã làm gì, vì sao, kiểm chứng lại
+> bằng lệnh nào, và còn thiếu gì theo thứ tự ưu tiên: xem
+> [docs/WORKLOG.md](docs/WORKLOG.md).**
 
 ## Không commit
 
