@@ -52,6 +52,12 @@ toàn lớp khi nguồn ngành khan hiếm. Ba ngành là ưu tiên; giới hạ
 trùng người là điều kiện cứng. Mentor xem các đề xuất `good` và sửa/ghép tay khi
 cần. Không di chuyển thành viên cũ để tăng độ đa dạng.
 
+Bản ghi sinh viên có MSSV rỗng hoặc chỉ gồm khoảng trắng bị bỏ qua có chủ đích:
+không có định danh thì không thể đề xuất hay kiểm tra trùng người một cách an
+toàn, và Firestore Rules không cho tạo tài liệu sinh viên với ID như vậy. Một
+nhóm có `memberIds` rỗng vẫn bị đánh dấu xung đột (xem `team.memberIds.any(...)`).
+Ghi nhận theo finding F10 trong `docs/code-review.md`.
+
 Thuật toán chỉ tính đề xuất. `ProposalService.savePending` đối chiếu roster và
 sinh viên hiện tại trước khi lưu. S8 chuyển trang theo danh sách `pending` do
 service trả về. Cùng ID thì giữ bản nháp hợp lệ đã được mentor sửa, bỏ qua
