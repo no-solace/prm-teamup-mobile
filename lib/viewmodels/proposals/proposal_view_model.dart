@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../models/major.dart';
 import '../../models/proposal.dart';
 import '../../models/student.dart';
 import '../../models/team.dart';
@@ -98,15 +99,27 @@ class ProposalActionViewModel extends Notifier<bool> {
     }
   });
 
-  Future<Proposal> updateMembers(Proposal proposal, List<String> ids) => _run(
-    () => ref
-        .read(proposalServiceProvider)
-        .updateMembers(
-          proposal.id,
-          addStudentIds: ids,
-          currentMemberIds: proposal.currentMemberIds,
-        ),
-  );
+  Future<Proposal> updateMembers(Proposal proposal, List<String> ids) =>
+      _run(() async {
+        final updated = await ref
+            .read(proposalServiceProvider)
+            .updateMembers(
+              proposal.id,
+              addStudentIds: ids,
+              currentMemberIds: proposal.currentMemberIds,
+            );
+        // S25: the edit leaves the team under 5, so Approve is blocked.
+        if (updated.resultingSize < TeamRules.minMembers) {
+          unawaited(
+            bestEffort(
+              () => ref
+                  .read(analyticsServiceProvider)
+                  .logMemberChangeBlocked(reason: 'min_5'),
+            ),
+          );
+        }
+        return updated;
+      });
 
   Future<Proposal> createManual(
     String classId,

@@ -1,4 +1,3 @@
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:teamup_exe/models/proposal.dart';
@@ -160,6 +159,20 @@ void main() {
     expect(logged('report_export').single, contains('team_count'));
     expect(logged('report_export').single, contains('file_size_kb'));
   });
+
+  test(
+    'S25 logs member_change_blocked min_5 when an edit leaves under 5',
+    () async {
+      final c = container();
+      final proposal =
+          (await c.read(proposalServiceProvider).watchAllPending().first).first;
+      // Removing every added member leaves only the current roster (under 5).
+      await c.read(proposalActionProvider.notifier).updateMembers(proposal, []);
+      await pumpEventQueue();
+      expect(logged('member_change_blocked'), hasLength(1));
+      expect(logged('member_change_blocked').single, contains('min_5'));
+    },
+  );
 
   test('user mistakes are not reported to Crashlytics', () async {
     final c = container();
