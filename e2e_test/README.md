@@ -7,11 +7,17 @@ Android thật (hoặc emulator) theo hướng dẫn bằng ngôn ngữ tự nhi
 
 | Thành phần | Phiên bản / ghi chú |
 |---|---|
-| Python | 3.12+ |
-| `uv` | theo hướng dẫn chính thức của ARTEMIS |
+| Python | **3.10+** (khuyến nghị 3.12) |
+| ARTEMIS daemon | commit `351ca8422f7b5b54e80a9c1ce03a222e02415b6b` (pinned trong `pyproject.toml`) |
+| ARTEMIS client SDK | `artemis-client` — gói con trong repo ARTEMIS, dùng `subdirectory=packages/artemis-client` |
 | ADB | ARTEMIS start script cài sẵn; cần `adb devices` thấy thiết bị |
-| ARTEMIS | commit đã ghim — xem `pyproject.toml` và `README.md` |
 | Model API key | Gemini / Claude / GPT-4o / Qwen-VL |
+| ARTEMIS host | mặc định `http://127.0.0.1:8000` |
+
+> **Lưu ý về kiến trúc.** `artemis-client` là client **remote-only**: nó gọi
+> HTTP tới một ARTEMIS daemon, không import ADB hay LLM provider. Vì vậy
+> `pytest --collect-only` chạy được trên máy không có thiết bị, và lỗi khi
+> không có daemon là `NetworkError` rõ ràng chứ không phải lỗi import.
 
 ## 2. Cài đặt
 
@@ -27,16 +33,35 @@ Biến môi trường (không commit):
 export ARTEMIS_API_KEY=<model api key>
 export ARTEMIS_DEVICE=emulator-5554      # serial từ `adb devices`
 export ARTEMIS_PROFILE=flash              # flash: regression, pro: exploratory
+export ARTEMIS_BASE_URL=http://127.0.0.1:8000   # ARTEMIS host
+export ARTEMIS_TOKEN=<token>              # chỉ khi host yêu cầu Bearer token
 ```
 
 Tài khoản Google dùng để test được cấu hình sẵn trên thiết bị; **không** đưa
 thông tin đăng nhập vào repo này.
 
-## 3. Chạy
+## 3. Khởi động ARTEMIS host
+
+Theo README chính thức của ARTEMIS:
+
+```bash
+git clone https://github.com/google/artemis.git
+cd artemis
+uv sync
+uv run artemis start            # daemon lắng nghe 127.0.0.1:8000
+```
+
+Kiểm tra daemon còn sống:
+
+```bash
+curl http://127.0.0.1:8000/api/status
+```
+
+## 4. Chạy
 
 ```bash
 # Toàn bộ regression (Flash profile)
-pytest -m "not exploratory"
+pytest -m "not exploratory" -v
 
 # Chạy lại một nhóm
 pytest test_auth.py
@@ -45,7 +70,7 @@ pytest test_auth.py
 ARTEMIS_PROFILE=pro pytest test_exploratory.py -s -m exploratory
 ```
 
-## 4. Quy tắc viết test (theo Lab 3 §7)
+## 5. Quy tắc viết test (theo Lab 3 §7)
 
 1. **Một test = một chỉ dẫn**. Chỉ dẫn nêu rõ: điểm bắt đầu, các bước, và
    **điều gì phải hiển thị ở cuối**.
@@ -59,7 +84,7 @@ ARTEMIS_PROFILE=pro pytest test_exploratory.py -s -m exploratory
 5. Test có native interaction: TC-01 (Google account picker), TC-16 (notification
    shade), TC-18 (Crashlytics test crash).
 
-## 5. Semantics labels
+## 6. Semantics labels
 
 ARTEMIS đọc cây accessibility trước rồi mới dùng ảnh. Vì vậy các widget chính
 đã có `Semantics`:
@@ -76,7 +101,7 @@ ARTEMIS đọc cây accessibility trước rồi mới dùng ảnh. Vì vậy c�
 
 Thêm nhãn mới = sửa widget trong `lib/widgets/`, không sửa test.
 
-## 6. Bằng chứng
+## 7. Bằng chứng
 
 * Screenshot / trace của mỗi lần chạy: `evidence/artemis/`.
 * Báo cáo phiên khám phá: `evidence/artemis/exploratory/`.

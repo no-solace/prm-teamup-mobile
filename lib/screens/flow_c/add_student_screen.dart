@@ -107,6 +107,8 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
                           students: students.value!,
                           selected: validSelection,
                           capacity: capacity,
+                          teamName: selectedTeam.name,
+                          currentSize: selectedTeam.size,
                           onChanged: (value) =>
                               setState(() => _selected = value),
                         ),

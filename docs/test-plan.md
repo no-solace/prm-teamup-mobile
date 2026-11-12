@@ -32,8 +32,8 @@
 | **TC-06** | A (S23) | Đã đăng nhập | Import `lab3-demo.csv` → tap "Import 12 students" | Ba số: **imported = 12**, **in a group = 9**, **available = 3** | Happy path | `test_flow_a.py` |
 | **TC-07** | A (S3→S8→S9) | Đã đăng nhập, lớp demo đã nhập | Mở lớp "EXE101 Demo" → tap "Match with AI" → chờ | Về tab **Proposals**, có **≥ 1** thẻ đề xuất, agent báo tên nhóm đầu tiên | Happy path | `test_flow_a.py` |
 | **TC-08** | A/B (S10) | Đã đăng nhập, có đề xuất pending | Proposals → tap thẻ đầu tiên | Màn chi tiết: chip fit ("Strong fit"/"Good fit"), **≥ 1** ô ngành, mục "Why this team?" | Happy path | `test_flow_a.py` |
-| **TC-09** | B (S10→S11) | Đã đăng nhập, đề xuất < 6 thành viên | Proposals → thẻ đầu → "Add member" | Dòng "x of 6 places selected" hiện, **≥ 1** hàng có checkbox | Happy path | `test_flow_b.py` |
-| **TC-10** | B — lỗi (S13) | Đã đăng nhập, đề xuất pending | Mở đề xuất → "Add member" → tick checkbox tới khi đủ 6 | Lỗi inline **"Max 6 members"** hiện, nút "Add" **disabled** | **Error path** | `test_flow_b.py` |
+| **TC-09** | B (S10→S11) | Đã đăng nhập, đề xuất < 6 thành viên | Proposals → thẻ đầu → "Add member" | Dòng meta theo Lab 2 **"Tên nhóm, N of 6"** hiện, **≥ 1** hàng có checkbox | Happy path | `test_flow_b.py` |
+| **TC-10** | B — lỗi (S13) | Đã đăng nhập, đề xuất pending có 5 thành viên | Mở đề xuất → "Add member" → tick thêm 1 SV (thành 7) | Lỗi inline **"Max 6 members"** hiện, nút lưu **disabled** | **Error path** | `test_flow_b.py` |
 | **TC-11** | B — lỗi (S25) | Đã đăng nhập, đề xuất pending | Mở đề xuất → bấm nút xoá 1 thành viên → xác nhận "Remove" | Banner **"Needs at least 5 members (now N)"**, nút "Approve proposal" **disabled** | **Error path** | `test_flow_b.py` |
 | **TC-12** | C (S5) | Đã đăng nhập, lớp demo đã nhập | Mở lớp → hàng "teams needing members" | **≥ 1** thẻ nhóm, hiện số thành viên và dòng "Needs … to reach 5" | Happy path | `test_flow_c.py` |
 | **TC-13** | C — lỗi (S21) | Đã đăng nhập, đang ở màn Add student | Gõ "ZZZNOONE" vào ô tìm kiếm | Trạng thái rỗng **"No student results"**, **0** hàng sinh viên | **Error path** | `test_flow_c.py` |

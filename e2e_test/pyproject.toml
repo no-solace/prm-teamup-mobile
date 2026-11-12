@@ -2,19 +2,22 @@
 name = "teamup-exe-e2e"
 version = "0.1.0"
 description = "ARTEMIS end-to-end suite for TeamUp EXE (PRM393 Lab 3 §7)"
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 
 dependencies = [
-    # ARTEMIS is pinned to a specific commit for reproducibility (Lab 3 §4).
-    # Install with:
-    #   pip install "artemis @ git+https://github.com/google/artemis@<COMMIT>"
+    # Lab 3 §4: "Pin the versions you use in pubspec.yaml and README.md."
+    # ARTEMIS is a fast-moving open-source project, so the client is pinned to
+    # an exact commit instead of a branch.
+    #
+    # The installable client lives in the monorepo under packages/artemis-client:
+    #   pip install "artemis-client @ git+https://github.com/google/artemis.git#subdirectory=packages/artemis-client"
     "pytest>=8.0",
     "pytest-timeout>=2.3",
 ]
 
 [project.optional-dependencies]
 artemis = [
-    "artemis @ git+https://github.com/google/artemis@main",
+    "artemis-client @ git+https://github.com/google/artemis.git@351ca8422f7b5b54e80a9c1ce03a222e02415b6b#subdirectory=packages/artemis-client",
 ]
 
 [tool.pytest.ini_options]
@@ -24,4 +27,4 @@ addopts = "-ra --strict-markers"
 markers = [
     "exploratory: the unscripted pro-profile session; excluded from the regression run",
 ]
-timeout = 900
+timeout = 1800

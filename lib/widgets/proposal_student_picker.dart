@@ -10,8 +10,16 @@ import 'student_row.dart';
 
 /// Shared S11/S16 student picker with the S13 size cap and S21 no-result state.
 ///
-/// S13 shows the error inline ("Max 6 members") and locks the Add button, not
-/// only a transient snackbar.
+/// Lab 2 handoff (S11 + S13):
+/// * the meta line reads `team name, N of 6` — N is the team size *after*
+///   the selection is applied ("FinLite, 6 of 6");
+/// * ticking a student that would push the team past six is refused and
+///   shows the inline error "Max 6 members" (S13);
+/// * while that error is on screen the confirm button is locked, and
+///   unchecking a student clears the error and unlocks the button.
+///
+/// The single invariant the screen keeps is: **the confirm button is enabled
+/// exactly when the error banner is hidden**.
 class ProposalStudentPicker extends StatefulWidget {
   const ProposalStudentPicker({
     super.key,
@@ -19,18 +27,41 @@ class ProposalStudentPicker extends StatefulWidget {
     required this.selected,
     required this.capacity,
     required this.onChanged,
+    this.teamName,
+    this.currentSize = 0,
     this.onLimit,
+    this.onValidityChanged,
   });
 
   final List<Student> students;
   final Set<String> selected;
+
+  /// Remaining places on the team: `TeamRules.maxMembers - currentSize`.
   final int capacity;
+
   final ValueChanged<Set<String>> onChanged;
+
+  /// Name of the team the members are added to (S11: "FinLite, 6 of 6").
+  final String? teamName;
+
+  /// Members already in the team, excluding the ones selected here.
+  final int currentSize;
+
   final VoidCallback? onLimit;
 
-  /// True when the team is full: the error banner stays visible and the
-  /// caller disables its confirm button.
+  /// Reports whether the current selection is acceptable. The caller locks
+  /// its confirm button while this is false (S13: "nút Add bị khóa").
+  final ValueChanged<bool>? onValidityChanged;
+
+  /// True when the team is already full: the error banner stays visible and
+  /// the caller disables its confirm button.
   bool get isAtCapacity => capacity <= 0;
+
+  /// "FinLite, 6 of 6" — the Lab 2 meta line for S11 and S13.
+  String get metaLabel {
+    final size = currentSize + selected.length;
+    return teamName == null ? '$size of 6' : '$teamName, $size of 6';
+  }
 
   @override
   State<ProposalStudentPicker> createState() => _ProposalStudentPickerState();
@@ -41,13 +72,28 @@ class _ProposalStudentPickerState extends State<ProposalStudentPicker> {
   String _query = '';
   bool _limitReached = false;
 
+  @override
+  void initState() {
+    super.initState();
+    // The team is already full before the user picks anybody: the error and
+    // the locked button must be visible from the first frame.
+    if (widget.isAtCapacity) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => widget.onValidityChanged?.call(false),
+      );
+    }
+  }
+
   void _change(Student student, bool checked) {
     if (student.hasTeam) return;
     final next = {...widget.selected};
     if (checked && !next.contains(student.mssv)) {
       if (next.length >= widget.capacity) {
+        // S13: the pick is refused, the reason stays on screen and the
+        // confirm button is locked until the user fixes the selection.
         widget.onLimit?.call();
         setState(() => _limitReached = true);
+        widget.onValidityChanged?.call(false);
         return;
       }
       next.add(student.mssv);
@@ -55,6 +101,7 @@ class _ProposalStudentPickerState extends State<ProposalStudentPicker> {
       next.remove(student.mssv);
     }
     setState(() => _limitReached = false);
+    widget.onValidityChanged?.call(!widget.isAtCapacity);
     widget.onChanged(next);
   }
 
@@ -92,9 +139,7 @@ class _ProposalStudentPickerState extends State<ProposalStudentPicker> {
             horizontal: kSpaceMd,
             vertical: kSpaceSm,
           ),
-          child: Text(
-            '${widget.selected.length} of ${widget.capacity} places selected',
-          ),
+          child: Text(widget.metaLabel),
         ),
         if (atCapacity)
           const Padding(

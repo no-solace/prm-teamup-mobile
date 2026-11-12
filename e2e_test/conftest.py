@@ -1,13 +1,16 @@
 """Pytest fixtures for the ARTEMIS end-to-end suite (Lab 3 §7).
 
-The suite drives a real Android device or emulator through the ARTEMIS Python
-SDK. Every test sends ONE natural-language instruction and asserts on the
-values the agent reports, not on ``status == "SUCCESS"`` alone.
+The suite drives a real Android device through the **ARTEMIS Python SDK**
+(``artemis-client``), which talks to an ARTEMIS host over HTTP. The client is
+remote-only: it never imports ADB, an LLM provider or a device driver, so
+pytest does not need a device to *collect* the suite.
 
 Environment variables (never committed):
     ARTEMIS_API_KEY      API key of the multimodal model (Gemini / Claude / GPT-4o).
     ARTEMIS_DEVICE       ADB serial of the device, e.g. ``emulator-5554``.
     ARTEMIS_PROFILE      ``flash`` (regression) or ``pro`` (exploratory).
+    ARTEMIS_BASE_URL     ARTEMIS host, e.g. ``http://127.0.0.1:8000``.
+    ARTEMIS_TOKEN        Bearer token, if the ARTEMIS host requires one.
     ANDROID_SERIAL       Fallback for the ADB serial.
 
 The Google test account used for sign-in is configured on the device itself;
@@ -16,6 +19,7 @@ its credentials are NOT part of this repository.
 
 from __future__ import annotations
 
+import asyncio
 import os
 import re
 import subprocess
@@ -28,13 +32,14 @@ import pytest
 # collection of the suite working (and `--collect-only`) on a machine where the
 # SDK is not installed yet.
 try:  # pragma: no cover - depends on the environment
-    from artemis import ArtemisClient  # type: ignore
+    from artemis_client import ArtemisClient  # type: ignore
 except Exception:  # pragma: no cover - the SDK is optional at collection time
     ArtemisClient = None  # type: ignore
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-APP_PACKAGE = "com.example.teamup_exe"
+#: Must match ``applicationId`` in ``android/app/build.gradle.kts``.
+APP_PACKAGE = "com.group6.teamup_exe"
 REPORT_DIR = REPO_ROOT / "evidence" / "artemis"
 
 
@@ -54,7 +59,8 @@ class Observed:
 
     @property
     def ok(self) -> bool:
-        return self.status.upper() == "SUCCESS"
+        """True when the ARTEMIS task reached a successful terminal state."""
+        return self.status.lower() in {"completed", "success"}
 
     def number(self, label: str | None = None) -> int:
         """Return the first integer in the report, optionally after ``label``."""
@@ -82,7 +88,10 @@ def device_serial() -> str:
 @pytest.fixture(scope="session")
 def profile() -> str:
     """``flash`` for regression, ``pro`` for the exploratory session."""
-    return os.environ.get("ARTEMIS_PROFILE", "flash")
+    value = os.environ.get("ARTEMIS_PROFILE", "flash").strip().lower()
+    if value not in {"flash", "pro"}:
+        pytest.fail(f"ARTEMIS_PROFILE must be 'flash' or 'pro'; got {value!r}")
+    return value
 
 
 @pytest.fixture(scope="session")
@@ -100,24 +109,49 @@ def artemis(device_serial: str, profile: str, api_key: str):
         pytest.skip("The ARTEMIS SDK is not installed (pip install -e '.[artemis]')")
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     return ArtemisClient(
+        base_url=os.environ.get("ARTEMIS_BASE_URL", "http://127.0.0.1:8000"),
+        token=os.environ.get("ARTEMIS_TOKEN"),
         device_serial=device_serial,
-        profile=profile,
-        api_key=api_key,
-        output_dir=str(REPORT_DIR),
+        default_profile=profile,
     )
 
 
 def _normalise(result) -> Observed:
-    status = getattr(result, "status", "") or ""
-    text = getattr(result, "output", "") or getattr(result, "text", "") or ""
+    """Turn an ARTEMIS ``TaskResult`` into an :class:`Observed`.
+
+    ``TaskResult.output`` may be a string or a structured payload, so every
+    scalar is stringified before the text is searched.
+    """
+    status = str(getattr(result, "status", "") or "")
+    output = getattr(result, "output", None)
+    if output is None:
+        text = ""
+    elif isinstance(output, str):
+        text = output
+    else:
+        text = " ".join(
+            f"{key}: {value}" for key, value in output.items() if not isinstance(value, dict)
+        )
     error = getattr(result, "error", None)
-    screenshot = getattr(result, "screenshot", None)
-    return Observed(status=status, text=str(text), error=error, screenshot=screenshot)
+    screenshot = (getattr(result, "raw", {}) or {}).get("screenshot")
+    return Observed(status=status, text=text, error=error, screenshot=screenshot)
 
 
 def run(artemis, instruction: str) -> Observed:
-    """Send one instruction and return the normalised observation."""
-    result = artemis.run(instruction)
+    """Send one instruction and return the normalised observation.
+
+    ``ArtemisClient.run`` is a coroutine, so it is driven with
+    ``asyncio.run``. The ARTEMIS host is a long-lived daemon; the client keeps
+    no connection state between calls, so one event loop per instruction is
+    safe.
+    """
+    result = asyncio.run(
+        artemis.run(
+            instruction,
+            locked_app_package=APP_PACKAGE,
+            timeout=float(os.environ.get("ARTEMIS_TIMEOUT", "1800")),
+        )
+    )
     return _normalise(result)
 
 
@@ -167,4 +201,5 @@ __all__ = [
     "install_app",
     "launch_app",
     "read_logcat",
+    "run",
 ]
