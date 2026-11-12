@@ -123,7 +123,7 @@ class SignInViewModel extends Notifier<SignInState> {
           method: state.method.name == 'email' ? 'password' : state.method.name,
         ),
       ),
-      _bestEffort(() => crash.setUser(uid: user.uid, role: user.role)),
+      _bestEffort(() => crash.setUser(uid: user.uid, role: user.role?.name ?? 'unassigned')),
     ]);
   }
 

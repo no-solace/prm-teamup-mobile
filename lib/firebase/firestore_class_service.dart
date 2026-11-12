@@ -98,6 +98,28 @@ class FirestoreClassService implements ClassService {
       ));
 
   @override
+  Stream<({Team team, List<Student> members})> watchMyTeam(
+    String classId,
+    String teamId,
+  ) => _session((_) {
+    if (!DataValidation.isId(teamId)) {
+      return Stream.error(const ValidationError('Invalid team ID'));
+    }
+    // Rules: a student reads only their team and students with that teamId.
+    return combineDataStreams<Object>([
+      _class(classId).collection('teams').doc(teamId).snapshots().map((doc) {
+        if (!doc.exists) throw const NotFoundError('Team not found');
+        return Team.fromMap(doc.id, classId, doc.data()!);
+      }),
+      _class(classId)
+          .collection('students')
+          .where('teamId', isEqualTo: teamId)
+          .snapshots()
+          .map((s) => [for (final d in s.docs) Student.fromMap(d.id, classId, d.data())]),
+    ]).map((v) => (team: v[0] as Team, members: v[1] as List<Student>));
+  });
+
+  @override
   Future<Student> getStudent(String classId, String mssv) async {
     try {
       final uid = _uid();

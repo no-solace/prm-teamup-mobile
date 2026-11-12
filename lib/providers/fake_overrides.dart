@@ -4,6 +4,7 @@ import '../firebase/pdf_report_service.dart';
 import '../services/class_service.dart';
 import '../services/fakes/fake_auth_service.dart';
 import '../services/fakes/fake_class_service.dart';
+import '../services/fakes/fake_flow_def_services.dart';
 import '../services/fakes/fake_infra_services.dart';
 import '../services/fakes/fake_matching_service.dart';
 import '../services/fakes/fake_proposal_service.dart';
@@ -43,5 +44,8 @@ List<Override> fakeOverrides({
     configServiceProvider.overrideWithValue(
       configService ?? FakeConfigService(),
     ),
+    topicServiceProvider.overrideWithValue(FakeTopicService()),
+    bookingServiceProvider.overrideWithValue(FakeBookingService()),
+    meetingServiceProvider.overrideWithValue(FakeMeetingService()),
   ];
 }

@@ -8,6 +8,7 @@ import '../services/app_error.dart';
 import '../services/auth_service.dart';
 import '../services/auth_validation.dart';
 import 'auth_error_mapper.dart';
+import 'firestore_class_service.dart' show switchDataStream;
 import 'firestore_mentor_profile_service.dart';
 
 /// Firebase is the session authority. Only a provisioned mentor session may
@@ -42,15 +43,25 @@ class FirebaseAuthService implements AuthService {
     }
   }
 
-  static AppUser? _map(User? user) => user == null
-      ? null
-      : AppUser(
-          uid: user.uid,
-          displayName: user.displayName ?? user.email ?? 'Mentor',
-          email: user.email,
-          photoUrl: user.photoURL,
-          phoneNumber: user.phoneNumber,
-        );
+  /// Without [profile] the role is unknown (null), as before onboarding.
+  static AppUser? _map(User? user, [Map<String, dynamic>? profile]) {
+    if (user == null) return null;
+    String? field(String key) =>
+        profile?[key] is String ? profile![key] as String : null;
+    return AppUser(
+      uid: user.uid,
+      displayName:
+          field('displayName') ?? user.displayName ?? user.email ?? 'User',
+      email: user.email,
+      photoUrl: user.photoURL,
+      phoneNumber: user.phoneNumber,
+      role: UserRole.fromName(profile?['role']),
+      classId: field('classId'),
+      teamId: field('teamId'),
+      studentId: field('studentId'),
+      mentorUid: field('mentorUid'),
+    );
+  }
 
   AppUser _requireUser(UserCredential result) {
     final user = _map(result.user);
@@ -64,14 +75,37 @@ class FirebaseAuthService implements AuthService {
 
   @override
   Stream<AppUser?> authStateChanges() =>
-      _auth.userChanges().asyncMap((user) async {
-        if (user == null) return null;
+      switchDataStream(_auth.userChanges(), (User? user) {
+        if (user == null) return Stream<AppUser?>.value(null);
         // Also runs for restored Firebase sessions after an app restart.
-        await _profiles.ensure(user);
-        // Sign-out/account switch can occur while Firestore is responding.
-        if (_auth.currentUser?.uid != user.uid) return null;
-        return _map(user);
+        // Then follow users/{uid} live, so onboarding or a role change
+        // re-routes without signing in again.
+        return Stream.fromFuture(
+          _profiles.ensure(user),
+        ).asyncExpand((_) => _profiles.watch(user.uid)).map(
+          // Sign-out/account switch can occur while Firestore is responding.
+          (profile) => _auth.currentUser?.uid != user.uid ? null : _map(user, profile),
+        );
       });
+
+  User _signedInUser() =>
+      _auth.currentUser ?? (throw const PermissionDeniedError('Sign in first'));
+
+  @override
+  Future<void> completeMentorProfile() =>
+      _profiles.createMentor(_signedInUser());
+
+  @override
+  Future<void> completeStudentProfile({
+    required String classId,
+    required String studentId,
+    required bool leader,
+  }) => _profiles.createStudent(
+    _signedInUser(),
+    classId: classId.trim(),
+    studentId: studentId.trim(),
+    leader: leader,
+  );
 
   @override
   AppUser? get currentUser => _map(_auth.currentUser);

@@ -20,6 +20,8 @@ class FirebaseConfigService implements ConfigService {
 
   static const kAiMatchingEnabled = 'ai_matching_enabled';
   static const kMaxProposalsShown = 'max_proposals_shown';
+  static const kMaxTopicRevisions = 'max_topic_revisions';
+  static const kMeetingDuration = 'default_meeting_duration_minutes';
   final FirebaseRemoteConfig _rc;
   final Future<String> Function() _loadDefaults;
   final _controller = StreamController<AppConfig>.broadcast();
@@ -43,6 +45,8 @@ class FirebaseConfigService implements ConfigService {
       await _rc.setDefaults({
         kAiMatchingEnabled: _active.aiMatchingEnabled,
         kMaxProposalsShown: _active.maxProposalsShown,
+        kMaxTopicRevisions: _active.maxTopicRevisions,
+        kMeetingDuration: _active.defaultMeetingDurationMinutes,
       });
       await _rc.setConfigSettings(
         RemoteConfigSettings(
@@ -73,6 +77,8 @@ class FirebaseConfigService implements ConfigService {
     _active = AppConfig.fromValues({
       kAiMatchingEnabled: _rc.getBool(kAiMatchingEnabled),
       kMaxProposalsShown: _rc.getInt(kMaxProposalsShown),
+      kMaxTopicRevisions: _rc.getInt(kMaxTopicRevisions),
+      kMeetingDuration: _rc.getInt(kMeetingDuration),
     });
   }
 

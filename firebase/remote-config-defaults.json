@@ -1,4 +1,6 @@
 {
   "ai_matching_enabled": true,
-  "max_proposals_shown": 3
+  "max_proposals_shown": 3,
+  "max_topic_revisions": 3,
+  "default_meeting_duration_minutes": 30
 }

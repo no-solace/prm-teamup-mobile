@@ -34,6 +34,8 @@ void main() {
     when(() => rc.setConfigSettings(any())).thenAnswer((_) async {});
     when(() => rc.getBool('ai_matching_enabled')).thenAnswer((_) => enabled);
     when(() => rc.getInt('max_proposals_shown')).thenAnswer((_) => limit);
+    when(() => rc.getInt('max_topic_revisions')).thenAnswer((_) => 3);
+    when(() => rc.getInt('default_meeting_duration_minutes')).thenAnswer((_) => 30);
     when(() => rc.fetchAndActivate()).thenAnswer((_) async => true);
     when(() => rc.activate()).thenAnswer((_) async => true);
     when(() => rc.lastFetchStatus).thenReturn(RemoteConfigFetchStatus.success);
@@ -74,6 +76,17 @@ void main() {
         template['parameters']['max_proposals_shown']['defaultValue']['value'],
         defaults['max_proposals_shown'].toString(),
       );
+      expect(defaults['max_topic_revisions'], AppConfig.defaults.maxTopicRevisions);
+      expect(
+        defaults['default_meeting_duration_minutes'],
+        AppConfig.defaults.defaultMeetingDurationMinutes,
+      );
+      for (final key in ['max_topic_revisions', 'default_meeting_duration_minutes']) {
+        expect(
+          template['parameters'][key]['defaultValue']['value'],
+          defaults[key].toString(),
+        );
+      }
       await service.init();
       verify(() => rc.setDefaults(defaults)).called(1);
     },

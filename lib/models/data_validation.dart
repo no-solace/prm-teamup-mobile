@@ -16,6 +16,10 @@ abstract final class DataValidation {
     return value;
   }
 
+  /// The Firebase layer converts Timestamps to DateTime before parsing.
+  static DateTime time(Object? value) =>
+      value is DateTime ? value : throw const FormatException('Invalid time');
+
   static String? optionalText(Map<String, dynamic> data, String key, {int max = 32}) {
     final value = data[key];
     if (value == null) return null;

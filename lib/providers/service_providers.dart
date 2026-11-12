@@ -6,20 +6,26 @@ import '../firebase/firebase_auth_service.dart';
 import '../firebase/firebase_config_service.dart';
 import '../firebase/firebase_crash_service.dart';
 import '../firebase/firebase_storage_service.dart';
+import '../firebase/firestore_booking_service.dart';
 import '../firebase/firestore_class_service.dart';
+import '../firebase/firestore_meeting_service.dart';
 import '../firebase/firestore_proposal_service.dart';
+import '../firebase/firestore_topic_service.dart';
 import '../firebase/pdf_report_service.dart';
 import '../services/analytics_service.dart';
 import '../services/auth_service.dart';
+import '../services/booking_service.dart';
 import '../services/class_service.dart';
 import '../services/config_service.dart';
 import '../services/crash_service.dart';
 import '../services/matching_service.dart';
+import '../services/meeting_service.dart';
 import '../services/notification_service.dart';
 import '../services/proposal_service.dart';
 import '../services/report_service.dart';
 import '../services/rule_based_matching_service.dart';
 import '../services/storage_service.dart';
+import '../services/topic_service.dart';
 
 // The ONLY place where interfaces are bound to implementations (C5).
 // main.dart uses these defaults (Firebase). main_fake.dart and tests override
@@ -64,4 +70,16 @@ final crashServiceProvider = Provider<CrashService>(
 
 final configServiceProvider = Provider<ConfigService>(
   (ref) => FirebaseConfigService(),
+);
+
+final topicServiceProvider = Provider<TopicService>(
+  (ref) => FirestoreTopicService(),
+);
+
+final bookingServiceProvider = Provider<BookingService>(
+  (ref) => FirestoreBookingService(),
+);
+
+final meetingServiceProvider = Provider<MeetingService>(
+  (ref) => FirestoreMeetingService(),
 );

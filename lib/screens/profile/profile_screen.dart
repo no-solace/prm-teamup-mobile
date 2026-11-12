@@ -44,7 +44,7 @@ class ProfileScreen extends ConsumerWidget {
           Center(child: Text(user?.displayName ?? '', style: text.titleLarge)),
           Center(
             child: Text(
-              'Mentor',
+              user?.roleLabel ?? '',
               style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
             ),
           ),
@@ -87,8 +87,11 @@ class ProfileScreen extends ConsumerWidget {
                 Text('Firebase demo', style: text.titleMedium),
                 const SizedBox(height: kSpaceSm),
                 const ConfigDemoPanel(),
-                const SizedBox(height: kSpaceMd),
-                const ReportDemoPanel(),
+                // Class reports read mentor-owned data only.
+                if (user?.isMentor ?? false) ...[
+                  const SizedBox(height: kSpaceMd),
+                  const ReportDemoPanel(),
+                ],
                 const SizedBox(height: kSpaceMd),
                 AppButton(
                   label: 'Test crash',

@@ -32,6 +32,18 @@ abstract interface class AuthService {
   /// Ignores late native callbacks; an already sent SMS cannot be recalled.
   void cancelPhoneVerification();
 
+  /// First sign-in only: creates users/{uid} with role mentor.
+  Future<void> completeMentorProfile();
+
+  /// First sign-in only: links the account to an imported student who
+  /// already has a team. Throws [ValidationError] when the class code/MSSV
+  /// does not match, or the student has no team yet.
+  Future<void> completeStudentProfile({
+    required String classId,
+    required String studentId,
+    required bool leader,
+  });
+
   /// Signs out of Firebase and Google; callers clear local state.
   Future<void> signOut();
 }

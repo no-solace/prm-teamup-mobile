@@ -1,7 +1,14 @@
 rules_version = '2';
 
 // Prototype schema; docs/data-model.md is the integration contract.
-// users/{uid}: displayName:string<=120, role:'mentor', lastSignInAt:timestamp.
+// users/{uid}: displayName:string<=120, role:mentor|leader|member,
+//   lastSignInAt:timestamp. Students add classId,teamId,studentId,mentorUid
+//   (verified against the imported roster at creation, immutable after).
+// topics/{classId_teamId}: Flow D, one per team; leader writes, mentor decides.
+// mentors/{uid}/slots/{id}: Flow E availability; status available|booked.
+// bookings/{id}: Flow E/F; requested|confirmed|cancelled|completed; slot and
+//   booking always change in the same commit (each side checks the other).
+// minutes/{bookingId}: Flow F; editable by both sides until the mentor signs.
 // classes/{id}: name:string<=120, mentorUid:string<=128 immutable,
 //   createdAt:timestamp immutable. Counts are derived, never stored.
 // students/{mssv}: fullName:string<=120, major:SE|AI|MKT|GD,
@@ -63,6 +70,102 @@ service cloud.firestore {
         && d.keys().hasOnly(['displayName', 'role', 'lastSignInAt'])
         && text(d.displayName, 120) && d.role == 'mentor'
         && d.lastSignInAt == request.time;
+    }
+    // ---- Student roles (Flow D/E/F) ----
+    function me() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    function hasRole() {
+      return signedIn() && me().role in ['mentor', 'leader', 'member'];
+    }
+    // A signed-in account that has not chosen a role yet (onboarding).
+    function noProfile() {
+      return signedIn() && !exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+    function isStudentOf(classId, teamId) {
+      return signedIn() && me().role in ['leader', 'member']
+        && me().classId == classId && me().teamId == teamId;
+    }
+    function isLeaderOf(classId, teamId) {
+      return isStudentOf(classId, teamId) && me().role == 'leader';
+    }
+    function teamName(classId, teamId) {
+      return get(/databases/$(database)/documents/classes/$(classId)/teams/$(teamId)).data.name;
+    }
+    function validStudentUser(d) {
+      return d.keys().hasAll(['displayName', 'role', 'lastSignInAt', 'classId', 'teamId', 'studentId', 'mentorUid'])
+        && d.keys().hasOnly(['displayName', 'role', 'lastSignInAt', 'classId', 'teamId', 'studentId', 'mentorUid'])
+        && text(d.displayName, 120) && d.role in ['leader', 'member']
+        && d.lastSignInAt == request.time
+        && safeId(d.classId) && safeId(d.teamId) && safeId(d.studentId) && text(d.mentorUid, 128);
+    }
+    // The MSSV must be in the class and already in that team.
+    function studentLinkValid(d) {
+      return get(/databases/$(database)/documents/classes/$(d.classId)/students/$(d.studentId)).data.teamId == d.teamId
+        && get(/databases/$(database)/documents/classes/$(d.classId)).data.mentorUid == d.mentorUid;
+    }
+    function topicIdOf(u) { return u.classId + '_' + u.teamId; }
+    function validTopic(d) {
+      return d.keys().hasAll(['classId', 'teamId', 'teamName', 'mentorUid', 'leaderUid', 'title',
+          'description', 'techStack', 'status', 'revisionCount', 'submittedAt'])
+        && d.keys().hasOnly(['classId', 'teamId', 'teamName', 'mentorUid', 'leaderUid', 'title',
+          'description', 'techStack', 'status', 'revisionCount', 'submittedAt',
+          'attachmentName', 'attachmentUrl', 'mentorFeedback', 'reviewedAt'])
+        && safeId(d.classId) && safeId(d.teamId) && text(d.teamName, 120)
+        && text(d.mentorUid, 128) && text(d.leaderUid, 128)
+        && text(d.title, 200) && text(d.description, 4000) && text(d.techStack, 300)
+        && d.status in ['pending', 'approved', 'rejected', 'revision_requested']
+        // Remote Config max_topic_revisions is enforced in the app; 10 is the hard cap.
+        && d.revisionCount is int && d.revisionCount >= 0 && d.revisionCount <= 10
+        && d.submittedAt is timestamp
+        && (!('attachmentName' in d) || text(d.attachmentName, 200))
+        && (!('attachmentUrl' in d) || (text(d.attachmentUrl, 2048) && d.attachmentUrl.matches('^https://.*')))
+        && (!('mentorFeedback' in d) || text(d.mentorFeedback, 2000))
+        && (!('reviewedAt' in d) || d.reviewedAt is timestamp);
+    }
+    function validSlot(d) {
+      return d.keys().hasAll(['startTime', 'endTime', 'status', 'bookingId'])
+        && d.keys().hasOnly(['startTime', 'endTime', 'status', 'bookingId'])
+        && d.startTime is timestamp && d.endTime is timestamp
+        && d.endTime - d.startTime >= duration.value(15, 'm')
+        && d.endTime - d.startTime <= duration.value(120, 'm')
+        && ((d.status == 'available' && d.bookingId == null)
+          || (d.status == 'booked' && safeId(d.bookingId)));
+    }
+    function bookingPath(id) { return /databases/$(database)/documents/bookings/$(id); }
+    function slotPath(mentorUid, slotId) {
+      return /databases/$(database)/documents/mentors/$(mentorUid)/slots/$(slotId);
+    }
+    function validBooking(d) {
+      return d.keys().hasAll(['slotId', 'mentorUid', 'classId', 'teamId', 'teamName', 'purpose',
+          'status', 'startTime', 'endTime', 'requestedBy', 'createdAt'])
+        && d.keys().hasOnly(['slotId', 'mentorUid', 'classId', 'teamId', 'teamName', 'purpose',
+          'status', 'startTime', 'endTime', 'requestedBy', 'createdAt', 'meetUrl'])
+        && safeId(d.slotId) && text(d.mentorUid, 128) && safeId(d.classId) && safeId(d.teamId)
+        && text(d.teamName, 120) && d.purpose in ['topic_review', 'sprint_review', 'tech_guidance']
+        && d.status in ['requested', 'confirmed', 'cancelled', 'completed']
+        && d.startTime is timestamp && d.endTime is timestamp
+        && text(d.requestedBy, 128) && d.createdAt is timestamp
+        && (!('meetUrl' in d) || d.meetUrl.matches('^https://meet[.]google[.]com/[a-z]{3}-[a-z]{4}-[a-z]{3}$'));
+    }
+    // Mentor of the booking or a student of its team.
+    function bookingParty(bookingId) {
+      let b = get(bookingPath(bookingId)).data;
+      return (isMentor() && b.mentorUid == request.auth.uid) || isStudentOf(b.classId, b.teamId);
+    }
+    function validMinutes(d, id) {
+      return d.keys().hasAll(['bookingId', 'mentorUid', 'classId', 'teamId', 'teamName', 'meetingDate',
+          'summary', 'actionItems', 'mentorRating', 'isSignedByMentor', 'createdBy', 'updatedAt'])
+        && d.keys().hasOnly(['bookingId', 'mentorUid', 'classId', 'teamId', 'teamName', 'meetingDate',
+          'summary', 'actionItems', 'mentorRating', 'isSignedByMentor', 'createdBy', 'updatedAt',
+          'pdfStoragePath', 'pdfDownloadUrl'])
+        && d.bookingId == id && text(d.summary, 4000)
+        // Items are {task, assignee, deadline} strings; the app validates each.
+        && d.actionItems is list && d.actionItems.size() <= 20
+        && (d.mentorRating == null || (d.mentorRating is int && d.mentorRating >= 1 && d.mentorRating <= 5))
+        && d.isSignedByMentor is bool && d.updatedAt is timestamp
+        && (!('pdfStoragePath' in d) || d.pdfStoragePath == 'minutes/' + id + '/minutes.pdf')
+        && (!('pdfDownloadUrl' in d) || (text(d.pdfDownloadUrl, 2048) && d.pdfDownloadUrl.matches('^https://.*')));
     }
     function validClass(d) {
       return d.keys().hasAll(['name', 'mentorUid', 'createdAt'])
@@ -206,30 +309,35 @@ service cloud.firestore {
 
     match /users/{uid} {
       allow read: if isSelf(uid);
-      // Lab 3 mentor is the baseline role: only owns personal imports.
-      allow create: if isSelf(uid) && validUser(request.resource.data);
-      allow update: if isSelf(uid) && validUser(request.resource.data)
-        && request.resource.data.role == resource.data.role;
+      // Onboarding: a mentor, or a student linked to the imported roster.
+      allow create: if isSelf(uid) && (validUser(request.resource.data)
+        || (validStudentUser(request.resource.data) && studentLinkValid(request.resource.data)));
+      // Role and student links are immutable; only the sign-in refresh.
+      allow update: if isSelf(uid)
+        && (validUser(request.resource.data) || validStudentUser(request.resource.data))
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'lastSignInAt']);
       // No client delete/recreate path to change an assigned role.
       match /notifications/{id} {
-        allow read: if isSelf(uid) && isMentor();
-        allow create: if isSelf(uid) && isMentor() && validNotification(request.resource.data);
-        allow update: if isSelf(uid) && isMentor() && validNotification(request.resource.data)
+        allow read: if isSelf(uid) && hasRole();
+        allow create: if isSelf(uid) && hasRole() && validNotification(request.resource.data);
+        allow update: if isSelf(uid) && hasRole() && validNotification(request.resource.data)
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
       }
       match /fcmTokens/{id} {
-        allow read: if isSelf(uid) && isMentor();
-        allow create, update: if isSelf(uid) && isMentor()
+        allow read: if isSelf(uid) && hasRole();
+        allow create, update: if isSelf(uid) && hasRole()
           // Token document IDs are base64url-encoded FCM tokens. Keep the
           // Firestore document-ID limit without relying on unsupported regex
           // repetition bounds in the Rules runtime.
           && id.size() > 0 && id.size() <= 1500
           && validFcmToken(request.resource.data);
-        allow delete: if isSelf(uid) && isMentor();
+        allow delete: if isSelf(uid) && hasRole();
       }
     }
     match /classes/{classId} {
       allow read: if isMentor() && resource.data.mentorUid == request.auth.uid;
+      // Onboarding looks up the class code (a single get, never a list).
+      allow get: if noProfile();
       allow create: if isMentor() && safeId(classId) && validClass(request.resource.data)
         && request.resource.data.mentorUid == request.auth.uid
         && request.resource.data.createdAt == request.time;
@@ -239,6 +347,9 @@ service cloud.firestore {
       // Delete needs a server-side cascade; prevent orphaned children.
       match /students/{mssv} {
         allow read: if ownsClass(classId);
+        // Students see their own teammates; onboarding gets one known MSSV.
+        allow read: if isStudentOf(classId, resource.data.teamId);
+        allow get: if noProfile();
         allow create: if ownsClassAfter(classId) && safeId(mssv)
           && validStudent(request.resource.data)
           && (request.resource.data.teamId == null ||
@@ -261,6 +372,7 @@ service cloud.firestore {
       }
       match /teams/{teamId} {
         allow read: if ownsClass(classId);
+        allow get: if isStudentOf(classId, teamId);
         allow create: if ownsClassAfter(classId) && safeId(teamId)
           && validTeam(request.resource.data)
           && !('rosterChangeProposalId' in request.resource.data)
@@ -348,6 +460,142 @@ service cloud.firestore {
         && request.resource.data.createdAt == resource.data.createdAt;
       allow delete: if isMentor() && resource.data.ownerUid == request.auth.uid;
     }
+
+    // ---- Flow D: project topics ----
+    match /topics/{topicId} {
+      allow read: if isMentor() && resource.data.mentorUid == request.auth.uid;
+      // By ID, so the team can also watch a topic that does not exist yet.
+      allow get: if signedIn() && me().role in ['leader', 'member'] && topicId == topicIdOf(me());
+      allow create: if signedIn() && me().role == 'leader' && topicId == topicIdOf(me())
+        && validTopic(request.resource.data)
+        && request.resource.data.classId == me().classId
+        && request.resource.data.teamId == me().teamId
+        && request.resource.data.mentorUid == me().mentorUid
+        && request.resource.data.leaderUid == request.auth.uid
+        && request.resource.data.teamName == teamName(me().classId, me().teamId)
+        && request.resource.data.status == 'pending'
+        && request.resource.data.revisionCount == 0
+        && request.resource.data.submittedAt == request.time
+        && !('mentorFeedback' in request.resource.data)
+        && !('reviewedAt' in request.resource.data);
+      // Leader edits a pending topic or resubmits after a decision; never
+      // approves. A resubmission (non-pending before) counts one revision.
+      allow update: if isLeaderOf(resource.data.classId, resource.data.teamId)
+        && resource.data.status != 'approved'
+        && validTopic(request.resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'description',
+          'techStack', 'attachmentName', 'attachmentUrl', 'status', 'submittedAt', 'revisionCount',
+          'mentorFeedback'])
+        && request.resource.data.status == 'pending'
+        && request.resource.data.submittedAt == request.time
+        && request.resource.data.revisionCount
+          == resource.data.revisionCount + (resource.data.status == 'pending' ? 0 : 1)
+        && !('mentorFeedback' in request.resource.data);
+      // Only the mentor decides, and only on a pending topic.
+      allow update: if isMentor() && resource.data.mentorUid == request.auth.uid
+        && resource.data.status == 'pending'
+        && request.resource.data.status in ['approved', 'rejected', 'revision_requested']
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'mentorFeedback', 'reviewedAt'])
+        && request.resource.data.reviewedAt == request.time
+        && validTopic(request.resource.data)
+        && (request.resource.data.status == 'approved' || 'mentorFeedback' in request.resource.data);
+    }
+
+    // ---- Flow E: availability slots ----
+    match /mentors/{mentorUid}/slots/{slotId} {
+      allow read: if (isSelf(mentorUid) && isMentor())
+        || (signedIn() && me().role in ['leader', 'member'] && me().mentorUid == mentorUid);
+      allow create: if isSelf(mentorUid) && isMentor() && validSlot(request.resource.data)
+        && request.resource.data.status == 'available' && request.resource.data.startTime > request.time;
+      allow delete: if isSelf(mentorUid) && isMentor() && resource.data.status == 'available';
+      // Book: available -> booked with a booking created for it in the same
+      // commit. Free: booked -> available as that booking is cancelled. Who
+      // may do either is checked by the booking rules.
+      allow update: if validSlot(request.resource.data)
+        && request.resource.data.startTime == resource.data.startTime
+        && request.resource.data.endTime == resource.data.endTime
+        && ((resource.data.status == 'available' && request.resource.data.status == 'booked'
+            && !exists(bookingPath(request.resource.data.bookingId))
+            && getAfter(bookingPath(request.resource.data.bookingId)).data.slotId == slotId
+            && getAfter(bookingPath(request.resource.data.bookingId)).data.mentorUid == mentorUid
+            && getAfter(bookingPath(request.resource.data.bookingId)).data.status == 'requested')
+          || (resource.data.status == 'booked' && request.resource.data.status == 'available'
+            && get(bookingPath(resource.data.bookingId)).data.status in ['requested', 'confirmed']
+            && getAfter(bookingPath(resource.data.bookingId)).data.status == 'cancelled'));
+    }
+
+    // ---- Flow E/F: bookings (a confirmed booking is the meeting) ----
+    match /bookings/{bookingId} {
+      allow read: if (isMentor() && resource.data.mentorUid == request.auth.uid)
+        || isStudentOf(resource.data.classId, resource.data.teamId);
+      // Leader books a slot that was available and is booked for this ID now.
+      allow create: if validBooking(request.resource.data)
+        && isLeaderOf(request.resource.data.classId, request.resource.data.teamId)
+        && request.resource.data.mentorUid == me().mentorUid
+        && request.resource.data.teamName == teamName(me().classId, me().teamId)
+        && request.resource.data.status == 'requested'
+        && !('meetUrl' in request.resource.data)
+        && request.resource.data.requestedBy == request.auth.uid
+        && request.resource.data.createdAt == request.time
+        && get(slotPath(request.resource.data.mentorUid, request.resource.data.slotId)).data.status == 'available'
+        && getAfter(slotPath(request.resource.data.mentorUid, request.resource.data.slotId)).data.bookingId == bookingId
+        && request.resource.data.startTime == get(slotPath(request.resource.data.mentorUid, request.resource.data.slotId)).data.startTime
+        && request.resource.data.endTime == get(slotPath(request.resource.data.mentorUid, request.resource.data.slotId)).data.endTime;
+      // Mentor confirms with a Google Meet link.
+      allow update: if isMentor() && resource.data.mentorUid == request.auth.uid
+        && resource.data.status == 'requested' && request.resource.data.status == 'confirmed'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'meetUrl'])
+        && 'meetUrl' in request.resource.data && validBooking(request.resource.data);
+      // Mentor marks a confirmed meeting as held.
+      allow update: if isMentor() && resource.data.mentorUid == request.auth.uid
+        && resource.data.status == 'confirmed' && request.resource.data.status == 'completed'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
+      // Mentor declines/cancels or the leader cancels; the slot is freed in the same commit.
+      allow update: if ((isMentor() && resource.data.mentorUid == request.auth.uid)
+          || isLeaderOf(resource.data.classId, resource.data.teamId))
+        && resource.data.status in ['requested', 'confirmed']
+        && request.resource.data.status == 'cancelled'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && getAfter(slotPath(resource.data.mentorUid, resource.data.slotId)).data.status == 'available';
+    }
+
+    // ---- Flow F: minutes (ID = booking ID) ----
+    match /minutes/{minutesId} {
+      // By booking, so both sides can watch minutes that do not exist yet.
+      allow get: if bookingParty(minutesId);
+      allow create: if bookingParty(minutesId)
+        && validMinutes(request.resource.data, minutesId)
+        && get(bookingPath(minutesId)).data.status in ['confirmed', 'completed']
+        && request.resource.data.mentorUid == get(bookingPath(minutesId)).data.mentorUid
+        && request.resource.data.classId == get(bookingPath(minutesId)).data.classId
+        && request.resource.data.teamId == get(bookingPath(minutesId)).data.teamId
+        && request.resource.data.teamName == get(bookingPath(minutesId)).data.teamName
+        && request.resource.data.meetingDate == get(bookingPath(minutesId)).data.startTime
+        && request.resource.data.mentorRating == null
+        && request.resource.data.isSignedByMentor == false
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time
+        && !('pdfStoragePath' in request.resource.data);
+      // Either side edits the draft.
+      allow update: if bookingParty(minutesId) && resource.data.isSignedByMentor == false
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['summary', 'actionItems', 'updatedAt'])
+        && request.resource.data.updatedAt == request.time
+        && validMinutes(request.resource.data, minutesId);
+      // Only the mentor rates and signs; signed minutes are then read-only.
+      allow update: if isMentor() && resource.data.mentorUid == request.auth.uid
+        && resource.data.isSignedByMentor == false
+        && request.resource.data.isSignedByMentor == true
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['mentorRating', 'isSignedByMentor', 'updatedAt'])
+        && request.resource.data.updatedAt == request.time
+        && validMinutes(request.resource.data, minutesId)
+        && request.resource.data.mentorRating != null;
+      // After signing: attach the exported PDF.
+      allow update: if bookingParty(minutesId) && resource.data.isSignedByMentor == true
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['pdfStoragePath', 'pdfDownloadUrl'])
+        && validMinutes(request.resource.data, minutesId)
+        && 'pdfStoragePath' in request.resource.data;
+    }
+
     match /{document=**} { allow read, write: if false; }
   }
 }

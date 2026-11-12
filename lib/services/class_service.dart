@@ -53,4 +53,10 @@ abstract interface class ClassService {
   Future<ImportPreview> parseImportFile({required String fileName, required List<int> bytes});
 
   Future<ImportResult> importClass(ImportPreview preview);
+
+  /// Student view (My team tab): their own team and its members only.
+  Stream<({Team team, List<Student> members})> watchMyTeam(
+    String classId,
+    String teamId,
+  );
 }

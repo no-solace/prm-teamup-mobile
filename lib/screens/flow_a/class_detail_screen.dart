@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -8,6 +9,7 @@ import '../../theme/app_spacing.dart';
 import '../../viewmodels/classes/class_detail_view_model.dart';
 import '../../viewmodels/classes/flow_a_config.dart';
 import '../../viewmodels/view_state.dart';
+import '../../widgets/action_feedback.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_card.dart';
 import '../../widgets/stat_triple.dart';
@@ -49,6 +51,22 @@ class ClassDetailScreen extends ConsumerWidget {
               title: 'Automated grouping',
               message:
                   'AI matching balances majors and team size (5–6 members) for the ${room.withoutTeamCount} students without a team.',
+            ),
+            const SizedBox(height: kSpaceMd),
+            // Students join with this code + their MSSV (Flow D/E/F).
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.key_outlined),
+              title: const Text('Class code for students'),
+              subtitle: SelectableText(room.id),
+              trailing: IconButton(
+                tooltip: 'Copy class code',
+                icon: const Icon(Icons.copy),
+                onPressed: () async {
+                  await Clipboard.setData(ClipboardData(text: room.id));
+                  if (context.mounted) showMessage(context, 'Class code copied');
+                },
+              ),
             ),
           ],
         ),
