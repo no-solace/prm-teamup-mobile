@@ -24,13 +24,12 @@ class FcmNotificationService implements NotificationService {
     String? Function()? currentUserId,
     Stream<RemoteMessage>? foregroundMessages,
     Stream<RemoteMessage>? openedMessages,
-    List<Duration> tokenRetryDelays = const [
+    this._tokenRetryDelays = const [
       Duration(seconds: 1),
       Duration(seconds: 2),
       Duration(seconds: 4),
     ],
-  }) : _tokenRetryDelays = tokenRetryDelays,
-       _messaging = messaging ?? FirebaseMessaging.instance,
+  }) : _messaging = messaging ?? FirebaseMessaging.instance,
        _store = store ?? FirestoreNotificationStore(),
        _presenter = presenter ?? AndroidNotificationPresenter(),
        _userIds =
