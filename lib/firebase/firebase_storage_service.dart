@@ -56,9 +56,12 @@ class FirebaseStorageService implements StorageService {
     if (_uid() != uid) {
       throw const PermissionDeniedError('Account changed during upload');
     }
-    final url = await file.getDownloadURL();
     final sizeKb = (bytes.length / 1024).ceil();
+    final String url;
     try {
+      // Any failure from here on leaves the uploaded PDF without metadata,
+      // so it is removed below (finding F5: getDownloadURL used to sit outside).
+      url = await file.getDownloadURL();
       await reportDoc.set({
         'ownerUid': uid,
         'classId': classId,
