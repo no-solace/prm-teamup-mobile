@@ -35,8 +35,11 @@
 | **CR-07** | Copilot Code Review | `lib/viewmodels/classes/matching_view_model.dart:57` | Test gap | Sau khi thêm `logAiMatchResult`, kết quả matching được ghi event **kể cả khi ViewModel đã bị dispose** (`_active(generation)` đã false) → event rác. | **Accepted** | Ràng buộc thực tế: Riverpod dispose là bình thường khi người dùng bấm Back giữa lúc AI đang chạy. Ghi event cho một màn đã đóng sẽ làm sai số liệu phễu (`ai_match_start` không có `ai_match_result` tương ứng). Đã sửa bằng cách chỉ ghi event khi `_active(generation)` còn đúng. | `1b6fea8` `fix(CR-01)` |
 | **CR-08** | Copilot Code Review | `lib/services/fakes/fake_proposal_service.dart:70` | Test gap | Fake `watchAllPending()` không sort, còn Firestore implementation sort theo `teamName`. Khi thêm giới hạn `take(limit)` (CR-02), test và app **chọn khác nhóm** → test xanh nhưng app sai. | **Accepted** | Ràng buộc thực tế: fake phải mô phỏng đúng hành vi production, nếu không test không bảo chứng được điều gì. Đã sửa fake sort theo `teamName` cho khớp `FirestoreProposalService`. | `9cf68f5` `fix(CR-02)` |
 
-**Tổng: 8 finding** — vượt mức tối thiểu 5; bao phủ **nhiều loại**: bug (CR-02, CR-04,
-CR-06), architecture (CR-03), test gap (CR-01, CR-07, CR-08), maintainability (CR-05).
+| **CR-09** | Cursor Agent | `e2e_test/conftest.py:37`<br>`e2e_test/conftest.py:100` | Bug | Bộ test gọi `ArtemisClient(device_serial=…, profile=…, api_key=…, output_dir=…)` và `artemis.run(instruction)` — **không tồn tại trong SDK thật**. Client cài được là `artemis-client` (gói con trong monorepo ARTEMIS), nó **remote-only** (gọi HTTP tới daemon), `run()` là coroutine, và không có tham số `api_key`/`output_dir`. Ngoài ra `APP_PACKAGE` là `com.example.teamup_exe` trong khi `applicationId` thật là `com.group6.teamup_exe`. | **Accepted** | Vi phạm trực tiếp Lab 3 §7: bộ test phải **chạy được**. Hiện tại mọi test ném `TypeError`/`AttributeError` ngay khi gọi client — tức 18 ca ARTEMIS sẽ fail 100% khi giảng viên chạy, dù app đã đúng. Tác động đo được: `pytest` không tạo được bất kỳ ca nào. | `668ce5f` `fix(lab3)` |
+| **CR-10** | Cursor Agent | `lib/widgets/proposal_student_picker.dart:96`<br>`lib/screens/flow_b/add_member_screen.dart:70` | Bug / Fidelity | S13 yêu cầu lỗi **"Max 6 members"** kèm **nút bị khóa**, nhưng nút lưu vẫn bấm được; dòng đếm hiện `"X of Y places selected"` thay vì meta line của Lab 2 `"FinLite, 6 of 6"`. | **Accepted** | Lab 3 §3: *"An unrecorded difference between Figma and the app is graded as a defect."*; Lab 2 handoff S13 ghi rõ *"Button primary (disabled)"* và *"Bỏ một lựa chọn thì lỗi biến mất và nút Add bật"*. Tác động đo được: giữa Flow B và Flow C (S11/S16 dùng chung widget) không có trạng thái nào cho mentor thấy nhóm đã đầy bằng cách khóa nút. Đã sửa và thêm 5 widget test cho S11/S13/S21. | `668ce5f` `fix(lab3)` |
+
+**Tổng: 10 finding** — vượt mức tối thiểu 5; bao phủ **nhiều loại**: bug (CR-02, CR-04,
+CR-06, CR-09, CR-10), architecture (CR-03), test gap (CR-01, CR-07, CR-08), maintainability (CR-05).
 
 ---
 
@@ -149,6 +152,64 @@ Nếu fake khác production thì test xanh không bảo chứng điều gì — 
 `FirestoreProposalService.watchAllPending()`. Sau khi sửa, smoke test đầu-cuối
 lại chạy xanh (trước đó lộ ra đúng lỗi này).
 
+### CR-09 — Bộ ARTEMIS gọi một API không tồn tại — **Accepted**
+
+*Vì sao phải sửa*: Đề Lab 3 §7 yêu cầu bộ test **chạy được** và cho điểm ở
+mục "Automated E2E tests". Bộ test hiện tại gọi
+`ArtemisClient(device_serial=…, profile=…, api_key=…, output_dir=…)` rồi gọi
+`artemis.run(instruction)` **đồng bộ**. SDK thật của ARTEMIS:
+
+* tên gói cài được là `artemis-client` (gói con trong monorepo `packages/`),
+  không phải `artemis`;
+* là client **remote-only** — nó gọi HTTP tới một ARTEMIS daemon, không import
+  ADB hay LLM provider;
+* `run()` là **coroutine**, nên phải được `await` (trong pytest: `asyncio.run`);
+* không có tham số `api_key`/`output_dir`; key thuộc về phía daemon.
+
+Hệ quả: **mọi test ném `TypeError`/`AttributeError` trước khi chạm tới thiết
+bị** — giảng viên chạy `pytest` sẽ thấy 18/18 fail với lý do không liên quan
+tới app. Thêm vào đó `APP_PACKAGE` là `com.example.teamup_exe` trong khi
+`applicationId` trong `android/app/build.gradle.kts` là
+`com.group6.teamup_exe` → `adb shell pm clear` và `monkey` sẽ không nhắm
+đúng app.
+
+*Cách sửa*:
+1. `pyproject.toml` ghim **đúng commit** của ARTEMIS
+   (`351ca842…`) với `subdirectory=packages/artemis-client`; `requires-python`
+   hạ xuống `>=3.10` cho khớp `artemis-client` (trước đó ghi `>=3.12` trong
+   khi máy chạy Python 3.11 và SDK hỗ trợ từ 3.10).
+2. `conftest.py` import `from artemis_client import ArtemisClient`, dựng client
+   với `base_url`/`token`/`device_serial`/`default_profile`, và chạy `run()`
+   qua `asyncio.run` với `locked_app_package`.
+3. `Observed.ok` so khớp đúng tập trạng thái cuối của ARTEMIS
+   (`completed`/`success`) thay vì so `"SUCCESS"`.
+4. `APP_PACKAGE` sửa thành `com.group6.teamup_exe`.
+5. Bổ sung `ARTEMIS_BASE_URL`, `ARTEMIS_TOKEN`, `ARTEMIS_TIMEOUT` vào tài liệu.
+
+*Kiểm chứng*: `pytest --collect-only` thu thập đủ 19 test; khi không có
+daemon, lỗi là `NetworkError` rõ ràng ("Could not reach Artemis host at
+http://127.0.0.1:8000/api/run") — tức đã đúng đường, chỉ còn thiếu môi
+trường.
+
+### CR-10 — S13 hiện lỗi nhưng nút vẫn bấm được — **Accepted**
+
+*Vì sao phải sửa*: Lab 2 handoff mô tả S13 rất cụ thể: *"Components: Checkbox
+row, error text, Button primary (disabled)"* và *"Bỏ một lựa chọn thì lỗi biến
+mất và nút Add bật"*. App chỉ hiện đúng dòng lỗi "Max 6 members" nhưng nút lưu
+vẫn bấm được, và dòng đếm hiện `"1 of 2 places selected"` thay vì meta line
+của Lab 2 `"FinLite, 6 of 6"`. Đề Lab 3 §3 nói rõ: *"An unrecorded difference
+between Figma and the app is graded as a defect."*
+
+*Cách sửa*: `ProposalStudentPicker` trả về trạng thái hợp lệ qua
+`onValidityChanged`; `AddMemberScreen` khoá nút lưu **đúng lúc** dòng lỗi đang
+hiện, và bỏ khoá ngay khi người dùng bỏ chọn một sinh viên. Meta line đổi
+theo handoff: `<tên nhóm>, N of 6` với N là kích thước nhóm *sau* khi áp dụng
+lựa chọn. Widget dùng chung nên S16 (Add student) cũng được sửa theo.
+
+*Kiểm chứng*: thêm `test/widgets/proposal_student_picker_test.dart` với 5 ca
+(S11 meta line, S13 từ chối lựa chọn, S13 gỡ lỗi khi bỏ chọn, nhóm đầy ngay
+từ frame đầu, S21 empty state). Tổng `flutter test` lên **150/150**.
+
 ---
 
 ## 4. Những điểm **không** sửa (minh bạch)
@@ -173,7 +234,7 @@ lại chạy xanh (trước đó lộ ra đúng lỗi này).
 
 > Không có công cụ AI nào được dùng để **viết thay** phần code mà sinh viên
 > không hiểu. Mọi finding đều được kiểm lại bằng `flutter analyze`, `flutter test`
-> (145 test) và `tool/check_layers.sh` trước khi commit.
+> (150 test) và `tool/check_layers.sh` trước khi commit.
 
 ---
 
@@ -182,7 +243,7 @@ lại chạy xanh (trước đó lộ ra đúng lỗi này).
 | Kiểm tra | Lệnh | Kết quả |
 |---|---|---|
 | Phân tích tĩnh | `flutter analyze` | **No issues found** |
-| Unit + widget test | `flutter test` | **145/145 pass** |
+| Unit + widget test | `flutter test` | **150/150 pass** |
 | Luật layer | `bash tool/check_layers.sh` | **Layers OK** |
 
 Lịch sử commit (mỗi fix là một commit riêng, có tên finding):
@@ -192,4 +253,5 @@ Lịch sử commit (mỗi fix là một commit riêng, có tên finding):
 9cf68f5  fix(CR-02): apply the max_proposals_shown Remote Config value to the proposal list
 000f51b  fix(CR-03): restore the Lab 2 components and the inline error states
 7c0fc66  fix(CR-04): show the download URL and storage path of the uploaded report
+668ce5f  fix(lab3): correct the ARTEMIS client API (CR-09) and enforce the S13 capacity lock (CR-10)
 ```

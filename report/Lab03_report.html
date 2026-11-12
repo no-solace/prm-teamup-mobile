@@ -522,7 +522,7 @@ ARTEMIS đọc cây accessibility thay vì đoán từ ảnh.</p>
 </table>
 <p>Bảng đầy đủ 20 dòng ở <code>docs/architecture.md</code> §4.</p>
 <h3 id="35-kiem-thu-tu-ong-o-tang-unit">3.5 Kiểm thử tự động ở tầng unit</h3>
-<p><code>flutter test</code> chạy <strong>145 test</strong> (unit + widget + integration) và <strong>145/145 pass</strong>:</p>
+<p><code>flutter test</code> chạy <strong>150 test</strong> (unit + widget + integration) và <strong>150/150 pass</strong>:</p>
 <table>
 <thead>
 <tr>
@@ -1015,7 +1015,7 @@ thiết bị; mỗi lần chạy có trace/screenshot trong <code>evidence/artem
 <tr>
 <td>Unit / widget / integration Dart</td>
 <td><code>flutter test</code></td>
-<td><strong>145/145 pass</strong></td>
+<td><strong>150/150 pass</strong></td>
 </tr>
 <tr>
 <td>Firestore Security Rules</td>
@@ -1039,7 +1039,7 @@ thiết bị; mỗi lần chạy có trace/screenshot trong <code>evidence/artem
 <p>Bản ghi đầy đủ ở <code>docs/code-review.md</code>. Tóm tắt:</p>
 <p><strong>Công cụ dùng:</strong> Cursor Agent (Claude Opus 4.5), Claude Code trong Cursor, GitHub
 Copilot Chat, GitHub Copilot Code Review (chạy trên pull request).</p>
-<p><strong>8 phát hiện, thuộc 4 nhóm:</strong> bug (CR-02, CR-04, CR-06), architecture (CR-03),
+<p><strong>10 phát hiện, thuộc 4 nhóm:</strong> bug (CR-02, CR-04, CR-06, CR-09, CR-10), architecture (CR-03),
 test gap (CR-01, CR-07, CR-08), maintainability (CR-05). Mỗi phát hiện gắn với
 file và dòng cụ thể.</p>
 <table>
@@ -1109,9 +1109,23 @@ file và dòng cụ thể.</p>
 <td>Test xanh nhưng app sai — loại "test gap" nguy hiểm nhất</td>
 <td><code>9cf68f5</code></td>
 </tr>
+<tr>
+<td>CR-09</td>
+<td>Bộ ARTEMIS gọi API <strong>không tồn tại</strong> (<code>ArtemisClient(api_key=…)</code>, <code>run()</code> đồng bộ) và sai <code>applicationId</code></td>
+<td>Accepted</td>
+<td>§7 yêu cầu bộ test <strong>chạy được</strong>; hiện 18/18 test ném <code>TypeError</code> trước khi chạm thiết bị</td>
+<td><code>668ce5f</code></td>
+</tr>
+<tr>
+<td>CR-10</td>
+<td>S13 hiện lỗi "Max 6 members" nhưng <strong>nút lưu vẫn bấm được</strong>; dòng đếm lệch Lab 2</td>
+<td>Accepted</td>
+<td>Lab 2 handoff: <em>"Button primary (disabled)"</em>; §3 coi sai lệch Figma↔app là lỗi</td>
+<td><code>668ce5f</code></td>
+</tr>
 </tbody>
 </table>
-<p><strong>4 phát hiện được sửa, mỗi cái một commit riêng có tên mã phát hiện</strong> — yêu cầu
+<p><strong>5 phát hiện được sửa, mỗi cái một commit riêng có tên mã phát hiện</strong> — yêu cầu
 "≥ 3 fixes, each in a commit that names the finding ID" (§8).</p>
 <hr />
 <h2 id="9-kho-khan-gap-phai-va-bai-hoc">9. Khó khăn gặp phải và bài học</h2>
@@ -1204,7 +1218,7 @@ file và dòng cụ thể.</p>
 </tr>
 </tbody>
 </table>
-<p>Mọi phát hiện đều được kiểm lại bằng <code>flutter analyze</code>, <code>flutter test</code> (145 test) và
+<p>Mọi phát hiện đều được kiểm lại bằng <code>flutter analyze</code>, <code>flutter test</code> (150 test) và
 <code>tool/check_layers.sh</code> trước khi commit. Không có phần code nào được nộp mà
 sinh viên không giải thích được.</p>
 <hr />
@@ -1219,7 +1233,7 @@ Firebase, với:</p>
 <li>10 event Analytics có câu hỏi sản phẩm và tham số không chứa dữ liệu cá nhân;</li>
 <li>bộ test E2E ARTEMIS 18 ca + 1 phiên khám phá, assert trên <strong>giá trị quan sát
   được</strong>;</li>
-<li>8 phát hiện AI code review với quyết định có lý do, 4 commit sửa truy vết được.</li>
+<li>10 phát hiện AI code review với quyết định có lý do, 5 commit sửa truy vết được.</li>
 </ul>
 <p><strong>Hướng tiếp theo (Final Assignment):</strong> web admin cho vai Điều phối khoa, luồng
 liên vai duyệt nhóm trên mobile → xác nhận trên web, và thay <code>RuleBasedMatchingService</code>

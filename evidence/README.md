@@ -54,7 +54,7 @@ evidence/
 |---|---|
 | Output gốc của công cụ | `evidence/code-review/` — copy nguyên văn output của GitHub Copilot Code Review trên pull request |
 | Quyết định và lý do | `docs/code-review.md` §2 và §3 |
-| Commit sửa | 4 commit: `1b6fea8` (CR-01, CR-05, CR-06, CR-07) · `9cf68f5` (CR-02, CR-08) · `000f51b` (CR-03) · `7c0fc66` (CR-04) |
+| Commit sửa | 5 commit: `1b6fea8` (CR-01, CR-05, CR-06, CR-07) · `9cf68f5` (CR-02, CR-08) · `000f51b` (CR-03) · `7c0fc66` (CR-04) · `668ce5f` (CR-09, CR-10) |
 
 ## 5. Quy tắc
 

@@ -146,7 +146,7 @@ Chi tiết và quyết định cho từng phát hiện: [docs/code-review.md](do
 | Hạng mục | Trạng thái | Ghi chú |
 |---|---|---|
 | `flutter analyze` | ✅ **No issues found** | 0 cảnh báo |
-| `flutter test` | ✅ **145/145 pass** | unit + widget |
+| `flutter test` | ✅ **150/150 pass** | unit + widget |
 | Firestore rules test | ✅ **21/21 pass** | `npx firebase-tools@15.35.0 emulators:exec --only firestore "node --test firestore.rules.test.mjs"` |
 | `tool/check_layers.sh` | ✅ **Layers OK** | 0 vi phạm layer |
 | Báo cáo PDF | ✅ 10 trang | rubric yêu cầu 8–12 |

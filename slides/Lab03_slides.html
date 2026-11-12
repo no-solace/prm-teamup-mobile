@@ -171,7 +171,7 @@ hr {
 </tr>
 <tr>
 <td><strong>Bằng chứng</strong></td>
-<td>App chạy thật trên máy · 145/145 test Dart · 21/21 test Firestore rules · 18 ca ARTEMIS + 1 phiên khám phá (đã viết) · 8 phát hiện AI review có 4 commit sửa</td>
+<td>App chạy thật trên máy · 150/150 test Dart · 21/21 test Firestore rules · 18 ca ARTEMIS + 1 phiên khám phá (đã viết) · 10 phát hiện AI review có 5 commit sửa</td>
 </tr>
 </tbody>
 </table>
@@ -692,8 +692,8 @@ hr {
 <tr>
 <td>Unit / widget / integration</td>
 <td><code>flutter_test</code></td>
-<td><strong>145 test</strong></td>
-<td><strong>145/145 pass</strong></td>
+<td><strong>150 test</strong></td>
+<td><strong>150/150 pass</strong></td>
 </tr>
 <tr>
 <td>E2E / UI</td>
@@ -711,78 +711,41 @@ hr {
 </table>
 <p>Assert trên <strong>giá trị agent báo lại</strong> (<code>Observed.number()</code>, <code>Observed.contains()</code>), không chỉ <code>status == "SUCCESS"</code>; có 3 ca lỗi thật (vượt 6 · dưới 5 · không tìm ra SV) và 3 native interaction (account picker · notification shade · test crash); kế hoạch chạy mỗi ca ≥ 3 lần, trace lưu ở <code>evidence/artemis/</code>.</p>
 <blockquote>
-<p><strong>Trạng thái bằng chứng:</strong> 145/145 test Dart và 21/21 test Firestore rules <strong>đã chạy thật</strong> và xanh. 18 ca ARTEMIS <strong>đã viết nhưng chưa chạy trên thiết bị</strong> — cần chạy và điền <code>docs/test-plan.md</code> §6 + ảnh vào <code>evidence/artemis/</code> trước khi nộp.</p>
+<p><strong>Trạng thái bằng chứng:</strong> 150/150 test Dart và 21/21 test Firestore rules <strong>đã chạy thật</strong> và xanh. 18 ca ARTEMIS <strong>đã viết nhưng chưa chạy trên thiết bị</strong> — cần chạy và điền <code>docs/test-plan.md</code> §6 + ảnh vào <code>evidence/artemis/</code> trước khi nộp.</p>
 </blockquote>
-<p><strong>AI code review — 8 phát hiện, 4 commit sửa có tên mã</strong></p>
+<p><strong>AI code review — 10 phát hiện, 5 commit sửa có tên mã</strong></p>
+<p>Bảng đầy đủ 10 phát hiện (kèm file:line và lý do) nằm ở <strong>slide dự phòng A3</strong>.
+Hai phát hiện mới nhất là loại "mồi lỗi" — đều là thứ <strong>không test Dart nào bắt được</strong>:</p>
 <table>
 <thead>
 <tr>
 <th>ID</th>
 <th>Finding</th>
 <th>Quyết định</th>
-<th>Lý do</th>
+<th>Vì sao nghiêm trọng</th>
 <th>Commit</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>CR-01</td>
-<td>5 event Analytics + <code>recordNonFatal</code> <strong>không có call site</strong></td>
+<td>CR-09</td>
+<td>Bộ ARTEMIS gọi <code>ArtemisClient(api_key=…)</code> và <code>run()</code> <strong>đồng bộ</strong> — SDK thật là <code>artemis-client</code>, remote-only, <code>run()</code> là coroutine. Sai <code>applicationId</code> nữa (<code>com.example</code> vs <code>com.group6</code>).</td>
 <td>Accepted</td>
-<td>§6 — 0/10 event có dữ liệu DebugView</td>
-<td><code>1b6fea8</code></td>
+<td>§7 yêu cầu bộ test <strong>chạy được</strong>; 18/18 ca sẽ ném <code>TypeError</code> trước khi chạm thiết bị</td>
+<td><code>668ce5f</code></td>
 </tr>
 <tr>
-<td>CR-02</td>
-<td><code>max_proposals_shown</code> chỉ <strong>in ra</strong>, không giới hạn</td>
+<td>CR-10</td>
+<td>S13 hiện lỗi "Max 6 members" nhưng <strong>nút lưu vẫn bấm được</strong>; dòng đếm lệch Lab 2 (<code>places selected</code> thay vì <code>FinLite, 6 of 6</code>)</td>
 <td>Accepted</td>
-<td>Rubric: "Values only printed, not used"</td>
-<td><code>9cf68f5</code></td>
-</tr>
-<tr>
-<td>CR-03</td>
-<td>Dùng <code>Chip</code>/<code>AlertDialog</code> tự chế thay vì component Lab 2</td>
-<td>Accepted</td>
-<td>§10 trừ điểm one-off widgets</td>
-<td><code>000f51b</code></td>
-</tr>
-<tr>
-<td>CR-04</td>
-<td>Thiếu <strong>download URL</strong> ở khu demo Storage</td>
-<td>Accepted</td>
-<td>§6 yêu cầu hiện URL</td>
-<td><code>7c0fc66</code></td>
-</tr>
-<tr>
-<td>CR-05</td>
-<td><code>report_export.teamCount</code> là số bịa</td>
-<td><strong>Modified</strong></td>
-<td>Sửa theo AI sẽ vi phạm luật layer → đổi interface thành <code>BuiltReport(bytes, teamCount)</code></td>
-<td><code>1b6fea8</code></td>
-</tr>
-<tr>
-<td>CR-06</td>
-<td>Constructor gọi <code>Firebase*.instance</code> ngay</td>
-<td>Accepted</td>
-<td>Crash khi Firebase chưa sẵn sàng</td>
-<td><code>1b6fea8</code></td>
-</tr>
-<tr>
-<td>CR-07</td>
-<td>Ghi <code>ai_match_result</code> cho màn đã dispose</td>
-<td>Accepted</td>
-<td>Phễu DebugView lệch → kết luận sai</td>
-<td><code>1b6fea8</code></td>
-</tr>
-<tr>
-<td>CR-08</td>
-<td>Fake <code>watchAllPending</code> không sort, lệch production</td>
-<td>Accepted</td>
-<td>Test xanh nhưng app sai</td>
-<td><code>9cf68f5</code></td>
+<td>Handoff Lab 2: <em>"Button primary (disabled)"</em>; §3 coi sai lệch Figma↔app là lỗi</td>
+<td><code>668ce5f</code></td>
 </tr>
 </tbody>
 </table>
+<blockquote>
+<p>CR-01 → CR-08 (8 phát hiện trước đó) đã sửa ở 4 commit: <code>1b6fea8</code>, <code>9cf68f5</code>, <code>000f51b</code>, <code>7c0fc66</code>.</p>
+</blockquote>
 <h2 id="15-achievements-limitations-conclusion">15 · Achievements, Limitations &amp; Conclusion</h2>
 <p><strong>Đã đạt (kèm bằng chứng):</strong></p>
 <table>
@@ -831,13 +794,13 @@ hr {
 </tr>
 <tr>
 <td>AI review ≥ 5 phát hiện, ≥ 3 commit sửa</td>
-<td>✅ <strong>8 phát hiện</strong>, <strong>4 commit</strong> có tên mã</td>
+<td>✅ <strong>10 phát hiện</strong>, <strong>5 commit</strong> có tên mã</td>
 <td><code>docs/code-review.md</code></td>
 </tr>
 </tbody>
 </table>
 <p><strong>Giới hạn trung thực:</strong> ① <strong>Figma chưa cập nhật</strong> cho D1–D4 (đã ghi ở traceability, cần sửa trước khi nộp) — ưu tiên <strong>Cao</strong>; ② <strong>18 ca ARTEMIS đã viết nhưng chưa chạy trên thiết bị</strong> — cần chạy + chụp bằng chứng vào <code>evidence/artemis/</code> — ưu tiên <strong>Cao</strong>; ③ "AI" là thuật toán quy tắc, chưa dùng kỹ năng/lịch — Final thay bằng Gemini; ④ chưa có web admin và luồng liên vai — Final bổ sung; ⑤ chưa test tải 2 mentor duyệt đồng thời — thấp.</p>
-<p><strong>Kết luận:</strong> <em>PROBLEM SOLVED</em> — chia nhóm thủ công mất hàng giờ và dễ sai quy tắc 5–6 người / ≥ 3 ngành → 25 màn + 3 workflow tự động hoá, có ràng buộc ở cả UI lẫn Firestore rules. <em>WORKING PRODUCT</em> — app Flutter + Firebase chạy thật trên Android: import → ghép theo ngành → sửa &amp; duyệt → undo → xuất PDF lên Cloud Storage. <em>VERIFIED RESULT</em> — 145/145 test Dart · 21/21 test Firestore rules · 18 ca ARTEMIS + 1 phiên khám phá (đã viết, cần chạy) · 8 phát hiện AI review có 4 commit sửa · 6 dịch vụ Firebase có ca lỗi.</p>
+<p><strong>Kết luận:</strong> <em>PROBLEM SOLVED</em> — chia nhóm thủ công mất hàng giờ và dễ sai quy tắc 5–6 người / ≥ 3 ngành → 25 màn + 3 workflow tự động hoá, có ràng buộc ở cả UI lẫn Firestore rules. <em>WORKING PRODUCT</em> — app Flutter + Firebase chạy thật trên Android: import → ghép theo ngành → sửa &amp; duyệt → undo → xuất PDF lên Cloud Storage. <em>VERIFIED RESULT</em> — 150/150 test Dart · 21/21 test Firestore rules · 18 ca ARTEMIS + 1 phiên khám phá (đã viết, cần chạy) · 10 phát hiện AI review có 5 commit sửa · 6 dịch vụ Firebase có ca lỗi.</p>
 <p><strong>Repo:</strong> <code>github.com/no-solace/prm-teamup-mobile</code> · <strong>Figma:</strong> file Lab 2 Final UI · <strong>Video demo:</strong> 5–10 phút (link trong README). <strong>Hướng tiếp:</strong> web admin cho Điều phối khoa, luồng duyệt mobile → web, và Gemini thay thuật toán quy tắc — giữ nguyên interface <code>MatchingService</code>/<code>ProposalService</code>.</p>
 <hr />
 <h1 id="phu-luc-slide-du-phong-khong-trinh-bay-mo-khi-bi-hoi">Phụ lục — slide dự phòng (không trình bày, mở khi bị hỏi)</h1>
@@ -944,7 +907,7 @@ hr {
 </tbody>
 </table>
 <p>Tất cả gọi qua <code>lib/viewmodels/instrumentation.dart</code> (<code>trackAnalytics</code>) — bọc try/catch để lỗi tracking không làm hỏng luồng chính.</p>
-<h2 id="a3-ai-code-review-chi-tiet-8-phat-hien">A3 · AI code review — chi tiết 8 phát hiện</h2>
+<h2 id="a3-ai-code-review-chi-tiet-10-phat-hien">A3 · AI code review — chi tiết 10 phát hiện</h2>
 <table>
 <thead>
 <tr>
@@ -1006,7 +969,7 @@ hr {
 <td>Maintainability</td>
 <td><code>report_export.teamCount</code> là số bịa</td>
 <td><strong>Modified</strong></td>
-<td>Sửa theo AI sẽ vi phạm luật layer → đổi interface thành <code>BuiltReport(bytes, teamCount)</code></td>
+<td>Đổi interface thành <code>BuiltReport(bytes, teamCount)</code></td>
 <td><code>1b6fea8</code></td>
 </tr>
 <tr>
@@ -1038,6 +1001,26 @@ hr {
 <td>Accepted</td>
 <td>Test xanh nhưng app sai</td>
 <td><code>9cf68f5</code></td>
+</tr>
+<tr>
+<td>CR-09</td>
+<td>Cursor Agent</td>
+<td><code>e2e_test/conftest.py:37</code></td>
+<td>Bug</td>
+<td>ARTEMIS: sai SDK, sai <code>applicationId</code></td>
+<td>Accepted</td>
+<td>§7 yêu cầu bộ test chạy được</td>
+<td><code>668ce5f</code></td>
+</tr>
+<tr>
+<td>CR-10</td>
+<td>Cursor Agent</td>
+<td><code>proposal_student_picker.dart:96</code></td>
+<td>Fidelity</td>
+<td>S13 hiện lỗi nhưng nút vẫn bấm được</td>
+<td>Accepted</td>
+<td>Handoff: <em>"Button primary (disabled)"</em></td>
+<td><code>668ce5f</code></td>
 </tr>
 </tbody>
 </table>
@@ -1072,12 +1055,17 @@ hr {
 <td>CR-01, 02, 03, 04, 06, 08</td>
 </tr>
 <tr>
+<td>Cursor Agent</td>
+<td>Rà soát theo checklist Lab 3 §5–§10</td>
+<td>CR-09, CR-10</td>
+</tr>
+<tr>
 <td>Mermaid CLI (<code>mmdc</code>)</td>
 <td>Vẽ sơ đồ activity / state / sequence / layer</td>
 <td><code>build/diagrams/*.svg</code></td>
 </tr>
 </tbody>
 </table>
-<p>Mọi phát hiện đều được kiểm lại bằng <code>flutter analyze</code>, <code>flutter test</code> (145 test) và <code>tool/check_layers.sh</code> trước khi commit.</p>
+<p>Mọi phát hiện đều được kiểm lại bằng <code>flutter analyze</code>, <code>flutter test</code> (150 test) và <code>tool/check_layers.sh</code> trước khi commit.</p>
 </body>
 </html>

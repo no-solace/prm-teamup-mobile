@@ -229,7 +229,7 @@ Bảng đầy đủ 20 dòng ở `docs/architecture.md` §4.
 
 ### 3.5 Kiểm thử tự động ở tầng unit
 
-`flutter test` chạy **145 test** (unit + widget + integration) và **145/145 pass**:
+`flutter test` chạy **150 test** (unit + widget + integration) và **150/150 pass**:
 
 | Nhóm | Số test | Nội dung |
 |---|---|---|
@@ -455,7 +455,7 @@ logcat dùng cho ARTEMIS (test `TC-17` kiểm `ai_match_start` **và** `ai_match
 
 | Bộ test | Lệnh | Kết quả |
 |---|---|---|
-| Unit / widget / integration Dart | `flutter test` | **145/145 pass** |
+| Unit / widget / integration Dart | `flutter test` | **150/150 pass** |
 | Firestore Security Rules | `npx firebase-tools@15.35.0 emulators:exec --only firestore --project demo-teamup-data "node --test firestore.rules.test.mjs"` | **21/21 pass** |
 | Ràng buộc kiến trúc | `bash tool/check_layers.sh` | **Layers OK** — 0 vi phạm |
 | Phân tích tĩnh | `flutter analyze` | **No issues found** |
@@ -469,7 +469,7 @@ Bản ghi đầy đủ ở `docs/code-review.md`. Tóm tắt:
 **Công cụ dùng:** Cursor Agent (Claude Opus 4.5), Claude Code trong Cursor, GitHub
 Copilot Chat, GitHub Copilot Code Review (chạy trên pull request).
 
-**8 phát hiện, thuộc 4 nhóm:** bug (CR-02, CR-04, CR-06), architecture (CR-03),
+**10 phát hiện, thuộc 4 nhóm:** bug (CR-02, CR-04, CR-06, CR-09, CR-10), architecture (CR-03),
 test gap (CR-01, CR-07, CR-08), maintainability (CR-05). Mỗi phát hiện gắn với
 file và dòng cụ thể.
 
@@ -483,8 +483,10 @@ file và dòng cụ thể.
 | CR-06 | Constructor gọi `Firebase*.instance` ngay khi provider được đọc | Accepted | Crash nếu Firebase chưa sẵn sàng; §6 yêu cầu xử lý lỗi bằng thông báo | `1b6fea8` |
 | CR-07 | Ghi `ai_match_result` cho màn đã dispose | Accepted | Phễu DebugView lệch → kết luận sai kiểu "AI thất bại nhiều" | `1b6fea8` |
 | CR-08 | Fake `watchAllPending` không sort, lệch với production | Accepted | Test xanh nhưng app sai — loại "test gap" nguy hiểm nhất | `9cf68f5` |
+| CR-09 | Bộ ARTEMIS gọi API **không tồn tại** (`ArtemisClient(api_key=…)`, `run()` đồng bộ) và sai `applicationId` | Accepted | §7 yêu cầu bộ test **chạy được**; hiện 18/18 test ném `TypeError` trước khi chạm thiết bị | `668ce5f` |
+| CR-10 | S13 hiện lỗi "Max 6 members" nhưng **nút lưu vẫn bấm được**; dòng đếm lệch Lab 2 | Accepted | Lab 2 handoff: *"Button primary (disabled)"*; §3 coi sai lệch Figma↔app là lỗi | `668ce5f` |
 
-**4 phát hiện được sửa, mỗi cái một commit riêng có tên mã phát hiện** — yêu cầu
+**5 phát hiện được sửa, mỗi cái một commit riêng có tên mã phát hiện** — yêu cầu
 "≥ 3 fixes, each in a commit that names the finding ID" (§8).
 
 ---
@@ -530,7 +532,7 @@ file và dòng cụ thể.
 | GitHub Copilot Code Review | Rà soát pull request, sinh danh sách phát hiện | CR-01, CR-02, CR-03, CR-04, CR-06, CR-08 |
 | Mermaid CLI (`mmdc`) | Vẽ sơ đồ activity / state / sequence / layer | `build/diagrams/*.svg` → nhúng vào báo cáo và slide |
 
-Mọi phát hiện đều được kiểm lại bằng `flutter analyze`, `flutter test` (145 test) và
+Mọi phát hiện đều được kiểm lại bằng `flutter analyze`, `flutter test` (150 test) và
 `tool/check_layers.sh` trước khi commit. Không có phần code nào được nộp mà
 sinh viên không giải thích được.
 
@@ -548,7 +550,7 @@ Firebase, với:
 * 10 event Analytics có câu hỏi sản phẩm và tham số không chứa dữ liệu cá nhân;
 * bộ test E2E ARTEMIS 18 ca + 1 phiên khám phá, assert trên **giá trị quan sát
   được**;
-* 8 phát hiện AI code review với quyết định có lý do, 4 commit sửa truy vết được.
+* 10 phát hiện AI code review với quyết định có lý do, 5 commit sửa truy vết được.
 
 **Hướng tiếp theo (Final Assignment):** web admin cho vai Điều phối khoa, luồng
 liên vai duyệt nhóm trên mobile → xác nhận trên web, và thay `RuleBasedMatchingService`
