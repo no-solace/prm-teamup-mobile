@@ -133,6 +133,8 @@ dùng đúng bộ component, token và quy tắc trạng thái của Lab 2.
 | **D6** | S9/S11/S13: giới hạn nhóm **5–6 người** do `TeamRules` chốt, không cho mentor chọn số người tuỳ ý. | Lab 2 §"Business rules" chốt 5–6; S13 là màn lỗi riêng. | Nút lưu ở S11 bị khoá khi đủ 6 người (đã sửa ở CR-10). | Không cần. |
 | **D7** | Báo cáo PDF lưu trong **Firestore** (`reports/{id}/files/pdf`) thay vì Cloud Storage bucket. | Gói Firebase **Spark** (miễn phí) không có Cloud Storage bucket; đề chỉ yêu cầu "Firebase". Dữ liệu mentor vẫn nằm trong Firestore nên vẫn theo đúng câu "Cloud Firestore when the app stores the user's own data". | UI hiện đường dẫn file trong Firestore (`Report.filePath`) thay cho download URL. | Chưa — cần cập nhật frame demo trong Figma. |
 | **D8** | Thêm **Flow D/E/F** và vai **sinh viên** (leader/member) ngoài 25 màn Lab 2. | Mở rộng chức năng cho nhóm: đề tài → đặt lịch → biên bản; cần vai trò để route đúng người. | Thêm 9 màn (xem §1b); tất cả tái dùng component Lab 2. | Chưa — chưa có frame Lab 3 trong Figma. |
+| **D9** | Điều hướng theo vai: **mentor 5 tab** (Classes, Proposals, Topics, Schedule, Profile), **sinh viên 4 tab** (My team, Topics, Schedule, Profile). | Mở rộng Lab 3 (`docs/PROPOSAL.md` mục 9): sinh viên không được thấy tab Proposals/đề xuất của lớp khác. S3 hiện **mã lớp** để mentor copy cho sinh viên. | Bottom bar khác nhau theo vai; deep-link chỉ mở route đúng vai. | Chưa — chưa có frame Lab 3 trong Figma. |
+| **D10** | Khối **xuất PDF** ở S6 chỉ hiện với mentor. | Bản demo Firebase là công cụ của mentor; sinh viên không có quyền ghi báo cáo. | Hồ sơ sinh viên không thấy khu demo. | Chưa — cần thêm frame demo trong Figma. |
 
 ---
 
@@ -171,3 +173,11 @@ Mọi màn nạp dữ liệu dùng `ViewState<T>` (`viewmodels/view_state.dart`)
 
 Không màn nào có trạng thái "spinner vô hạn": mọi `Stream` đều có nhánh `error` và
 `StatusView.error(onRetry: ...)`.
+
+---
+
+## 8. Việc còn lại
+
+- [ ] Cập nhật Figma cho D1 đến D10 (đề: "unrecorded difference … graded as a defect").
+- [ ] Chạy từng màn trên thiết bị thật rồi đổi cột Trạng thái thành **Máy thật**; lưu ảnh vào `evidence/`.
+- [ ] Kiểm tra bố cục ở 360 dp và 412 dp, vùng chạm ≥ 48 dp, chữ ≥ 14 sp (có widget test cho S22).

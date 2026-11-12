@@ -37,7 +37,7 @@
 | **D** | Nhóm nộp đề tài, mentor duyệt | `/topics`, `/topics/submit`, `/topics/{id}` | Yêu cầu sửa, từ chối |
 | **E** | Trưởng nhóm đặt lịch với mentor | `/schedule`, `/schedule/book`, `/schedule/{id}` | Khung giờ đã bị đặt |
 | **F** | Ghi và ký biên bản họp | `/schedule/{id}/minutes` | Chưa ký |
-| **Tab** | Điều hướng cấp cao | S2, S9, Topics, Schedule, S6 | — |
+| **Tab** | Điều hướng cấp cao (mentor 5 tab, sinh viên 4 tab) | S2, S9, Topics, Schedule, S6 | — |
 | **Auth** | Đăng nhập / đăng xuất | S1, S6 | S19 |
 | **Export** | Sinh PDF và lưu | S6 (demo) | — |
 
@@ -63,8 +63,8 @@ cáo** khi giá trị thiếu — đây là bằng chứng để điều tra, kh
 
 | ID | Kiểu | Flow / mục đề | Tiền điều kiện | Kết quả mong đợi | Loại | File |
 |---|---|---|---|---|---|---|
-| **TC-01** | free-text | Đăng nhập Google qua account picker | Đã đăng xuất, app đã cài | Màn "My classes" hiện; bottom navigation có các tab; agent báo số tab | **Native** (Google account picker) | `test_auth.py` |
-| **TC-02** | free-text | Mở từng tab cấp cao | Đã đăng nhập | Mỗi tab mở đúng màn; agent báo các tiêu đề Proposals, Profile, Classes | Happy path | `test_auth.py` |
+| **TC-01** | free-text | Đăng nhập Google qua account picker | Đã đăng xuất, app đã cài | Màn "My classes" hiện; bottom navigation có **5 tab** (mentor); agent báo số tab | **Native** (Google account picker) | `test_auth.py` |
+| **TC-02** | free-text | Mở từng tab cấp cao | Đã đăng nhập (mentor) | Mỗi tab mở đúng màn; agent báo các tiêu đề Proposals, Topics, Schedule, Profile, Classes | Happy path | `test_auth.py` |
 | **TC-03** | free-text | Remote Config hiện giá trị trên màn | Đã đăng nhập | Dòng `max_proposals_shown` hiện kèm số ≥ 1 | Happy path | `test_auth.py` |
 | **TC-04** | free-text | Đăng xuất | Đã đăng nhập | Quay lại màn Sign in, thấy "Continue with Google" | Happy path | `test_auth.py` |
 | **TC-05** | free-text | Nhập CSV (S22) | Đã đăng nhập, lớp demo chưa nhập | Tên file hiện; **5 cột** detected; nút ghi **12** sinh viên | Happy path | `test_flow_a.py` |
@@ -81,7 +81,7 @@ cáo** khi giá trị thiếu — đây là bằng chứng để điều tra, kh
 | **TC-16** | free-text | Chạm thông báo đẩy | Vừa gửi test message từ console | App mở màn "Proposals", thông báo có trong danh sách | **Native** (notification shade) | `test_export_and_notifications.py` |
 | **TC-17** | free-text | Analytics event được ghi | Bật Analytics debug mode | Logcat chứa `ai_match_start` **và** `ai_match_result` | Analytics | `test_export_and_notifications.py` |
 | **TC-18** | free-text | Test crash Crashlytics | Bật Crashlytics collection | App đóng lại, crash hiện trên dashboard Crashlytics | **Native** (deliberate crash) | `test_export_and_notifications.py` |
-| **TC-19** | JSON | Đăng nhập Google (khoá) | Đã đăng xuất | `signed_in = true`; logcat có event `login` | Native, analytics | `test_auth.py` |
+| **TC-19** | JSON | Đăng nhập Google (khoá) | Đã đăng xuất, tài khoản mentor | `signed_in = true`; `tabs = [classes, proposals, topics, schedule, profile]`; logcat có event `login` | Native, analytics | `test_auth.py` |
 | **TC-20** | JSON | Đăng xuất (khoá) | Đã đăng nhập | `sign_in_visible = true`; `classes_tab_visible = false`; mở lại app vẫn ở màn đăng nhập | — | `test_auth.py` |
 | **TC-21** | JSON | Email sai (khoá) | Đã đăng xuất | `error_text = "Enter a valid email"`; không vào được My classes | error_path | `test_auth.py` |
 | **TC-22** | JSON | Nhập CSV + số liệu (khoá) | Đã đăng nhập | `preview_button = "Import 12 students"`; `(imported, in_a_group, available) = (12, 9, 3)`; logcat có `class_import` | analytics | `test_flow_a.py` |

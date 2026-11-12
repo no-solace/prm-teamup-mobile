@@ -72,12 +72,12 @@ Nhiều màn là **trạng thái của cùng một màn**: S19/S1, S13/S11, S25/
 
 | Ngày | Ken | Dan | Cuong | Khang |
 |---|---|---|---|---|
-| **1** | Tạo dự án Firebase, mời cả nhóm, gom **SHA-1 của 4 máy**; dựng khung MVVM, router, theme | Model `Class/Student/Team`; script seed Firestore từ file mẫu; interface `ClassService`, `MatchingService` + fake | Gắn thẻ Blaze, **budget alert 1 USD**, bucket `us-central1`; model `Proposal`; interface `ProposalService`, `ReportService`, `CrashService`, `StorageService` + fake | Khung `design-traceability.md` và `analytics-plan.md`; interface `AnalyticsService`; tạo môi trường ARTEMIS (Python, uv, ADB, API key) |
+| **1** | Tạo dự án Firebase, mời cả nhóm, gom **SHA-1 của 4 máy**; dựng khung MVVM, router, theme | Model `Class/Student/Team`; script seed Firestore từ file mẫu; interface `ClassService`, `MatchingService` + fake | ~~Gắn thẻ Blaze, budget alert 1 USD, bucket `us-central1`~~ (ở lại Spark); model `Proposal`; interface `ProposalService`, `ReportService`, `CrashService`, `StorageService` + fake | Khung `design-traceability.md` và `analytics-plan.md`; interface `AnalyticsService`; tạo môi trường ARTEMIS (Python, uv, ADB, API key) |
 | | **Cả 4:** điền traceability cho màn mình; chốt `data-model.md` (họp 30 phút) | | | |
 | **2** | Widget dùng chung (**trưa**); Google Sign-In S1/S19, chặn route | S2, S3, S4, S7 trên fake | S9, S10 (kèm trạng thái S25) trên fake | S5, S16 (kèm S21) trên fake; ARTEMIS chạy thử 1 ca sign-in |
-| **3** | S6 hồ sơ + Sign out; `firestore.rules`; review PR | S22/S23 import CSV; S8/S18; `MatchingService` thật + unit test; Remote Config | S11/S13, S12, S14 (Undo), S24; Crashlytics init + crash thử; `storage.rules` | S15, S20, S17; gắn Analytics vào mọi flow; viết `test-plan.md` (≥ 10 ca) |
-| **4** | Nối Firestore toàn app; sửa lỗi tích hợp; **hạn chót tính năng 20h** | FCM: quyền Android 13+, 3 trạng thái, chạm mở đúng màn, trung tâm thông báo | PDF + upload có tiến độ và URL; non-fatal ở S22 / S8; mục demo S6 | Viết ca ARTEMIS trong `e2e_test/`; **mở PR cho AI code review** |
-| **5** | Ảnh Console Auth; sửa lỗi từ ARTEMIS | Ảnh Remote Config trước/sau, FCM 3 trạng thái | Ảnh Crashlytics (non-fatal, crash, khóa), Storage | **Chạy ARTEMIS ≥ 10 ca × 3 lần**; ảnh DebugView; ghi `code-review.md` |
+| **3** | S6 hồ sơ + Sign out; `firestore.rules`; review PR | S22/S23 import CSV; S8/S18; `MatchingService` thật + unit test; Remote Config | S11/S13, S12, S14 (Undo), S24; Crashlytics init + crash thử; rules lưu PDF (~~`storage.rules`~~) | S15, S20, S17; gắn Analytics vào mọi flow; viết `test-plan.md` (≥ 10 ca) |
+| **4** | Nối Firestore toàn app; sửa lỗi tích hợp; **hạn chót tính năng 20h** | FCM: quyền Android 13+, 3 trạng thái, chạm mở đúng màn, trung tâm thông báo | PDF + lưu vào Firestore có tiến độ; non-fatal ở S22 / S8; mục demo S6 | Viết ca ARTEMIS trong `e2e_test/`; **mở PR cho AI code review** |
+| **5** | Ảnh Console Auth; sửa lỗi từ ARTEMIS | Ảnh Remote Config trước/sau, FCM 3 trạng thái | Ảnh Crashlytics (non-fatal, crash, khóa), ảnh Firestore `reports/{id}/files/pdf` | **Chạy ARTEMIS ≥ 10 ca × 3 lần**; ảnh DebugView; ghi `code-review.md` |
 | | **Cả 4:** sửa ≥ 3 phát hiện code review (mỗi cái 1 commit); cập nhật Figma các chỗ khác thiết kế | | | |
 | **6** | `architecture.md` bản cuối (sơ đồ, sequence, bảng ViewModel); README | Viết báo cáo và slide phần mình | Viết báo cáo và slide phần mình | Phiên ARTEMIS khám phá 15-30 phút; gộp báo cáo (8-12 trang) và slide (12-15) |
 | **7** | Kiểm repo, báo cáo, slide, video mở được trong cửa sổ ẩn danh | **Quay và dựng video** 5-10 phút trên máy thật | Quay phần mình; tập buổi kiểm tra 5 phút | Kiểm checklist nộp bài; tập buổi kiểm tra 5 phút |
@@ -111,9 +111,9 @@ Phần nào đề bắt buộc thì giữ. Chỉ cắt phần làm cho đẹp h�
 - [ ] FCM: quyền, từ chối quyền, 3 trạng thái, chạm mở đúng màn, trung tâm thông báo; video
 
 **Cuong**
-- [ ] Gói Blaze: gắn thẻ, budget alert 1 USD, bucket `us-central1`; gỡ thẻ hoặc hạ về Spark sau khi chấm
+- [x] ~~Gói Blaze: gắn thẻ, budget alert 1 USD, bucket `us-central1`~~ → ở lại gói Spark (12/11)
 - [ ] S9-S14, S24, S25: chặn > 6 (S13) và < 5 (S25), Approve + Undo, badge tab
-- [ ] PDF lên `reports/{uid}/…` có tiến độ và URL; `storage.rules` chỉ chủ sở hữu; thử truy cập trái phép
+- [ ] PDF lưu vào Firestore (`reports/{id}` + `files/pdf`, ≤ 900 KB) có tiến độ; rules chỉ chủ sở hữu (đã có test emulator); thử truy cập trái phép
 - [ ] Crashlytics: non-fatal từ đường lỗi thật, crash thử ở S6, user ID, khóa `role`, `class_id`; mục demo S6
 
 **Khang**

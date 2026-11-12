@@ -17,7 +17,7 @@ def test_tc01_google_signin_reaches_classes_tab(artemis):
 
     Precondition: the app is installed and signed out.
     Expected: the Classes tab is visible and the bottom navigation bar shows
-    three tabs. The agent reports the number of visible bottom tabs.
+    the five mentor tabs. The agent reports the number of visible bottom tabs.
     """
     result = run(
         artemis,
@@ -31,26 +31,31 @@ def test_tc01_google_signin_reaches_classes_tab(artemis):
     )
     assert result.ok, result.error
     assert result.contains("Classes"), result.text
-    assert result.number("tabs") == 3, result.text
+    assert result.number("tabs") == 5, result.text
 
 
 def test_tc02_open_each_top_level_tab(artemis):
     """TC-02 (navigation).
 
-    Precondition: signed in.
-    Expected: the three tabs open their own screens: Classes, Proposals and
-    Profile. The agent reports which tab titles it saw.
+    Precondition: signed in as a mentor.
+    Expected: each tab opens its own screen. The agent reports which tab
+    titles it saw.
     """
     result = run(
         artemis,
         "In the TeamUp EXE app, signed in, tap the bottom navigation tab named "
         "'Proposals' and report the screen title that appears. Then tap the "
-        "tab named 'Profile' and report the screen title that appears. Then "
-        "tap the tab named 'Classes' and report the screen title that "
-        "appears. Report the three titles separated by commas.",
+        "tab named 'Topics' and report the screen title that appears. Then "
+        "tap the tab named 'Schedule' and report the screen title that "
+        "appears. Then tap the tab named 'Profile' and report the screen "
+        "title that appears. Then tap the tab named 'Classes' and report the "
+        "screen title that appears. Report the five titles separated by "
+        "commas.",
     )
     assert result.ok, result.error
     assert result.contains("Proposals"), result.text
+    assert result.contains("Topics"), result.text
+    assert result.contains("Schedule"), result.text
     assert result.contains("Profile"), result.text
     assert result.contains("Classes"), result.text
 
@@ -110,7 +115,9 @@ async def test_tc01_google_sign_in_account_picker(artemis, analytics_log):
         ["signed_in", "tabs"],
     )
     assert got.values["signed_in"] is True
-    assert [t.lower() for t in got.values["tabs"]] == ["classes", "proposals", "profile"]
+    assert [t.lower() for t in got.values["tabs"]] == [
+        "classes", "proposals", "topics", "schedule", "profile",
+    ]
     assert "login" in analytics_log.events(), analytics_log.raw()[-2000:]
 
 

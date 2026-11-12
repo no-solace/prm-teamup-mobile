@@ -37,6 +37,15 @@ flutter run -t lib/main_fake.dart
 flutter run
 ```
 
+Bản fake mặc định đăng nhập là **mentor**. Muốn thử vai sinh viên:
+1. Sửa `lib/main_fake.dart` để truyền `FakeAuthService(user: FakeAuthService.leader)` vào
+   `fakeOverrides(...)`. Đây là trưởng nhóm có sẵn: lớp `class-a`, MSSV `190501`,
+   nhóm Tutor Match.
+2. Muốn thử onboarding thì thay bằng một `AppUser` có `role: null`, rồi nhập
+   mã lớp `class-a` và MSSV `190501`.
+
+Trên Firebase thật, mentor copy **mã lớp** ở màn chi tiết lớp (S3) để gửi cho sinh viên.
+
 Trước mỗi PR:
 
 ```bash
@@ -68,10 +77,18 @@ Tóm tắt: `screens` → `viewmodels` (Riverpod Notifier) → `services` (inter
    cd android && ./gradlew signingReport
    ```
    Copy dòng `SHA1` của biến thể `debug`, dán vào Firebase Console → Project settings → app Android → Add fingerprint. Sau đó tải lại `google-services.json`.
-3. Deploy rules và Remote Config (gói Spark: **không** deploy Storage hay Functions):
+3. Test rules trên emulator (cần JDK 21 trong `JAVA_HOME`):
+   ```bash
+   npm --prefix firebase/test install
+   npx firebase-tools@15.35.0 emulators:exec --only firestore \
+        --project demo-teamup-data "node --test firebase/test/firestore.rules.test.mjs"
+   ```
+4. Deploy rules và Remote Config (gói Spark: **không** deploy Storage hay Functions):
    ```bash
    npx firebase-tools@15.35.0 deploy --only firestore:rules,remoteconfig
    ```
+   Lưu ý: lệnh này ghi đè Remote Config trên Console bằng
+   `firebase/remote-config-template.json`. Gói Spark là đủ.
 
 ### Chạy test Firestore rules cục bộ (không cần đăng nhập)
 
@@ -82,6 +99,7 @@ npm install
 npx firebase-tools@15.35.0 emulators:exec --only firestore \
      --project demo-teamup-data "node --test firebase/test/firestore.rules.test.mjs"
 ```
+Kết quả hiện tại: **30/30 pass**.
 
 ## Chạy bộ test E2E (Google ARTEMIS)
 
