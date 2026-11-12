@@ -26,4 +26,5 @@ adb shell setprop debug.firebase.analytics.app com.group6.teamup_exe
 
 **Remote Config:** sửa giá trị ở Firebase Console → Remote Config → Publish, đợi app cập nhật theo realtime (không cần build lại), chụp trước và sau.
 
+**FCM:** tin thử từ Console **phải có data** `uid` = UID của tài khoản đang đăng nhập (xem ở Firebase Console → Authentication → Users) và tùy chọn `route` (ví dụ `/proposals`); app bỏ qua tin không có `uid` khớp (`_receive` trong `fcm_notification_service.dart`).
 **FCM terminated:** vuốt tắt app rồi gửi tin thử từ Console tới token hiện ở Profile → Notifications. Nhớ nhấn **Enable / check notifications** sau lần đăng nhập đầu tiên (xem finding F2 trong [code-review.md](../docs/code-review.md)).

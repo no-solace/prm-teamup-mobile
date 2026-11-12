@@ -4,8 +4,8 @@ Hai lớp kiểm thử:
 
 | Lớp | Công cụ | Số lượng | Chạy ở đâu |
 |---|---|---|---|
-| Unit, ViewModel, widget | `flutter test` | 153 test | CI và máy dev, không cần thiết bị |
-| Rules Firestore | `@firebase/rules-unit-testing` trên emulator | 23 test | `firebase/test` |
+| Unit, ViewModel, widget | `flutter test` | 159 test | CI và máy dev, không cần thiết bị |
+| Rules Firestore | `@firebase/rules-unit-testing` trên emulator | 25 test | `firebase/test` |
 | **E2E trên thiết bị** | **Google ARTEMIS** + pytest | **14 ca** (13 chạy tự động, 1 cần người gửi push) | thiết bị/emulator Android |
 
 > **Trạng thái 12/11/2026: bộ ARTEMIS đã viết và thu thập được 14 ca (`pytest --collect-only`), nhưng chưa chạy lần nào trên thiết bị.**

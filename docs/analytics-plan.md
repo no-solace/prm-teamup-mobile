@@ -30,14 +30,14 @@ Quy ước: tên theo [sự kiện khuyến nghị của Firebase](https://suppo
 | 6 | `ai_match_result` | S8, khi có kết quả | `proposal_count` (int), `no_match` (int 0/1), `duration_ms` (int) | Q2 | `MatchingViewModel.start` |
 | 7 | `proposal_approve` | S12, xác nhận Approve | `member_count` (int), `major_count` (int), `source` (string: `ai` \| `manual`), `edited` (int 0/1) | Q1 | `ProposalActionViewModel.approve` |
 | 8 | `proposal_discard` | S17, xác nhận Discard | `source` (string: `ai` \| `manual`) | Q1 | `ProposalActionViewModel.discard` |
-| 9 | `member_change_blocked` | S13, chạm giới hạn | `reason` (string: `max_6`) | Q3 | `ProposalActionViewModel.logMemberLimit` |
+| 9 | `member_change_blocked` | S13 chạm giới hạn; S25 sau khi sửa làm nhóm dưới 5 người | `reason` (string: `max_6` \| `min_5`) | Q3 | `ProposalActionViewModel.logMemberLimit` (`max_6`), `ProposalActionViewModel.updateMembers` (`min_5`) |
 | 10 | `report_export` | S6, upload PDF thành công | `team_count` (int), `file_size_kb` (int) | Q6 | `ReportDemoActions.logExported` |
 
 **User ID:** `setUserId(uid)` sau khi đăng nhập (`SignInViewModel._recordLogin`), `setUserId(null)` khi đăng xuất. Cùng `uid` được gắn vào Crashlytics.
 
 ### Điểm chưa đầy đủ (ghi rõ để không bị hiểu nhầm)
 
-- `member_change_blocked` mới ghi `reason = max_6`. Giá trị `min_5` (S25: nhóm dưới 5 người, Approve bị khóa) chưa có nơi gọi.
+- `member_change_blocked` với `min_5` ghi khi một lần sửa thành viên kết thúc ở dưới 5 người (cả khi bỏ lẫn khi thêm), không ghi lúc người dùng chỉ mở màn có sẵn nhóm dưới 5.
 - `ai_match_start` ghi cả khi mentor bấm Try again, nên một lần mở S8 có thể sinh nhiều cặp start/result.
 - `view_item` ghi một lần mỗi lần mở màn (lúc dữ liệu đầu tiên về), không ghi lại khi dữ liệu realtime thay đổi.
 
