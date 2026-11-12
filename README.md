@@ -1,6 +1,10 @@
 # TeamUp EXE (PRM393 Lab 3, nhóm 6)
 
-Ứng dụng Flutter + Firebase giúp mentor môn EXE ghép nhóm 5-6 sinh viên đủ ngành (SE / AI / MKT / GD), duyệt đề xuất và xuất báo cáo. Phạm vi Lab 3: Flow A, B, C với 25 màn của Lab 2 (xem [docs/PROPOSAL.md](docs/PROPOSAL.md)).
+Ứng dụng Flutter + Firebase giúp mentor môn EXE ghép nhóm 5-6 sinh viên đủ ngành (SE / AI / MKT / GD), duyệt đề xuất và xuất báo cáo. Phạm vi Lab 3: Flow A, B, C với 25 màn của Lab 2, cộng phần mở rộng D/E/F cho sinh viên (nộp đề tài, đặt lịch họp, biên bản). Xem [docs/PROPOSAL.md](docs/PROPOSAL.md).
+
+Dự án chạy trên **gói Spark (miễn phí)**: không dùng Cloud Storage và Cloud Functions.
+- File (PDF báo cáo, outline đề tài) lưu trong Firestore, tối đa 900 KB mỗi file.
+- Thông báo D/E/F do app tự sinh. Xem `docs/PROPOSAL.md` mục 10.
 
 ## Môi trường
 
@@ -24,6 +28,12 @@ flutter run -t lib/main_fake.dart
 flutter run
 ```
 
+Bản fake mặc định đăng nhập là mentor. Muốn thử vai sinh viên:
+1. Sửa `lib/main_fake.dart` để truyền `FakeAuthService(user: FakeAuthService.leader)` vào `fakeOverrides(...)`. Đây là trưởng nhóm có sẵn: lớp `class-a`, MSSV `190501`, nhóm Tutor Match.
+2. Muốn thử onboarding thì thay bằng một `AppUser` có `role: null`, rồi nhập mã lớp `class-a` và MSSV `190501`.
+
+Trên Firebase thật, mentor copy **mã lớp** ở màn chi tiết lớp (S3) để gửi cho sinh viên.
+
 Trước mỗi PR:
 
 ```bash
@@ -45,7 +55,12 @@ bash tool/check_layers.sh
    cd android && ./gradlew signingReport
    ```
    Copy dòng `SHA1` của biến thể `debug`, dán vào Firebase Console → Project settings → app Android → Add fingerprint. Sau đó tải lại `google-services.json`.
-3. Deploy rules: `firebase deploy --only firestore:rules,remoteconfig` (gói Spark: không dùng Storage/Functions).
+3. Test rules trên emulator (cần JDK 21 trong `JAVA_HOME`):
+   ```bash
+   npm --prefix firebase/test install
+   firebase emulators:exec --only firestore "npm --prefix firebase/test test"
+   ```
+4. Deploy: `firebase deploy --only firestore:rules,remoteconfig`. Lưu ý: lệnh này ghi đè Remote Config trên Console bằng `firebase/remote-config-template.json`. Gói Spark là đủ.
 
 ## Cấu trúc
 
@@ -59,7 +74,7 @@ Bộ pytest nằm ở [e2e_test/](e2e_test/), kế hoạch và kết quả ở [
 |---|---|
 | Google ARTEMIS | commit `351ca8422f7b5b54e80a9c1ce03a222e02415b6b` |
 | Python | 3.12 (qua `uv`) |
-| firebase-tools (test rules) | 14.27.0 (bản 15 đòi JDK 21) |
+| firebase-tools (test rules) | 14.27.0 trở lên (bản 15 đòi JDK 21) |
 
 ```bash
 cd e2e_test && export ARTEMIS_DEVICE=<adb serial> && bash run_suite.sh

@@ -14,7 +14,9 @@ async def test_tc01_google_sign_in_account_picker(artemis, analytics_log):
         ["signed_in", "tabs"],
     )
     assert got.values["signed_in"] is True
-    assert [t.lower() for t in got.values["tabs"]] == ["classes", "proposals", "profile"]
+    assert [t.lower() for t in got.values["tabs"]] == [
+        "classes", "proposals", "topics", "schedule", "profile",
+    ]
     assert "login" in analytics_log.events(), analytics_log.raw()[-2000:]
 
 

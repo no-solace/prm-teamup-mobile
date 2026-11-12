@@ -191,9 +191,9 @@ Mọi widget bấm được đều bọc `Semantics(label: …)` sẵn (D16).
 
 ### D10. Firebase: dự án và cấu hình
 
-- **Một** dự án Firebase cho cả nhóm. Ken tạo, Cuong nâng Blaze. SHA-1 debug của **4 máy** được thêm vào app Android.
+- **Một** dự án Firebase cho cả nhóm. Ken tạo. SHA-1 debug của **4 máy** được thêm vào app Android. *(12/11: không nâng Blaze; dự án ở gói Spark, file lưu trong Firestore, không có Cloud Storage và Cloud Functions. Xem `docs/PROPOSAL.md` mục 10.)*
 - `flutterfire configure` sinh `lib/firebase_options.dart` và `android/app/google-services.json`. **Commit cả hai** (C13), để ai clone về cũng chạy được.
-- Thư mục `firebase/`: `firebase.json`, `firestore.rules`, `storage.rules`, `remote-config-defaults.json`, `firestore.indexes.json`. Deploy rules bằng Firebase CLI.
+- Thư mục `firebase/`: `firebase.json`, `firestore.rules`, `remote-config-defaults.json`, `firestore.indexes.json`. Deploy rules bằng Firebase CLI.
 - Khởi tạo trong `main.dart`, theo thứ tự: `Firebase.initializeApp` → gắn `FlutterError.onError` và `PlatformDispatcher.onError` vào Crashlytics → đăng ký `FirebaseMessaging.onBackgroundMessage` (phải là hàm top-level) → `runApp`. Remote Config fetch **sau** `runApp`, để mất mạng không chặn màn đầu.
 
 ### D11. Mô hình dữ liệu Firestore (C15)
@@ -220,7 +220,7 @@ Mọi widget bấm được đều bọc `Semantics(label: …)` sẵn (D16).
 |---|---|
 | State, DI | `flutter_riverpod` |
 | Điều hướng | `go_router` |
-| Firebase | `firebase_core`, `firebase_auth`, `cloud_firestore`, `firebase_storage`, `firebase_messaging`, `firebase_analytics`, `firebase_crashlytics`, `firebase_remote_config` |
+| Firebase | `firebase_core`, `firebase_auth`, `cloud_firestore`, `firebase_messaging`, `firebase_analytics`, `firebase_crashlytics`, `firebase_remote_config` |
 | Đăng nhập | `google_sign_in` |
 | Thông báo khi app đang mở | `flutter_local_notifications` (FCM không tự hiện banner khi app ở foreground) |
 | Import | `file_picker`, `csv` (`excel` chỉ thêm nếu còn thời gian, xem PHAN_CONG mục 5) |
@@ -315,7 +315,7 @@ Cách ghim: chạy `flutter pub add …` để lấy bản mới nhất tương 
 | 2 | `flutterfire configure --project teamup-exe-group6 --platforms android --android-package-name com.group6.teamup_exe` | Ken | Ghi đè `lib/firebase_options.dart` (hiện là file tạm, `main.dart` sẽ báo lỗi khi mở) và sinh `google-services.json`; commit cả hai |
 | 3 | Bật Google Sign-In trong Authentication | Ken | |
 | 4 | Thêm SHA-1 debug của 4 máy (`cd android && ./gradlew signingReport`) | Cả nhóm | Tải lại `google-services.json` sau khi thêm |
-| 5 | Nâng Blaze, đặt cảnh báo ngân sách, tạo bucket Storage ở `us-central1` | Cuong | |
+| 5 | ~~Nâng Blaze, đặt cảnh báo ngân sách, tạo bucket Storage ở `us-central1`~~ (bỏ: ở lại gói Spark, 12/11) | Cuong | |
 | 6 | Tạo nhánh `feature/skeleton`, commit, mở PR | Ken | |
 
 **Lưu ý môi trường Windows:**

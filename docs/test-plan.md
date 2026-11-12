@@ -20,8 +20,9 @@ Hai lớp kiểm thử:
 | Flow B: sửa thành viên đề xuất (đường lỗi: dưới 5 người) | S10, S24, S25 (S11, S13) |
 | Flow C: hủy đề xuất, ghép tay (đường lỗi: không tìm thấy) | S17, S5, S16, S21 |
 | Màn chi tiết | S3 (lớp), S7 (sinh viên), S10 (đề xuất) |
-| Điều hướng 3 tab | S2, S9, S6 |
-| Xuất PDF và upload | S6 (vùng Firebase demo) |
+| Điều hướng các tab (mentor 5, sinh viên 4) | S2, S9, Topics, Schedule, S6 |
+| Xuất PDF và lưu (Firestore) | S6 (vùng Firebase demo) |
+| Mở rộng D/E/F (chưa có ca ARTEMIS; đã có widget test `test/flow_def/` và test rules) | Onboarding, Topics, Schedule, biên bản |
 | Remote Config đổi hành vi | S3 (nút Match with AI), S6, S9 |
 | Mất mạng | S18 |
 | Thông báo đẩy | trung tâm thông báo, deep link |
@@ -34,7 +35,7 @@ Mỗi ca là một hàm pytest trong `e2e_test/`, gửi **một** chỉ dẫn qu
 
 | ID | Tên | Flow / mục đề | Tiền điều kiện | Kết quả mong đợi (giá trị agent báo, test so sánh) | Đánh dấu | Đã chạy |
 |---|---|---|---|---|---|---|
-| TC01 | Đăng nhập Google bằng account picker | Đăng nhập | Đã đăng xuất | `signed_in = true`; tab = Classes, Proposals, Profile; logcat có `login` | native, analytics | Chưa |
+| TC01 | Đăng nhập Google bằng account picker | Đăng nhập | Đã đăng xuất, tài khoản mentor | `signed_in = true`; tab = Classes, Proposals, Topics, Schedule, Profile; logcat có `login` | native, analytics | Chưa |
 | TC02 | Đăng xuất | Sign-out | Đã đăng nhập | Hiện nút Continue with Google; không còn thanh tab; mở lại app vẫn ở màn đăng nhập | | Chưa |
 | TC03 | Email sai | Flow A, S19 (lỗi) | Đã đăng xuất | `error_text = "Enter a valid email"`; không vào My classes | error_path | Chưa |
 | TC04 | Nhập CSV | Flow A, S22, S23 | Đã đăng nhập | Nút `Import 12 students`; kết quả 12 / 9 / 3; logcat có `class_import` | analytics | Chưa |
@@ -44,7 +45,7 @@ Mỗi ca là một hàm pytest trong `e2e_test/`, gửi **một** chỉ dẫn qu
 | TC08 | Chi tiết lớp và sinh viên | màn chi tiết | Đã đăng nhập | 3 SV chưa có nhóm, 1 nhóm thiếu người; ID `AI000012`, `GD000011`, `MK000010`; SV Dương Yến có ngành AI | | Chưa |
 | TC09 | 3 tab và Back | điều hướng | Đã đăng nhập | Tiêu đề Proposals, Profile đúng; Back về đúng My classes | | Chưa |
 | TC10 | Remote Config đổi hành vi | Remote Config | Đã đăng nhập | `ai_matching_enabled` và `max_proposals_shown` khớp giá trị console; nút Match with AI hiện/ẩn theo cờ | | Chưa |
-| TC11 | Xuất PDF và upload | export/upload | Đã đăng nhập | Thấy tiến độ `% uploaded`; thông báo bắt đầu bằng `Uploaded`; danh sách Saved reports có mục; logcat có `report_export` | analytics | Chưa |
+| TC11 | Xuất PDF và lưu | export/upload | Đã đăng nhập | Thấy tiến độ `% uploaded`; thông báo bắt đầu bằng `Uploaded`; danh sách Saved reports có mục; logcat có `report_export`. Gói Spark: PDF lưu trong Firestore (`reports/{id}/files/pdf`) | analytics | Chưa |
 | TC12 | Hộp thoại quyền thông báo | native | Đã thu hồi `POST_NOTIFICATIONS` | Hộp thoại hệ thống xuất hiện; sau khi Allow app hiện trạng thái đã cho phép | native | Chưa |
 | TC13 | Mất mạng khi ghép | Flow A, S18 (lỗi) | Đã đăng nhập, có mạng lúc nhập | Hiện lỗi và nút `Try again`; tắt Airplane rồi thử lại thì phục hồi | error_path | Chưa |
 | TC14 | Chạm thông báo đẩy từ notification shade | native, FCM | Cần người gửi tin từ console, `TEAMUP_PUSH_READY=1` | Mở màn Proposals; thông báo có trong danh sách | native | Mặc định bỏ qua |

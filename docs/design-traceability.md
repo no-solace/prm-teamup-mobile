@@ -35,7 +35,21 @@ Route là hằng số trong [`lib/router/routes.dart`](../lib/router/routes.dart
 | S12 Approve dialog | dialog trên S10 | `widgets/confirm_dialog.dart` | `ProposalActionViewModel.approve` | giao dịch Firestore (roster + proposal) | Test |
 | S17 Discard dialog | dialog trên S10 | `widgets/confirm_dialog.dart` | `ProposalActionViewModel.discard` | `proposals/{id}.status = discarded` | Test |
 | S24 Remove member dialog | dialog trên S10 | `widgets/confirm_dialog.dart` | `ProposalActionViewModel.updateMembers` | `proposals/{id}` | Test |
-| S6 Profile | `/profile` | `profile/profile_screen.dart` | `ProfileViewModel` | Auth, `users/{uid}`, Remote Config, Storage, FCM | Test |
+| S6 Profile | `/profile` | `profile/profile_screen.dart` | `ProfileViewModel` | Auth, `users/{uid}`, Remote Config, lưu PDF trong Firestore (`reports`), FCM | Test |
+
+### Màn mở rộng D/E/F (không có trong Figma Lab 2, xem mục 4, D10)
+
+| Màn | Route | Widget (`lib/screens/…`) | ViewModel / provider | Nguồn dữ liệu | Trạng thái |
+|---|---|---|---|---|---|
+| Onboarding (chọn vai, mã lớp + MSSV) | `/onboarding` | `onboarding/onboarding_screen.dart` | `OnboardingViewModel` | `users/{uid}`, `classes/{id}/students/{mssv}` | Test |
+| My team (tab 1 của sinh viên) | `/classes` | `my_team/my_team_screen.dart` | `myTeamProvider` | `classes/{id}/teams/{teamId}`, `students` | Test |
+| Topics: hàng chờ mentor / trạng thái nhóm | `/topics` | `flow_d/topics_screen.dart` | `mentorTopicsProvider`, `myTopicProvider` | `topics` | Test |
+| Nộp / sửa đề tài (trưởng nhóm) | `/topics/submit` | `flow_d/topic_form_screen.dart` | `TopicActionViewModel` | `topics/{id}`, `files/outline` (≤ 900 KB) | Test |
+| Duyệt đề tài (mentor) | `/topics/:topicId` | `flow_d/topic_detail_screen.dart` | `topicProvider`, `TopicActionViewModel` | `topics/{id}` | Test |
+| Schedule: khung giờ + lịch hẹn | `/schedule` | `flow_e/schedule_screen.dart` | `slotsProvider`, `bookingsProvider`, `ScheduleActionViewModel` | `mentors/{uid}/slots`, `bookings` | Test |
+| Đặt lịch (trưởng nhóm) | `/schedule/book` | `flow_e/book_slot_screen.dart` | `slotsProvider`, `ScheduleActionViewModel` | slot + booking trong một giao dịch | Test |
+| Buổi họp + biên bản | `/schedule/:bookingId` | `flow_f/meeting_screen.dart` | `bookingProvider`, `minutesProvider` | `bookings/{id}`, `minutes/{id}` | Test |
+| Viết biên bản | `/schedule/:bookingId/minutes` | `flow_f/minutes_form_screen.dart` | `ScheduleActionViewModel` | `minutes/{id}` | Test |
 
 ## 2. Flow → màn
 
@@ -54,7 +68,7 @@ Token nằm ở [`lib/theme/`](../lib/theme/): `app_colors.dart` (`ColorScheme` 
 | Button primary / tonal / text / destructive | `app_button.dart` (`AppButton`, `AppButtonVariant`) | `loading`, vô hiệu khi `onPressed == null` |
 | Text field | `app_text_field.dart` | `errorText`, `hint` |
 | Card | `app_card.dart` | |
-| Navigation bar, App bar | `screens/app_shell.dart` (`NavigationBar` 3 tab) | |
+| Navigation bar, App bar | `screens/app_shell.dart` (`NavigationBar`) | mentor 5 tab, sinh viên 4 tab (D10) |
 | Dialog confirm / destructive | `confirm_dialog.dart` | destructive |
 | Loading, Empty, Error | `view_state_builder.dart` + `status_view.dart` | 4 nhánh `Loading/Empty/Data/Failure` |
 | Error banner | `error_banner.dart` | |
@@ -73,16 +87,17 @@ Mọi khác biệt dưới đây là cố ý. **Chưa cập nhật Figma cho cá
 |---|---|---|---|---|
 | D1 | S1, S19 | Chỉ nhập email, không có bước mã | Google Sign-In là phương thức chính; thêm email + mật khẩu và SĐT + OTP. S19 là trạng thái lỗi của form email | Đề Lab 3 bắt buộc Google Sign-In; cần tài khoản thật để áp rules theo `uid` |
 | D2 | S22 | File mẫu `class_A.xlsx` | Chỉ nhận `.csv` (5 cột: MSSV, họ tên, lớp, nhóm, ngành) | Cắt phạm vi theo thứ tự ưu tiên trong `PHAN_CONG.md` mục 5 (7 ngày làm Lab 3); app báo rõ khi chọn file không phải CSV |
-| D3 | S6 | Thông tin mentor, Sign out | Thêm mục Notifications (inbox), Language, vùng **Firebase demo** (Remote Config, xuất PDF + upload, Test crash) | Đề Lab 3 yêu cầu vùng demo Firebase ở Profile |
+| D3 | S6 | Thông tin mentor, Sign out | Thêm mục Notifications (inbox), Language, vùng **Firebase demo** (Remote Config, xuất PDF + lưu, Test crash); khối báo cáo chỉ hiện với mentor | Đề Lab 3 yêu cầu vùng demo Firebase ở Profile |
 | D4 | thêm mới | Không có | `/profile/notifications` (trung tâm thông báo FCM) | Đề yêu cầu giữ danh sách thông báo nhận được trong app |
 | D5 | S2, S22 | Không vẽ trạng thái rỗng và lỗi | Thêm empty (chưa có lớp) và error (import lỗi, thử lại) | Đề yêu cầu loading/empty/error trên mọi màn tải dữ liệu |
 | D6 | S3, S4, S5 | Nút "Match with AI" luôn hiện | Ẩn khi Remote Config `ai_matching_enabled = false` | Remote Config phải đổi hành vi nhìn thấy được |
 | D7 | S9 | 3 thẻ đề xuất | Số thẻ theo Remote Config `max_proposals_shown` (1 đến 20, mặc định 3) | Như trên |
 | D8 | S8 → S18 | Offline là lỗi mạng | Thêm giới hạn 30 giây; quá hạn cũng hiện S18 | Tránh spinner vô hạn (rubric "Spinner forever") |
 | D9 | S10 | Hai trạng thái pending/approved | Thêm trạng thái dữ liệu `superseded` (không hiện ra UI) | Matching chạy lại thay bản nháp AI cũ nguyên tử (xem `docs/matching-service.md`) |
+| D10 | thêm mới | Không có vai sinh viên, 3 tab | Vai sinh viên và các màn D/E/F ở mục 1. Mentor có thêm tab Topics và Schedule (5 tab); sinh viên thấy My team, Topics, Schedule, Profile. S3 hiện mã lớp để copy cho sinh viên | Mở rộng Lab 3 (`docs/PROPOSAL.md` mục 9), dùng widget và token sẵn có, chưa có thiết kế Figma |
 
 ## 5. Việc còn lại
 
-- [ ] Cập nhật Figma cho D1 đến D9 (đề: "unrecorded difference … graded as a defect").
+- [ ] Cập nhật Figma cho D1 đến D10 (đề: "unrecorded difference … graded as a defect").
 - [ ] Chạy từng màn trên thiết bị thật rồi đổi cột Trạng thái thành **Máy thật**; lưu ảnh vào `evidence/`.
 - [ ] Kiểm tra bố cục ở 360 dp và 412 dp, vùng chạm ≥ 48 dp, chữ ≥ 14 sp (có widget test cho S22).
