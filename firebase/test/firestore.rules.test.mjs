@@ -430,3 +430,29 @@ test('notifications private; updates may only mark read; parent role required', 
     title: 'TeamUp', body: '', receivedAt: Timestamp.now(), read: false,
   }));
 });
+
+// Review finding F3: importClass writes the class, every student and every team in one batch.
+const importBatch = (client, id, students, groups) => {
+  const batch = writeBatch(client);
+  batch.set(doc(client, `classes/${id}`), room());
+  const majors = ['SE', 'AI', 'MKT', 'GD'];
+  const rows = Array.from({ length: students }, (_, i) => ({
+    id: `M${String(i + 1).padStart(6, '0')}`, major: majors[i % 4] }));
+  groups.forEach((size, g) => {
+    const members = rows.splice(0, size);
+    batch.set(doc(client, `classes/${id}/teams/${g + 1}`), {
+      name: `Group ${g + 1}`, memberIds: members.map((m) => m.id), majors: members.map((m) => m.major) });
+    for (const m of members) {
+      batch.set(doc(client, `classes/${id}/students/${m.id}`), { ...student, major: m.major, teamId: String(g + 1) });
+    }
+  });
+  for (const m of rows) batch.set(doc(client, `classes/${id}/students/${m.id}`), { ...student, major: m.major, teamId: null });
+  return batch.commit();
+};
+
+test('import of the 12-student demo class commits in one batch', async () => {
+  await assertSucceeds(importBatch(db(), 'demo12', 12, [6, 3]));
+});
+test('import of a 42-student class (6 groups of 5, 12 free) commits in one batch', async () => {
+  await assertSucceeds(importBatch(db(), 'full42', 42, [5, 5, 5, 5, 5, 5]));
+});
