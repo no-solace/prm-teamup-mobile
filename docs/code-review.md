@@ -37,9 +37,11 @@
 
 | **CR-09** | Cursor Agent | `e2e_test/conftest.py:37`<br>`e2e_test/conftest.py:100` | Bug | Bộ test gọi `ArtemisClient(device_serial=…, profile=…, api_key=…, output_dir=…)` và `artemis.run(instruction)` — **không tồn tại trong SDK thật**. Client cài được là `artemis-client` (gói con trong monorepo ARTEMIS), nó **remote-only** (gọi HTTP tới daemon), `run()` là coroutine, và không có tham số `api_key`/`output_dir`. Ngoài ra `APP_PACKAGE` là `com.example.teamup_exe` trong khi `applicationId` thật là `com.group6.teamup_exe`. | **Accepted** | Vi phạm trực tiếp Lab 3 §7: bộ test phải **chạy được**. Hiện tại mọi test ném `TypeError`/`AttributeError` ngay khi gọi client — tức 18 ca ARTEMIS sẽ fail 100% khi giảng viên chạy, dù app đã đúng. Tác động đo được: `pytest` không tạo được bất kỳ ca nào. | `668ce5f` `fix(lab3)` |
 | **CR-10** | Cursor Agent | `lib/widgets/proposal_student_picker.dart:96`<br>`lib/screens/flow_b/add_member_screen.dart:70` | Bug / Fidelity | S13 yêu cầu lỗi **"Max 6 members"** kèm **nút bị khóa**, nhưng nút lưu vẫn bấm được; dòng đếm hiện `"X of Y places selected"` thay vì meta line của Lab 2 `"FinLite, 6 of 6"`. | **Accepted** | Lab 3 §3: *"An unrecorded difference between Figma and the app is graded as a defect."*; Lab 2 handoff S13 ghi rõ *"Button primary (disabled)"* và *"Bỏ một lựa chọn thì lỗi biến mất và nút Add bật"*. Tác động đo được: giữa Flow B và Flow C (S11/S16 dùng chung widget) không có trạng thái nào cho mentor thấy nhóm đã đầy bằng cách khóa nút. Đã sửa và thêm 5 widget test cho S11/S13/S21. | `668ce5f` `fix(lab3)` |
+| **CR-11** | Cursor Agent | `e2e_test/conftest.py:120` | Bug / Test gap | `artemis-client` **không trả báo cáo cho client**: `TaskResult.output` luôn `None`. ARTEMIS lưu final report vào **step cuối cùng** (`action_taken.action == "report_task_status"` → `args.explanation`), còn client chỉ nhận metadata session. Hệ quả: mọi test FAIL với `Observed(status='completed', text='')` dúl task đã **PASS** thật. | **Accepted** | Vi phạm Lab 3 §7: bộ test phải **chạy được** và **trị đúng được kiểm chứng**. Tác động đo được: 0/19 test có thể trừ xác nhắng agent. Đã sửa bằng cách đọc `GET /api/sessions/{id}/steps` để đọc `args.explanation`; TC-02 sau khi sửa: **1 passed in 110.82s**. | `fix(lab3)` |
+| **CR-12** | Cursor Agent | `android/app/build.gradle.kts:1`<br>`docs/WORKLOG.md` §5b | Build / Tooling | App **crash ngay khi khởi động** với `RuntimeException: Unable to get provider net.nfet.flutter.printing.PrintFileProvider` — provider có trong merged manifest nhưng class không có trong dex. Nguyên nhân gốc: build bằng **JDK 26** làm AGP 9.1.0 fail ố bước `jlink` (`Could not resolve all files for configuration ':firebase_core:androidJdkImage'`), để lại build tổn còng. | **Accepted** | Lab 3 §11 đòi ngức repo “oốn trong một cḚ sḝ7 ừn danh” — một app crash khi mở ra là không thễ nổp. Tác động đo được: 0/1 ứở dùng được chạy. Đã sửa: dùng **JDK 24** + `flutter clean`; đã xác nhận app khởi động bình thường (`topResumedActivity=MainActivity`). | `fix(lab3)` |
 
-**Tổng: 10 finding** — vượt mức tối thiểu 5; bao phủ **nhiều loại**: bug (CR-02, CR-04,
-CR-06, CR-09, CR-10), architecture (CR-03), test gap (CR-01, CR-07, CR-08), maintainability (CR-05).
+**Tổng: 12 finding** — vượt mức tối thiểu 5; bao phủ **nhiều loại**: bug (CR-02, CR-04,
+CR-06, CR-09, CR-10, CR-11, CR-12), architecture (CR-03), test gap (CR-01, CR-07, CR-08), maintainability (CR-05), tooling (CR-12).
 
 ---
 
@@ -209,6 +211,67 @@ lựa chọn. Widget dùng chung nên S16 (Add student) cũng được sửa the
 *Kiểm chứng*: thêm `test/widgets/proposal_student_picker_test.dart` với 5 ca
 (S11 meta line, S13 từ chối lựa chọn, S13 gỡ lỗi khi bỏ chọn, nhóm đầy ngay
 từ frame đầu, S21 empty state). Tổng `flutter test` lên **150/150**.
+
+---
+
+### CR-11 — ARTEMIS client không trả báo cáo cho client — **Accepted**
+
+*Vì sao phải sửa*: Đề Lab 3 §7 đòi bộ test ARTEMIS phải **chạy được**
+trên thiặt bị thật và **trị đúng được kiểm chứng**. SDK
+`artemis-client` chỉ trả về cho remote client **metadata phiên** (`session_id`,
+`status`, timestamps) chứ không phải phần **báo cáo cuối cùng** của agent —
+nó nằm trong `TaskResult.output` là `None`.
+
+Hệ quả đo đo: mọi test trong `e2e_test/` sẽ FAIL với
+`Observed(status='completed', text='')`, dúl **task đã chạy PASS thật** trên thiặt bị.
+Đây là loối nguy hiểm nhất: giổa cách "test đọc đúng được kiểm
+chứng" mà ổn là "test không kiểm chứng gì".
+
+*Cách sửa*: bổ sung hai hàm trong `e2e_test/conftest.py`:
+
+- `_fetch_session_steps(session_id)` — gọi `GET /api/sessions/{session_id}/steps` trên daemon.
+- `_extract_final_report(steps)` — quét ngược các step, tìm `action_taken.action ==
+  "report_task_status"` rồi đọc `args.explanation`.
+
+Khi `TaskResult.output` rỗng, fixture sờ dùng giá trị ngữu để đọc báo cáo thật
+từ daemon.
+
+*Kiểm chứng*: TC-02 (`test_tc02_open_each_top_level_tab`) chạy trên emulator `emulator-5554`
+→ **1 passed in 110.82s**, có báo cáo thật của agent:
+
+```
+Proposals, Profile, My classes
+```
+
+---
+
+### CR-12 — App crash khi khởi động vì build bằng JDK 26 — **Accepted**
+
+*Vì sao phải sửa*: Lab 3 §11 đòi repo phải **mở được không lỗi** ("open in an
+incognito window"). Để động app trên emulator bằng
+`RuntimeException: Unable to get provider net.nfet.flutter.printing.PrintFileProvider` —
+nghĩa là provider đã khai báo trong merged manifest nhưng **class không có trong dex**.
+
+*Nguyên nhân gốc*: build trước đó dùng **JDK 26**. AGP 9.1.0 không tương
+chạy `jlink.exe` để tạo `androidJdkImage` cho `firebase_core`:
+
+```
+Could not resolve all files for configuration ':firebase_core:androidJdkImage'
+```
+
+Build fail để lại **incremental dex cache**, khiến class cù provider không có bổc
+vào APK.
+
+*Cách sửa*:
+
+1. Để `JAVA_HOME=C:\Toolkits\Java\jdk-24.0.2` (JDK 24 tương thích với AGP 9.1.0).
+2. `flutter clean` + `flutter pub get` để xoá cache build tổn còng.
+3. Build lại APK debug và cài lên emulator.
+
+*Kiểm chứng*: `adb shell dumpsys activity activities` →
+`topResumedActivity = com.group6.teamup_exe/.MainActivity` (app mở bình thường);
+`PrintFileProvider` xác nhận có trong `classes9.dex`; `flutter analyze` **0 issue**;
+`flutter test` **150/150 pass**.
 
 ---
 

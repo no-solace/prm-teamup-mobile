@@ -75,7 +75,7 @@ Bộ test này dùng Firestore emulator nên chạy được hoàn toàn offline
 cd firebase/test
 npm install
 npx firebase-tools@15.35.0 emulators:exec --only firestore \
-     --project demo-teamup-data "node --test firestore.rules.test.mjs"
+     --project demo-teamup-data "node --test firebase/test/firestore.rules.test.mjs"
 ```
 Kết quả hiện tại: **21/21 pass**.
 
@@ -88,6 +88,16 @@ export ARTEMIS_API_KEY=<model api key>     # không commit
 export ARTEMIS_DEVICE=emulator-5554        # serial từ `adb devices`
 pytest -m "not exploratory" -v              # Flash profile, regression
 ARTEMIS_PROFILE=pro pytest test_exploratory.py -s -m exploratory
+```
+
+Hoặc dùng script có sẵn — tự kiểm tra đủ kiện (daemon sống, thiết bị kết nối, key
+có mặt, app đã cài) rồi mới chạy `pytest`:
+
+```bash
+tool/run_e2e.ps1                                  # PowerShell
+tool/run_e2e.py                                   # Python / Git Bash
+tool/run_e2e.ps1 -TestPath e2e_test/test_auth.py  # một nhóm test
+python tool/collect_artemis_evidence.py            # tải ảnh + log vào evidence/
 ```
 
 Chi tiết: [e2e_test/README.md](e2e_test/README.md) và [docs/test-plan.md](docs/test-plan.md).
@@ -111,8 +121,9 @@ Kết quả: `report/Lab03_<StudentID>.pdf` và `slides/Lab03_<StudentID>_slides
 | Đặc tả workflow | [docs/workflow.md](docs/workflow.md) | 3 workflow lõi đủ 7 thành phần, activity diagram, state machine, registry BR-01…BR-07 |
 | Kế hoạch Analytics | [docs/analytics-plan.md](docs/analytics-plan.md) | 10 event: trigger, tham số có kiểu, câu hỏi sản phẩm, ánh xạ flow, quy tắc không PII |
 | Kế hoạch kiểm thử | [docs/test-plan.md](docs/test-plan.md) | 18 ca ARTEMIS + 1 phiên khám phá, bảng kết quả, giải thích ca flaky |
-| Rà soát mã AI | [docs/code-review.md](docs/code-review.md) | 10 phát hiện (tool, file:line, loại, quyết định, lý do, commit) + công bố công cụ |
+| Rà soát mã AI | [docs/code-review.md](docs/code-review.md) | 12 phát hiện (tool, file:line, loại, quyết định, lý do, commit) + công bố công cụ |
 | Nhật ký làm việc | [docs/WORKLOG.md](docs/WORKLOG.md) | Những gì đã làm và vì sao, cách kiểm chứng lại, việc còn lại theo thứ tự ưu tiên |
+| Bàn giao & hướng dẫn nộp bài | [docs/BAN_GIAO_HUONG_DAN_NOP_BAI.md](docs/BAN_GIAO_HUONG_DAN_NOP_BAI.md) | Trạng thái 30 giây · 4 lỗi đã sửa · việc còn lại theo thứ tự · lệnh kiểm chứng lại |
 | Bộ test E2E | [e2e_test/](e2e_test/) | `conftest.py`, `pyproject.toml`, 5 module test + phiên khám phá |
 | Bằng chứng | [evidence/](evidence/) | Checklist và danh mục ảnh Console / DebugView / Crashlytics / ARTEMIS |
 | Báo cáo | [report/](report/) | `Lab03_<StudentID>.pdf` (nguồn Markdown + script dựng) |
@@ -128,6 +139,7 @@ Kết quả: `report/Lab03_<StudentID>.pdf` và `slides/Lab03_<StudentID>_slides
 | GitHub Copilot Chat | Gợi ý refactor trong `lib/viewmodels/` |
 | GitHub Copilot Code Review | Rà soát pull request, sinh danh sách phát hiện (CR-01…CR-08) |
 | Cursor Agent (Claude Opus 4.5) — vòng 2 | Rà soát theo checklist Lab 3 §5–§10, phát hiện CR-09 (API ARTEMIS sai) và CR-10 (S13 chưa khoá nút) |
+| Cursor Agent (Claude Opus 4.5) — vòng 3 | Dựng & chạy hạ tầng ARTEMIS thật trên emulator, phát hiện CR-11 (client không nhận báo cáo) và CR-12 (app crash khi build bằng JDK 26) |
 | Mermaid CLI (`mmdc`) | Vẽ sơ đồ activity / state / sequence / layer cho báo cáo và slide |
 
 Chi tiết và quyết định cho từng phát hiện: [docs/code-review.md](docs/code-review.md) §5.
@@ -149,11 +161,11 @@ Chi tiết và quyết định cho từng phát hiện: [docs/code-review.md](do
 |---|---|---|
 | `flutter analyze` | ✅ **No issues found** | 0 cảnh báo |
 | `flutter test` | ✅ **150/150 pass** | unit + widget |
-| Firestore rules test | ✅ **21/21 pass** | `npx firebase-tools@15.35.0 emulators:exec --only firestore "node --test firestore.rules.test.mjs"` |
+| Firestore rules test | ✅ **21/21 pass** | `npx firebase-tools@15.35.0 emulators:exec --only firestore "node --test firebase/test/firestore.rules.test.mjs"` |
 | `tool/check_layers.sh` | ✅ **Layers OK** | 0 vi phạm layer |
 | Báo cáo PDF | ✅ 10 trang | rubric yêu cầu 8–12 |
-| Slide PDF | ✅ 15 slide chính + 4 slide phụ | rubric yêu cầu 12–15 |
-| 18 ca ARTEMIS | ⚠️ **đã viết, chưa chạy trên thiết bị** | cần chạy + điền `docs/test-plan.md` §6 + ảnh vào `evidence/artemis/` |
+| Slide PDF | ✅ 15 slide chính + 5 slide phụ | rubric yêu cầu 12–15 |
+| 18 ca ARTEMIS | ⚠️ **đã chạy thật 1 ca** (TC-02 pass 110.82s, 22 ảnh trong `evidence/artemis/`) | cần chạy ≥ 3 lần/ca trên build release + thiết bị thật → điền `docs/test-plan.md` §6 |
 | Ảnh Console (6 dịch vụ) | ⚠️ **chưa chụp** | checklist trong `evidence/README.md` |
 | `android/app/google-services.json` | ⚠️ **chưa có trong repo** | chạy `flutterfire configure` rồi commit (đề §9 cho phép commit) |
 | Video demo | ⚠️ **chưa quay** | xem mục trên |
@@ -161,6 +173,9 @@ Chi tiết và quyết định cho từng phát hiện: [docs/code-review.md](do
 > 📖 **Chi tiết toàn bộ quá trình làm việc — đã làm gì, vì sao, kiểm chứng lại
 > bằng lệnh nào, và còn thiếu gì theo thứ tự ưu tiên: xem
 > [docs/WORKLOG.md](docs/WORKLOG.md).**
+>
+> 🖥️ **Bàn giao nhanh — bảng trạng thái, việc còn lại, cách làm từng bước:
+> [docs/BAN_GIAO_HUONG_DAN_NOP_BAI.md](docs/BAN_GIAO_HUONG_DAN_NOP_BAI.md).**
 
 ## Không commit
 

@@ -1,0 +1,20 @@
+{
+  "session_id": "b495eec3-ff06-485e-812c-0ee943068945",
+  "initial_goal": "In the TeamUp EXE app, signed in, tap the bottom navigation tab named 'Proposals' and report the screen title that appears. Then tap the tab named 'Profile' and report the screen title that appears. Then tap the tab named 'Classes' and report the screen title that appears. Report the three titles separated by commas.",
+  "start_time": 1794474888.5440135,
+  "end_time": 1794475011.2395916,
+  "status": "completed",
+  "device_info": "{\"host_platform\": \"WINDOWS\", \"mobile_platform\": \"android\", \"device_id\": \"emulator-5554\", \"device_width\": 1080, \"device_height\": 2400, \"profile\": \"flash\", \"hierarchy_backend\": \"helper\", \"hierarchy_backend_note\": \"UI hierarchy source: the Artemis accessibility helper v1.2.0.\"}",
+  "video_filepath": null,
+  "pid": 26356,
+  "device_id": "emulator-5554",
+  "device_serial": "emulator-5554",
+  "video_url": null,
+  "recording_status": "unavailable",
+  "model_info": {
+    "name": "Flash",
+    "id": "gemini-3.6-flash",
+    "provider": "google",
+    "architecture": "ARTEMIS Flash"
+  }
+}

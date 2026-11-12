@@ -256,22 +256,24 @@ sequenceDiagram
 | Level | Công cụ | Số lượng | Kết quả |
 |---|---|---|---|
 | Unit / widget / integration | `flutter_test` | **150 test** | **150/150 pass** |
-| E2E / UI | **Google ARTEMIS** (pytest) | **18 ca + 1 phiên khám phá** | bộ test đã viết; **chưa có lần chạy trên thiết bị** — bảng kết quả để trống trong `docs/test-plan.md` §6 |
+| E2E / UI | **Google ARTEMIS** (pytest) | **18 ca + 1 phiên khám phá** | **đã chạy thật** trên emulator `emulator-5554`: `TC-02` pass trong **110.82s**; các ca còn lại cần chạy ≥ 3 lần trên build release |
 | Rules test | Firestore Rules emulator | `firestore.rules.test.mjs` | **21/21 pass** |
 
 Assert trên **giá trị agent báo lại** (`Observed.number()`, `Observed.contains()`), không chỉ `status == "SUCCESS"`; có 3 ca lỗi thật (vượt 6 · dưới 5 · không tìm ra SV) và 3 native interaction (account picker · notification shade · test crash); kế hoạch chạy mỗi ca ≥ 3 lần, trace lưu ở `evidence/artemis/`.
 
-> **Trạng thái bằng chứng:** 150/150 test Dart và 21/21 test Firestore rules **đã chạy thật** và xanh. 18 ca ARTEMIS **đã viết nhưng chưa chạy trên thiết bị** — cần chạy và điền `docs/test-plan.md` §6 + ảnh vào `evidence/artemis/` trước khi nộp.
+> **Trạng thái bằng chứng:** 150/150 test Dart, 21/21 test Firestore rules và **TC-02 ARTEMIS** **đã chạy thật** và xanh. 17 ca ARTEMIS còn lại **cần chạy ≥ 3 lần** trên build release + thiết bị thật, điền `docs/test-plan.md` §6 + ảnh vào `evidence/artemis/` trước khi nộp.
 
-**AI code review — 10 phát hiện, 5 commit sửa có tên mã**
+**AI code review — 12 phát hiện, 5 commit sửa có tên mã**
 
-Bảng đầy đủ 10 phát hiện (kèm file:line và lý do) nằm ở **slide dự phòng A3**.
-Hai phát hiện mới nhất là loại "mồi lỗi" — đều là thứ **không test Dart nào bắt được**:
+Bảng đầy đủ 12 phát hiện (kèm file:line và lý do) nằm ở **slide dự phòng A3**.
+Bốn phát hiện gần nhất là loại "mồi lỗi" — đều là thứ **không test Dart nào bắt được**:
 
 | ID | Finding | Quyết định | Vì sao nghiêm trọng | Commit |
 |---|---|---|---|---|
 | CR-09 | Bộ ARTEMIS gọi `ArtemisClient(api_key=…)` và `run()` **đồng bộ** — SDK thật là `artemis-client`, remote-only, `run()` là coroutine. Sai `applicationId` nữa (`com.example` vs `com.group6`). | Accepted | §7 yêu cầu bộ test **chạy được**; 18/18 ca sẽ ném `TypeError` trước khi chạm thiết bị | `668ce5f` |
 | CR-10 | S13 hiện lỗi "Max 6 members" nhưng **nút lưu vẫn bấm được**; dòng đếm lệch Lab 2 (`places selected` thay vì `FinLite, 6 of 6`) | Accepted | Handoff Lab 2: *"Button primary (disabled)"*; §3 coi sai lệch Figma↔app là lỗi | `668ce5f` |
+| CR-11 | `artemis-client` **không trả báo cáo** cho client (`TaskResult.output` = `None`); báo cáo thật nằm ở step cuối `report_task_status` | Accepted | §7 đòi test **chạy được** và **trừ đúng được kiểm chứng** — 0/19 test trừ xác nhắng agent | `fix(lab3)` |
+| CR-12 | App **crash ngay khi khởi động**: `PrintFileProvider` ClassNotFound — do build bằng JDK 26 | Accepted | §11 đòi repo mở được không lỗi; sửa bằng **JDK 24 + `flutter clean`** | `fix(lab3)` |
 
 > CR-01 → CR-08 (8 phát hiện trước đó) đã sửa ở 4 commit: `1b6fea8`, `9cf68f5`, `000f51b`, `7c0fc66`.
 
@@ -287,12 +289,12 @@ Hai phát hiện mới nhất là loại "mồi lỗi" — đều là thứ **kh
 | Design system Lab 2 trong code | ✅ 18 component dùng chung, token trong `ThemeData` | `docs/design-traceability.md` §3–§4 |
 | Analytics ≥ 7 event, **không PII** | ✅ **10 event** có câu hỏi sản phẩm | `docs/analytics-plan.md`, DebugView |
 | Remote Config ≥ 2 tham số đổi hành vi | ✅ `ai_matching_enabled` + `max_proposals_shown` | ảnh trước/sau |
-| ARTEMIS ≥ 10 ca, ≥ 3 lần/ca, exploratory | ⚠️ **18 ca + 1 phiên khám phá đã viết, chưa chạy trên thiết bị** | `e2e_test/`, `docs/test-plan.md` §6 |
-| AI review ≥ 5 phát hiện, ≥ 3 commit sửa | ✅ **10 phát hiện**, **5 commit** có tên mã | `docs/code-review.md` |
+| ARTEMIS ≥ 10 ca, ≥ 3 lần/ca, exploratory | ⚠️ **18 ca + 1 phiên khám phá đã viết; đã chạy thật 1 ca (TC-02) — cần chạy ≥ 3 lần** | `e2e_test/`, `docs/test-plan.md` §6, `evidence/artemis/` |
+| AI review ≥ 5 phát hiện, ≥ 3 commit sửa | ✅ **12 phát hiện**, **5 commit** có tên mã | `docs/code-review.md` |
 
-**Giới hạn trung thực:** ① **Figma chưa cập nhật** cho D1–D4 (đã ghi ở traceability, cần sửa trước khi nộp) — ưu tiên **Cao**; ② **18 ca ARTEMIS đã viết nhưng chưa chạy trên thiết bị** — cần chạy + chụp bằng chứng vào `evidence/artemis/` — ưu tiên **Cao**; ③ "AI" là thuật toán quy tắc, chưa dùng kỹ năng/lịch — Final thay bằng Gemini; ④ chưa có web admin và luồng liên vai — Final bổ sung; ⑤ chưa test tải 2 mentor duyệt đồng thời — thấp.
+**Giới hạn trung thực:** ① **Figma chưa cập nhật** cho D1–D4 (đã ghi ở traceability, cần sửa trước khi nộp) — ưu tiên **Cao**; ② **17 ca ARTEMIS còn lại chưa chạy ≥ 3 lần trên thiết bị thật** (TC-02 đã chạy thật) — cần chạy + chụp bằng chứng vào `evidence/artemis/` — ưu tiên **Cao**; ③ "AI" là thuật toán quy tắc, chưa dùng kỹ năng/lịch — Final thay bằng Gemini; ④ chưa có web admin và luồng liên vai — Final bổ sung; ⑤ chưa test tải 2 mentor duyệt đồng thời — thấp.
 
-**Kết luận:** *PROBLEM SOLVED* — chia nhóm thủ công mất hàng giờ và dễ sai quy tắc 5–6 người / ≥ 3 ngành → 25 màn + 3 workflow tự động hoá, có ràng buộc ở cả UI lẫn Firestore rules. *WORKING PRODUCT* — app Flutter + Firebase chạy thật trên Android: import → ghép theo ngành → sửa & duyệt → undo → xuất PDF lên Cloud Storage. *VERIFIED RESULT* — 150/150 test Dart · 21/21 test Firestore rules · 18 ca ARTEMIS + 1 phiên khám phá (đã viết, cần chạy) · 10 phát hiện AI review có 5 commit sửa · 6 dịch vụ Firebase có ca lỗi.
+**Kết luận:** *PROBLEM SOLVED* — chia nhóm thủ công mất hàng giờ và dễ sai quy tắc 5–6 người / ≥ 3 ngành → 25 màn + 3 workflow tự động hoá, có ràng buộc ở cả UI lẫn Firestore rules. *WORKING PRODUCT* — app Flutter + Firebase chạy thật trên Android: import → ghép theo ngành → sửa & duyệt → undo → xuất PDF lên Cloud Storage. *VERIFIED RESULT* — 150/150 test Dart · 21/21 test Firestore rules · 18 ca ARTEMIS + 1 phiên khám phá (đã viết; TC-02 đã chạy thật) · 12 phát hiện AI review có 5 commit sửa · 6 dịch vụ Firebase có ca lỗi.
 
 **Repo:** `github.com/no-solace/prm-teamup-mobile` · **Figma:** file Lab 2 Final UI · **Video demo:** 5–10 phút (link trong README). **Hướng tiếp:** web admin cho Điều phối khoa, luồng duyệt mobile → web, và Gemini thay thuật toán quy tắc — giữ nguyên interface `MatchingService`/`ProposalService`.
 
@@ -326,7 +328,7 @@ Hai phát hiện mới nhất là loại "mồi lỗi" — đều là thứ **kh
 
 Tất cả gọi qua `lib/viewmodels/instrumentation.dart` (`trackAnalytics`) — bọc try/catch để lỗi tracking không làm hỏng luồng chính.
 
-## A3 · AI code review — chi tiết 10 phát hiện
+## A3 · AI code review — chi tiết CR-01 → CR-08
 
 | ID | Tool | File:line | Kind | Finding | Decision | Reason | Commit |
 |---|---|---|---|---|---|---|---|
@@ -339,7 +341,14 @@ Tất cả gọi qua `lib/viewmodels/instrumentation.dart` (`trackAnalytics`) �
 | CR-07 | Copilot Code Review | `matching_view_model.dart:57` | Test gap | Ghi `ai_match_result` cho màn đã dispose | Accepted | Phễu DebugView lệch | `1b6fea8` |
 | CR-08 | Copilot Code Review | `fake_proposal_service.dart:70` | Test gap | Fake không sort, lệch production | Accepted | Test xanh nhưng app sai | `9cf68f5` |
 | CR-09 | Cursor Agent | `e2e_test/conftest.py:37` | Bug | ARTEMIS: sai SDK, sai `applicationId` | Accepted | §7 yêu cầu bộ test chạy được | `668ce5f` |
+
+## A3b · AI code review — chi tiết CR-09 → CR-12 (vòng dựng hạ tầng ARTEMIS thật)
+
+| ID | Tool | File:line | Kind | Finding | Decision | Reason | Commit |
+|---|---|---|---|---|---|---|---|
 | CR-10 | Cursor Agent | `proposal_student_picker.dart:96` | Fidelity | S13 hiện lỗi nhưng nút vẫn bấm được | Accepted | Handoff: *"Button primary (disabled)"* | `668ce5f` |
+| CR-11 | Cursor Agent | `e2e_test/conftest.py:120` | Bug | Client không nhận báo cáo của agent (`TaskResult.output` luôn `None`) | Accepted | §7 đòi test **trừ đúng được kiểm chứng** | `fix(lab3)` |
+| CR-12 | Cursor Agent | `android/app/build.gradle.kts` | Build | App crash khi khởi động vì build bằng JDK 26 | Accepted | §11 đòi repo mở được không lỗi | `fix(lab3)` |
 
 ## A4 · Công cụ AI đã dùng (công bố)
 
@@ -350,6 +359,7 @@ Tất cả gọi qua `lib/viewmodels/instrumentation.dart` (`trackAnalytics`) �
 | GitHub Copilot Chat | Gợi ý refactor trong `lib/viewmodels/` | Gợi ý CR-05 |
 | GitHub Copilot Code Review | Rà soát pull request | CR-01, 02, 03, 04, 06, 08 |
 | Cursor Agent | Rà soát theo checklist Lab 3 §5–§10 | CR-09, CR-10 |
+| Cursor Agent | Dựng & chạy hạ tầng ARTEMIS thật trên emulator | CR-11, CR-12 |
 | Mermaid CLI (`mmdc`) | Vẽ sơ đồ activity / state / sequence / layer | `build/diagrams/*.svg` |
 
 Mọi phát hiện đều được kiểm lại bằng `flutter analyze`, `flutter test` (150 test) và `tool/check_layers.sh` trước khi commit.

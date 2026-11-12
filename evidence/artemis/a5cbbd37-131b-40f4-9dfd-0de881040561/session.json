@@ -1,0 +1,20 @@
+{
+  "session_id": "a5cbbd37-131b-40f4-9dfd-0de881040561",
+  "initial_goal": "Open the app and report the screen title.",
+  "start_time": 1794475026.033663,
+  "end_time": 1794475036.4080603,
+  "status": "completed",
+  "device_info": "{\"host_platform\": \"WINDOWS\", \"mobile_platform\": \"android\", \"device_id\": \"emulator-5554\", \"device_width\": 1080, \"device_height\": 2400, \"profile\": \"flash\", \"hierarchy_backend\": \"helper\", \"hierarchy_backend_note\": \"UI hierarchy source: the Artemis accessibility helper v1.2.0.\"}",
+  "video_filepath": null,
+  "pid": 31888,
+  "device_id": "emulator-5554",
+  "device_serial": "emulator-5554",
+  "video_url": null,
+  "recording_status": "unavailable",
+  "model_info": {
+    "name": "Flash",
+    "id": "gemini-3.6-flash",
+    "provider": "google",
+    "architecture": "ARTEMIS Flash"
+  }
+}

@@ -20,9 +20,12 @@ its credentials are NOT part of this repository.
 from __future__ import annotations
 
 import asyncio
+import json
 import os
 import re
 import subprocess
+import urllib.error
+import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -116,11 +119,46 @@ def artemis(device_serial: str, profile: str, api_key: str):
     )
 
 
+def _fetch_session_steps(session_id: str) -> list[dict]:
+    """Return the recorded steps of an ARTEMIS session.
+
+    The ARTEMIS daemon stores the final report of a Flash run as a step whose
+    ``action_taken`` is ``report_task_status``. The remote client only
+    receives the session metadata, so the steps are read back from the host.
+    """
+    base = os.environ.get("ARTEMIS_BASE_URL", "http://127.0.0.1:8000").rstrip("/")
+    url = f"{base}/api/sessions/{session_id}/steps"
+    try:
+        with urllib.request.urlopen(url, timeout=30) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+    except (urllib.error.URLError, TimeoutError, ValueError):
+        return []
+    return payload if isinstance(payload, list) else []
+
+
+def _extract_final_report(steps: list[dict]) -> str:
+    """Pull the agent's final explanation out of the recorded steps."""
+    for step in reversed(steps):
+        action = step.get("action_taken")
+        if not isinstance(action, dict):
+            continue
+        if action.get("action") != "report_task_status":
+            continue
+        args = action.get("args")
+        if not isinstance(args, dict):
+            continue
+        explanation = args.get("explanation") or args.get("report") or args.get("summary")
+        if isinstance(explanation, str) and explanation.strip():
+            return explanation
+    return ""
+
+
 def _normalise(result) -> Observed:
     """Turn an ARTEMIS ``TaskResult`` into an :class:`Observed`.
 
     ``TaskResult.output`` may be a string or a structured payload, so every
-    scalar is stringified before the text is searched.
+    scalar is stringified before the text is searched. When the host does not
+    return the report directly, it is read back from the session steps.
     """
     status = str(getattr(result, "status", "") or "")
     output = getattr(result, "output", None)
@@ -128,12 +166,22 @@ def _normalise(result) -> Observed:
         text = ""
     elif isinstance(output, str):
         text = output
-    else:
+    elif isinstance(output, dict):
         text = " ".join(
             f"{key}: {value}" for key, value in output.items() if not isinstance(value, dict)
         )
+    else:
+        text = str(output)
     error = getattr(result, "error", None)
     screenshot = (getattr(result, "raw", {}) or {}).get("screenshot")
+
+    if not text.strip():
+        session_id = (getattr(result, "raw", {}) or {}).get("session_id") or getattr(
+            result, "session_id", None
+        )
+        if session_id:
+            text = _extract_final_report(_fetch_session_steps(session_id))
+
     return Observed(status=status, text=text, error=error, screenshot=screenshot)
 
 

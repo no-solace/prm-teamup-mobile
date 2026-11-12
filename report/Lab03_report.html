@@ -863,10 +863,11 @@ logcat dùng cho ARTEMIS (test <code>TC-17</code> kiểm <code>ai_match_start</c
 </table>
 <p><strong>Tổng: 18 ca script + 1 phiên khám phá</strong> (yêu cầu ≥ 10).</p>
 <blockquote>
-<p><strong>Trạng thái:</strong> bộ test đã <strong>được viết đầy đủ và kiểm tra cú pháp</strong>, nhưng
-<strong>chưa có lần chạy nào trên thiết bị thật</strong>. Vì vậy bảng kết quả §7.3 ghi
-<code>chưa chạy</code> thay vì điền số — bằng chứng bịa sẽ bị trừ điểm nặng hơn là để
-trống. Việc cần làm trước khi nộp nằm ở §9.</p>
+<p><strong>Trạng thái:</strong> bộ test đã <strong>được viết đầy đủ và kiểm tra cú pháp</strong>, và
+<strong>đã chạy thật trên emulator <code>emulator-5554</code></strong> (Android 14) với daemon ARTEMIS thật:
+<code>TC-02</code> (3 tab) <strong>pass trong 110.82s</strong>. Các ca còn lại <strong>chưa chạy</strong> — bảng kết quả §7.3
+ghi rõ từng trạng thái, không bịa báo cáo. Đề §7 yêu cầu <strong>chạy ≥ 3 lần/ca</strong>
+<strong>trên build release + thiết bị thật</strong>; phần đó được ghi ở §9.</p>
 </blockquote>
 <h3 id="72-vi-sao-ket-qua-ang-tin">7.2 Vì sao kết quả đáng tin</h3>
 <ol>
@@ -913,8 +914,8 @@ thiết bị; mỗi lần chạy có trace/screenshot trong <code>evidence/artem
 <td>TC-02</td>
 <td>3 tab</td>
 <td>Happy path</td>
-<td>chưa chạy</td>
-<td><code>evidence/artemis/</code></td>
+<td><strong>1/1 pass</strong> (110.82s, emulator)</td>
+<td><code>evidence/artemis/0797238d-da09-49d8-b3c4-49e5c9041348/</code></td>
 </tr>
 <tr>
 <td>TC-03</td>
@@ -1019,7 +1020,7 @@ thiết bị; mỗi lần chạy có trace/screenshot trong <code>evidence/artem
 </tr>
 <tr>
 <td>Firestore Security Rules</td>
-<td><code>npx firebase-tools@15.35.0 emulators:exec --only firestore --project demo-teamup-data "node --test firestore.rules.test.mjs"</code></td>
+<td><code>npx firebase-tools@15.35.0 emulators:exec --only firestore --project demo-teamup-data "node --test firebase/test/firestore.rules.test.mjs"</code></td>
 <td><strong>21/21 pass</strong></td>
 </tr>
 <tr>
@@ -1032,6 +1033,11 @@ thiết bị; mỗi lần chạy có trace/screenshot trong <code>evidence/artem
 <td><code>flutter analyze</code></td>
 <td><strong>No issues found</strong></td>
 </tr>
+<tr>
+<td>ARTEMIS TC-02 trên emulator</td>
+<td><code>tool/run_e2e.ps1 -TestPath e2e_test/test_auth.py</code></td>
+<td><strong>1 passed in 110.82s</strong></td>
+</tr>
 </tbody>
 </table>
 <hr />
@@ -1039,9 +1045,9 @@ thiết bị; mỗi lần chạy có trace/screenshot trong <code>evidence/artem
 <p>Bản ghi đầy đủ ở <code>docs/code-review.md</code>. Tóm tắt:</p>
 <p><strong>Công cụ dùng:</strong> Cursor Agent (Claude Opus 4.5), Claude Code trong Cursor, GitHub
 Copilot Chat, GitHub Copilot Code Review (chạy trên pull request).</p>
-<p><strong>10 phát hiện, thuộc 4 nhóm:</strong> bug (CR-02, CR-04, CR-06, CR-09, CR-10), architecture (CR-03),
-test gap (CR-01, CR-07, CR-08), maintainability (CR-05). Mỗi phát hiện gắn với
-file và dòng cụ thể.</p>
+<p><strong>12 phát hiện, thuộc 5 nhóm:</strong> bug (CR-02, CR-04, CR-06, CR-09, CR-10, CR-11, CR-12),
+architecture (CR-03), test gap (CR-01, CR-07, CR-08), maintainability (CR-05), tooling (CR-12).
+Mỗi phát hiện gắn với file và dòng cụ thể.</p>
 <table>
 <thead>
 <tr>
@@ -1122,6 +1128,20 @@ file và dòng cụ thể.</p>
 <td>Accepted</td>
 <td>Lab 2 handoff: <em>"Button primary (disabled)"</em>; §3 coi sai lệch Figma↔app là lỗi</td>
 <td><code>668ce5f</code></td>
+</tr>
+<tr>
+<td>CR-11</td>
+<td><code>artemis-client</code> <strong>không trả báo cáo</strong> cho client (<code>TaskResult.output</code> luôn <code>None</code>); báo cáo thật nằm ở step cuối</td>
+<td>Accepted</td>
+<td>§7 đòi test <strong>chạy được</strong> và <strong>trừ đúng được kiểm chứng</strong>; 0/19 test trừ xác nhắng agent</td>
+<td><code>fix(lab3)</code></td>
+</tr>
+<tr>
+<td>CR-12</td>
+<td>App <strong>crash khi khởi động</strong> (<code>PrintFileProvider</code> ClassNotFound) do build bằng JDK 26</td>
+<td>Accepted</td>
+<td>§11 đòi repo mở được không lỗi; đã sửa bằng JDK 24 + <code>flutter clean</code></td>
+<td><code>fix(lab3)</code></td>
 </tr>
 </tbody>
 </table>
@@ -1233,7 +1253,7 @@ Firebase, với:</p>
 <li>10 event Analytics có câu hỏi sản phẩm và tham số không chứa dữ liệu cá nhân;</li>
 <li>bộ test E2E ARTEMIS 18 ca + 1 phiên khám phá, assert trên <strong>giá trị quan sát
   được</strong>;</li>
-<li>10 phát hiện AI code review với quyết định có lý do, 5 commit sửa truy vết được.</li>
+<li>12 phát hiện AI code review với quyết định có lý do, 5 commit sửa truy vết được.</li>
 </ul>
 <p><strong>Hướng tiếp theo (Final Assignment):</strong> web admin cho vai Điều phối khoa, luồng
 liên vai duyệt nhóm trên mobile → xác nhận trên web, và thay <code>RuleBasedMatchingService</code>

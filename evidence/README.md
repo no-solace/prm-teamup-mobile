@@ -42,11 +42,15 @@ evidence/
 
 | Mục | Nội dung |
 |---|---|
-| Lệnh đã dùng | `pytest -m "not exploratory" -v` (Flash) và `ARTEMIS_PROFILE=pro pytest test_exploratory.py -s -m exploratory` |
-| Trace mỗi lần chạy | `evidence/artemis/TC-xx/run-1..3/` (ảnh chụp + log agent) |
+| Lệnh đã dùng | `tool/run_e2e.ps1` (bọc `pytest -m "not exploratory" -v`, Flash) và `ARTEMIS_PROFILE=pro pytest test_exploratory.py -s -m exploratory` |
+| Trace mỗi lần chạy | `evidence/artemis/<session-id>/` — `session.json` + `report.md` + `screenshots/step-NN-before/after.jpg` |
 | Bảng kết quả | `docs/test-plan.md` §6 — test ID, số lần chạy, pass rate, thời gian TB |
 | Ca flaky / fail | `docs/test-plan.md` §7 — nguyên nhân và cách sửa |
 | Phiên khám phá | `evidence/artemis/exploratory/` — báo cáo 15–30 phút, Pro profile |
+
+> **Đã có sẵn:** 12 phiên chạy thật (4 completed, 8 failed) với **22 ảnh chụp thật**
+> trong `evidence/artemis/`. `TC-02` **pass** (110.82s) — xem `evidence/artemis/README.md`
+> để biết vì sao các ca còn lại failed (hạn mức Gemini free-tier, không phải lỗi app).
 
 ## 4. Checklist AI code review
 
@@ -55,6 +59,7 @@ evidence/
 | Output gốc của công cụ | `evidence/code-review/` — copy nguyên văn output của GitHub Copilot Code Review trên pull request |
 | Quyết định và lý do | `docs/code-review.md` §2 và §3 |
 | Commit sửa | 5 commit: `1b6fea8` (CR-01, CR-05, CR-06, CR-07) · `9cf68f5` (CR-02, CR-08) · `000f51b` (CR-03) · `7c0fc66` (CR-04) · `668ce5f` (CR-09, CR-10) |
+| Tổng số finding | **12** (vượt mức tối thiểu 5 của đề §8) — xem `docs/code-review.md` §2 |
 
 ## 5. Quy tắc
 

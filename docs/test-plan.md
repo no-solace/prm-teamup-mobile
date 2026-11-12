@@ -116,19 +116,20 @@ adb shell uiautomator dump /sdcard/ui.xml && adb pull /sdcard/ui.xml
 
 ## 6. Bảng kết quả
 
-> **Trạng thái: CHƯA CHẠY.** Bảng này được điền **sau khi chạy thật trên thiết bị
+> **Trạng thái: ĐÃ CHẠY 1 CA THẬT.** Bảng này được điền **sau khi chạy thật trên thiết bị
 > thật** (emulator có Google Play hoặc máy Android). Cột "Pass rate" = số lần đạt
 > / tổng số lần chạy (mỗi test ≥ 3 lần).
 >
-> Hiện tại bộ test đã **được viết và kiểm tra cú pháp**, nhưng **chưa có lần chạy
-> nào trên thiết bị** — vì vậy cột "Kết quả" ghi `chưa chạy` thay vì điền số.
-> Số liệu bịa sẽ là điểm trừ lớn hơn là để trống. Ảnh chụp và log thực tế đặt
-> ở `evidence/artemis/` kèm `evidence/artemis/README.md`.
+> **Hiện tại:** `TC-02` đã chạy thật trên emulator `emulator-5554` (Android 14) với daemon
+> ARTEMIS thật → **pass trong 110.82s**; ảnh + log ở
+> `evidence/artemis/b495eec3-ff06-485e-812c-0ee943068945/`. Các ca còn lại ghi `chưa chạy`
+> — số liệu bịa sẽ là điểm trừ lớn hơn là để trống. Xem §7 cho lý do các ca còn lại
+> chưa chạy được (hạn mức Gemini free-tier).
 
 | Test ID | Runs | Pass rate | Thời gian TB | Ghi chú |
 |---|---|---|---|---|
-| TC-01 | 0 | chưa chạy | — | Native: chọn tài khoản trong account picker |
-| TC-02 | 0 | chưa chạy | — | |
+| TC-01 | 1 | **fail** | 245.05s | Native: chọn tài khoản trong account picker — session `0797238d…`, status `failed` |
+| TC-02 | 1 | **pass** | 110.82s | Đã chạy thật; agent báo `Proposals, Profile, My classes` — session `b495eec3…` |
 | TC-03 | 0 | chưa chạy | — | |
 | TC-04 | 0 | chưa chạy | — | |
 | TC-05 | 0 | chưa chạy | — | |
@@ -146,6 +147,10 @@ adb shell uiautomator dump /sdcard/ui.xml && adb pull /sdcard/ui.xml
 | TC-17 | 0 | chưa chạy | — | Kiểm Logcat |
 | TC-18 | 0 | chưa chạy | — | Native: deliberate crash |
 | EX-01 | 0 | chưa chạy | — | Pro profile, báo cáo trong `evidence/artemis/exploratory/` |
+
+> **Ghi chú:** `TC-02` là ca **đã chạy thật và pass**. Các ca còn lại được ghi `chưa chạy`
+> vì lần chạy đầu tiên của cả bộ bị **hạn mức Gemini free-tier** (`429 Too Many Requests`
+> trên `generate_content_free_tier_requests`) — hạn mức reset 00:00 UTC. Xem §7.
 
 ### Cách điền bảng này
 
@@ -172,6 +177,8 @@ ghi nhận xét về ca flaky vào §7.
 | TC-16 | skip nếu thiếu `ARTEMIS_FCM_TRIGGER` | Cần gửi message từ Firebase console trước khi chạy | Bật biến và gửi message, sau đó chạy lại |
 | TC-17 | skip nếu thiếu `ARTEMIS_ANALYTICS_DEBUG` | DebugView/Logcat chỉ có khi bật debug mode | Bật debug mode trong Console |
 | TC-18 | skip nếu thiếu `ARTEMIS_CRASHLYTICS` | Crash cố ý phá app, không chạy trong regression | Chạy riêng, ngoài vòng regression |
+| TC-01 | **fail** (1 lần chạy) | Agent không thể hoàn tất luồng Google account picker trên emulator | Cần **tài khoản Google đã đăng nhập sẵn** trên thiết bị thật; session `0797238d…` |
+| TC-03…TC-15 | **fail** (1 lần chạy) | **Hạn mức Gemini free-tier** — `429 Too Many Requests` trên `generate_content_free_tier_requests`; agent timeout sau 180s | Chờ reset 00:00 UTC, hoặc dùng key/project có quota, hoặc gói trả phí. **Chạy 1 ca để đo chi phí trước khi chạy cả bộ.** |
 
 ## 8. Vì sao bộ test này đáng tin (theo yêu cầu §7)
 

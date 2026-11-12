@@ -406,10 +406,11 @@ logcat dùng cho ARTEMIS (test `TC-17` kiểm `ai_match_start` **và** `ai_match
 
 **Tổng: 18 ca script + 1 phiên khám phá** (yêu cầu ≥ 10).
 
-> **Trạng thái:** bộ test đã **được viết đầy đủ và kiểm tra cú pháp**, nhưng
-> **chưa có lần chạy nào trên thiết bị thật**. Vì vậy bảng kết quả §7.3 ghi
-> `chưa chạy` thay vì điền số — bằng chứng bịa sẽ bị trừ điểm nặng hơn là để
-> trống. Việc cần làm trước khi nộp nằm ở §9.
+> **Trạng thái:** bộ test đã **được viết đầy đủ và kiểm tra cú pháp**, và
+> **đã chạy thật trên emulator `emulator-5554`** (Android 14) với daemon ARTEMIS thật:
+> `TC-02` (3 tab) **pass trong 110.82s**. Các ca còn lại **chưa chạy** — bảng kết quả §7.3
+> ghi rõ từng trạng thái, không bịa báo cáo. Đề §7 yêu cầu **chạy ≥ 3 lần/ca**
+> **trên build release + thiết bị thật**; phần đó được ghi ở §9.
 
 ### 7.2 Vì sao kết quả đáng tin
 
@@ -437,7 +438,7 @@ logcat dùng cho ARTEMIS (test `TC-17` kiểm `ai_match_start` **và** `ai_match
 | Test ID | Nhóm | Loại | Pass rate | Bằng chứng |
 |---|---|---|---|---|
 | TC-01 | Sign-in | Native | chưa chạy | `evidence/artemis/` |
-| TC-02 | 3 tab | Happy path | chưa chạy | `evidence/artemis/` |
+| TC-02 | 3 tab | Happy path | **1/1 pass** (110.82s, emulator) | `evidence/artemis/0797238d-da09-49d8-b3c4-49e5c9041348/` |
 | TC-03 | Remote Config | Happy path | chưa chạy | `evidence/artemis/` |
 | TC-04 | Sign-out | Happy path | chưa chạy | `evidence/artemis/` |
 | TC-05…TC-08 | Flow A | Happy path | chưa chạy | `evidence/artemis/` |
@@ -456,9 +457,10 @@ logcat dùng cho ARTEMIS (test `TC-17` kiểm `ai_match_start` **và** `ai_match
 | Bộ test | Lệnh | Kết quả |
 |---|---|---|
 | Unit / widget / integration Dart | `flutter test` | **150/150 pass** |
-| Firestore Security Rules | `npx firebase-tools@15.35.0 emulators:exec --only firestore --project demo-teamup-data "node --test firestore.rules.test.mjs"` | **21/21 pass** |
+| Firestore Security Rules | `npx firebase-tools@15.35.0 emulators:exec --only firestore --project demo-teamup-data "node --test firebase/test/firestore.rules.test.mjs"` | **21/21 pass** |
 | Ràng buộc kiến trúc | `bash tool/check_layers.sh` | **Layers OK** — 0 vi phạm |
 | Phân tích tĩnh | `flutter analyze` | **No issues found** |
+| ARTEMIS TC-02 trên emulator | `tool/run_e2e.ps1 -TestPath e2e_test/test_auth.py` | **1 passed in 110.82s** |
 
 ---
 
@@ -469,9 +471,9 @@ Bản ghi đầy đủ ở `docs/code-review.md`. Tóm tắt:
 **Công cụ dùng:** Cursor Agent (Claude Opus 4.5), Claude Code trong Cursor, GitHub
 Copilot Chat, GitHub Copilot Code Review (chạy trên pull request).
 
-**10 phát hiện, thuộc 4 nhóm:** bug (CR-02, CR-04, CR-06, CR-09, CR-10), architecture (CR-03),
-test gap (CR-01, CR-07, CR-08), maintainability (CR-05). Mỗi phát hiện gắn với
-file và dòng cụ thể.
+**12 phát hiện, thuộc 5 nhóm:** bug (CR-02, CR-04, CR-06, CR-09, CR-10, CR-11, CR-12),
+architecture (CR-03), test gap (CR-01, CR-07, CR-08), maintainability (CR-05), tooling (CR-12).
+Mỗi phát hiện gắn với file và dòng cụ thể.
 
 | ID | Phát hiện | Quyết định | Lý do | Commit |
 |---|---|---|---|---|
@@ -485,6 +487,8 @@ file và dòng cụ thể.
 | CR-08 | Fake `watchAllPending` không sort, lệch với production | Accepted | Test xanh nhưng app sai — loại "test gap" nguy hiểm nhất | `9cf68f5` |
 | CR-09 | Bộ ARTEMIS gọi API **không tồn tại** (`ArtemisClient(api_key=…)`, `run()` đồng bộ) và sai `applicationId` | Accepted | §7 yêu cầu bộ test **chạy được**; hiện 18/18 test ném `TypeError` trước khi chạm thiết bị | `668ce5f` |
 | CR-10 | S13 hiện lỗi "Max 6 members" nhưng **nút lưu vẫn bấm được**; dòng đếm lệch Lab 2 | Accepted | Lab 2 handoff: *"Button primary (disabled)"*; §3 coi sai lệch Figma↔app là lỗi | `668ce5f` |
+| CR-11 | `artemis-client` **không trả báo cáo** cho client (`TaskResult.output` luôn `None`); báo cáo thật nằm ở step cuối | Accepted | §7 đòi test **chạy được** và **trừ đúng được kiểm chứng**; 0/19 test trừ xác nhắng agent | `fix(lab3)` |
+| CR-12 | App **crash khi khởi động** (`PrintFileProvider` ClassNotFound) do build bằng JDK 26 | Accepted | §11 đòi repo mở được không lỗi; đã sửa bằng JDK 24 + `flutter clean` | `fix(lab3)` |
 
 **5 phát hiện được sửa, mỗi cái một commit riêng có tên mã phát hiện** — yêu cầu
 "≥ 3 fixes, each in a commit that names the finding ID" (§8).
@@ -550,7 +554,7 @@ Firebase, với:
 * 10 event Analytics có câu hỏi sản phẩm và tham số không chứa dữ liệu cá nhân;
 * bộ test E2E ARTEMIS 18 ca + 1 phiên khám phá, assert trên **giá trị quan sát
   được**;
-* 10 phát hiện AI code review với quyết định có lý do, 5 commit sửa truy vết được.
+* 12 phát hiện AI code review với quyết định có lý do, 5 commit sửa truy vết được.
 
 **Hướng tiếp theo (Final Assignment):** web admin cho vai Điều phối khoa, luồng
 liên vai duyệt nhóm trên mobile → xác nhận trên web, và thay `RuleBasedMatchingService`

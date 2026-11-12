@@ -699,7 +699,7 @@ hr {
 <td>E2E / UI</td>
 <td><strong>Google ARTEMIS</strong> (pytest)</td>
 <td><strong>18 ca + 1 phiên khám phá</strong></td>
-<td>bộ test đã viết; <strong>chưa có lần chạy trên thiết bị</strong> — bảng kết quả để trống trong <code>docs/test-plan.md</code> §6</td>
+<td><strong>đã chạy thật</strong> trên emulator <code>emulator-5554</code>: <code>TC-02</code> pass trong <strong>110.82s</strong>; các ca còn lại cần chạy ≥ 3 lần trên build release</td>
 </tr>
 <tr>
 <td>Rules test</td>
@@ -711,11 +711,11 @@ hr {
 </table>
 <p>Assert trên <strong>giá trị agent báo lại</strong> (<code>Observed.number()</code>, <code>Observed.contains()</code>), không chỉ <code>status == "SUCCESS"</code>; có 3 ca lỗi thật (vượt 6 · dưới 5 · không tìm ra SV) và 3 native interaction (account picker · notification shade · test crash); kế hoạch chạy mỗi ca ≥ 3 lần, trace lưu ở <code>evidence/artemis/</code>.</p>
 <blockquote>
-<p><strong>Trạng thái bằng chứng:</strong> 150/150 test Dart và 21/21 test Firestore rules <strong>đã chạy thật</strong> và xanh. 18 ca ARTEMIS <strong>đã viết nhưng chưa chạy trên thiết bị</strong> — cần chạy và điền <code>docs/test-plan.md</code> §6 + ảnh vào <code>evidence/artemis/</code> trước khi nộp.</p>
+<p><strong>Trạng thái bằng chứng:</strong> 150/150 test Dart, 21/21 test Firestore rules và <strong>TC-02 ARTEMIS</strong> <strong>đã chạy thật</strong> và xanh. 17 ca ARTEMIS còn lại <strong>cần chạy ≥ 3 lần</strong> trên build release + thiết bị thật, điền <code>docs/test-plan.md</code> §6 + ảnh vào <code>evidence/artemis/</code> trước khi nộp.</p>
 </blockquote>
-<p><strong>AI code review — 10 phát hiện, 5 commit sửa có tên mã</strong></p>
-<p>Bảng đầy đủ 10 phát hiện (kèm file:line và lý do) nằm ở <strong>slide dự phòng A3</strong>.
-Hai phát hiện mới nhất là loại "mồi lỗi" — đều là thứ <strong>không test Dart nào bắt được</strong>:</p>
+<p><strong>AI code review — 12 phát hiện, 5 commit sửa có tên mã</strong></p>
+<p>Bảng đầy đủ 12 phát hiện (kèm file:line và lý do) nằm ở <strong>slide dự phòng A3</strong>.
+Bốn phát hiện gần nhất là loại "mồi lỗi" — đều là thứ <strong>không test Dart nào bắt được</strong>:</p>
 <table>
 <thead>
 <tr>
@@ -740,6 +740,20 @@ Hai phát hiện mới nhất là loại "mồi lỗi" — đều là thứ <str
 <td>Accepted</td>
 <td>Handoff Lab 2: <em>"Button primary (disabled)"</em>; §3 coi sai lệch Figma↔app là lỗi</td>
 <td><code>668ce5f</code></td>
+</tr>
+<tr>
+<td>CR-11</td>
+<td><code>artemis-client</code> <strong>không trả báo cáo</strong> cho client (<code>TaskResult.output</code> = <code>None</code>); báo cáo thật nằm ở step cuối <code>report_task_status</code></td>
+<td>Accepted</td>
+<td>§7 đòi test <strong>chạy được</strong> và <strong>trừ đúng được kiểm chứng</strong> — 0/19 test trừ xác nhắng agent</td>
+<td><code>fix(lab3)</code></td>
+</tr>
+<tr>
+<td>CR-12</td>
+<td>App <strong>crash ngay khi khởi động</strong>: <code>PrintFileProvider</code> ClassNotFound — do build bằng JDK 26</td>
+<td>Accepted</td>
+<td>§11 đòi repo mở được không lỗi; sửa bằng <strong>JDK 24 + <code>flutter clean</code></strong></td>
+<td><code>fix(lab3)</code></td>
 </tr>
 </tbody>
 </table>
@@ -789,18 +803,18 @@ Hai phát hiện mới nhất là loại "mồi lỗi" — đều là thứ <str
 </tr>
 <tr>
 <td>ARTEMIS ≥ 10 ca, ≥ 3 lần/ca, exploratory</td>
-<td>⚠️ <strong>18 ca + 1 phiên khám phá đã viết, chưa chạy trên thiết bị</strong></td>
-<td><code>e2e_test/</code>, <code>docs/test-plan.md</code> §6</td>
+<td>⚠️ <strong>18 ca + 1 phiên khám phá đã viết; đã chạy thật 1 ca (TC-02) — cần chạy ≥ 3 lần</strong></td>
+<td><code>e2e_test/</code>, <code>docs/test-plan.md</code> §6, <code>evidence/artemis/</code></td>
 </tr>
 <tr>
 <td>AI review ≥ 5 phát hiện, ≥ 3 commit sửa</td>
-<td>✅ <strong>10 phát hiện</strong>, <strong>5 commit</strong> có tên mã</td>
+<td>✅ <strong>12 phát hiện</strong>, <strong>5 commit</strong> có tên mã</td>
 <td><code>docs/code-review.md</code></td>
 </tr>
 </tbody>
 </table>
-<p><strong>Giới hạn trung thực:</strong> ① <strong>Figma chưa cập nhật</strong> cho D1–D4 (đã ghi ở traceability, cần sửa trước khi nộp) — ưu tiên <strong>Cao</strong>; ② <strong>18 ca ARTEMIS đã viết nhưng chưa chạy trên thiết bị</strong> — cần chạy + chụp bằng chứng vào <code>evidence/artemis/</code> — ưu tiên <strong>Cao</strong>; ③ "AI" là thuật toán quy tắc, chưa dùng kỹ năng/lịch — Final thay bằng Gemini; ④ chưa có web admin và luồng liên vai — Final bổ sung; ⑤ chưa test tải 2 mentor duyệt đồng thời — thấp.</p>
-<p><strong>Kết luận:</strong> <em>PROBLEM SOLVED</em> — chia nhóm thủ công mất hàng giờ và dễ sai quy tắc 5–6 người / ≥ 3 ngành → 25 màn + 3 workflow tự động hoá, có ràng buộc ở cả UI lẫn Firestore rules. <em>WORKING PRODUCT</em> — app Flutter + Firebase chạy thật trên Android: import → ghép theo ngành → sửa &amp; duyệt → undo → xuất PDF lên Cloud Storage. <em>VERIFIED RESULT</em> — 150/150 test Dart · 21/21 test Firestore rules · 18 ca ARTEMIS + 1 phiên khám phá (đã viết, cần chạy) · 10 phát hiện AI review có 5 commit sửa · 6 dịch vụ Firebase có ca lỗi.</p>
+<p><strong>Giới hạn trung thực:</strong> ① <strong>Figma chưa cập nhật</strong> cho D1–D4 (đã ghi ở traceability, cần sửa trước khi nộp) — ưu tiên <strong>Cao</strong>; ② <strong>17 ca ARTEMIS còn lại chưa chạy ≥ 3 lần trên thiết bị thật</strong> (TC-02 đã chạy thật) — cần chạy + chụp bằng chứng vào <code>evidence/artemis/</code> — ưu tiên <strong>Cao</strong>; ③ "AI" là thuật toán quy tắc, chưa dùng kỹ năng/lịch — Final thay bằng Gemini; ④ chưa có web admin và luồng liên vai — Final bổ sung; ⑤ chưa test tải 2 mentor duyệt đồng thời — thấp.</p>
+<p><strong>Kết luận:</strong> <em>PROBLEM SOLVED</em> — chia nhóm thủ công mất hàng giờ và dễ sai quy tắc 5–6 người / ≥ 3 ngành → 25 màn + 3 workflow tự động hoá, có ràng buộc ở cả UI lẫn Firestore rules. <em>WORKING PRODUCT</em> — app Flutter + Firebase chạy thật trên Android: import → ghép theo ngành → sửa &amp; duyệt → undo → xuất PDF lên Cloud Storage. <em>VERIFIED RESULT</em> — 150/150 test Dart · 21/21 test Firestore rules · 18 ca ARTEMIS + 1 phiên khám phá (đã viết; TC-02 đã chạy thật) · 12 phát hiện AI review có 5 commit sửa · 6 dịch vụ Firebase có ca lỗi.</p>
 <p><strong>Repo:</strong> <code>github.com/no-solace/prm-teamup-mobile</code> · <strong>Figma:</strong> file Lab 2 Final UI · <strong>Video demo:</strong> 5–10 phút (link trong README). <strong>Hướng tiếp:</strong> web admin cho Điều phối khoa, luồng duyệt mobile → web, và Gemini thay thuật toán quy tắc — giữ nguyên interface <code>MatchingService</code>/<code>ProposalService</code>.</p>
 <hr />
 <h1 id="phu-luc-slide-du-phong-khong-trinh-bay-mo-khi-bi-hoi">Phụ lục — slide dự phòng (không trình bày, mở khi bị hỏi)</h1>
@@ -907,7 +921,7 @@ Hai phát hiện mới nhất là loại "mồi lỗi" — đều là thứ <str
 </tbody>
 </table>
 <p>Tất cả gọi qua <code>lib/viewmodels/instrumentation.dart</code> (<code>trackAnalytics</code>) — bọc try/catch để lỗi tracking không làm hỏng luồng chính.</p>
-<h2 id="a3-ai-code-review-chi-tiet-10-phat-hien">A3 · AI code review — chi tiết 10 phát hiện</h2>
+<h2 id="a3-ai-code-review-chi-tiet-cr-01-cr-08">A3 · AI code review — chi tiết CR-01 → CR-08</h2>
 <table>
 <thead>
 <tr>
@@ -1012,6 +1026,23 @@ Hai phát hiện mới nhất là loại "mồi lỗi" — đều là thứ <str
 <td>§7 yêu cầu bộ test chạy được</td>
 <td><code>668ce5f</code></td>
 </tr>
+</tbody>
+</table>
+<h2 id="a3b-ai-code-review-chi-tiet-cr-09-cr-12-vong-dung-ha-tang-artemis-that">A3b · AI code review — chi tiết CR-09 → CR-12 (vòng dựng hạ tầng ARTEMIS thật)</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Tool</th>
+<th>File:line</th>
+<th>Kind</th>
+<th>Finding</th>
+<th>Decision</th>
+<th>Reason</th>
+<th>Commit</th>
+</tr>
+</thead>
+<tbody>
 <tr>
 <td>CR-10</td>
 <td>Cursor Agent</td>
@@ -1021,6 +1052,26 @@ Hai phát hiện mới nhất là loại "mồi lỗi" — đều là thứ <str
 <td>Accepted</td>
 <td>Handoff: <em>"Button primary (disabled)"</em></td>
 <td><code>668ce5f</code></td>
+</tr>
+<tr>
+<td>CR-11</td>
+<td>Cursor Agent</td>
+<td><code>e2e_test/conftest.py:120</code></td>
+<td>Bug</td>
+<td>Client không nhận báo cáo của agent (<code>TaskResult.output</code> luôn <code>None</code>)</td>
+<td>Accepted</td>
+<td>§7 đòi test <strong>trừ đúng được kiểm chứng</strong></td>
+<td><code>fix(lab3)</code></td>
+</tr>
+<tr>
+<td>CR-12</td>
+<td>Cursor Agent</td>
+<td><code>android/app/build.gradle.kts</code></td>
+<td>Build</td>
+<td>App crash khi khởi động vì build bằng JDK 26</td>
+<td>Accepted</td>
+<td>§11 đòi repo mở được không lỗi</td>
+<td><code>fix(lab3)</code></td>
 </tr>
 </tbody>
 </table>
@@ -1058,6 +1109,11 @@ Hai phát hiện mới nhất là loại "mồi lỗi" — đều là thứ <str
 <td>Cursor Agent</td>
 <td>Rà soát theo checklist Lab 3 §5–§10</td>
 <td>CR-09, CR-10</td>
+</tr>
+<tr>
+<td>Cursor Agent</td>
+<td>Dựng &amp; chạy hạ tầng ARTEMIS thật trên emulator</td>
+<td>CR-11, CR-12</td>
 </tr>
 <tr>
 <td>Mermaid CLI (<code>mmdc</code>)</td>
