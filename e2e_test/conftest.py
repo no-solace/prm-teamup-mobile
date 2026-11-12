@@ -119,6 +119,32 @@ def artemis(device_serial: str, profile: str, api_key: str):
     )
 
 
+#: Substrings that identify a provider quota / rate-limit failure in the
+#: telemetry the ARTEMIS host records for a session.
+_QUOTA_MARKERS = (
+    "RESOURCE_EXHAUSTED",
+    "429 Too Many Requests",
+    "quota exceeded",
+    "generate_content_free_tier_requests",
+)
+
+
+def _session_hit_quota(session_id: str) -> str:
+    """Return the quota message if the session died on a rate limit.
+
+    The ARTEMIS daemon retries a rate-limited LLM call for minutes before it
+    gives up, so a run that is out of quota burns the whole timeout per test
+    and then reports a bare ``failed``. Reading the recorded telemetry turns
+    that into an explicit, actionable message.
+    """
+    steps = _fetch_session_steps(session_id)
+    blob = json.dumps(steps, ensure_ascii=False)
+    for marker in _QUOTA_MARKERS:
+        if marker.lower() in blob.lower():
+            return marker
+    return ""
+
+
 def _fetch_session_steps(session_id: str) -> list[dict]:
     """Return the recorded steps of an ARTEMIS session.
 
@@ -192,6 +218,10 @@ def run(artemis, instruction: str) -> Observed:
     ``asyncio.run``. The ARTEMIS host is a long-lived daemon; the client keeps
     no connection state between calls, so one event loop per instruction is
     safe.
+
+    When the host ran out of model quota the session is skipped instead of
+    failed: the cause is an account limit, not a defect in the app, and the
+    suite would otherwise spend the whole timeout on every remaining test.
     """
     result = asyncio.run(
         artemis.run(
@@ -200,7 +230,19 @@ def run(artemis, instruction: str) -> Observed:
             timeout=float(os.environ.get("ARTEMIS_TIMEOUT", "1800")),
         )
     )
-    return _normalise(result)
+    observed = _normalise(result)
+    if not observed.ok:
+        session_id = (getattr(result, "raw", {}) or {}).get("session_id") or getattr(
+            result, "session_id", None
+        )
+        if session_id and _session_hit_quota(session_id):
+            pytest.skip(
+                "The ARTEMIS host is out of model quota "
+                f"({_QUOTA_MARKERS[0]}). The free tier allows a limited number "
+                "of requests per day and resets at 00:00 UTC. Re-run after the "
+                "reset, or use a key with a higher quota."
+            )
+    return observed
 
 
 def install_app(apk: Path | None = None) -> str:

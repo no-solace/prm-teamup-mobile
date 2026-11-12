@@ -281,11 +281,19 @@ summarize/ghi chú).
 | TC-15 | ❌ | Cần Storage thật **+** quota |
 | TC-05, TC-06 | ❌ | Cần file picker + quota |
 
+**Con số chính xác** (lấy từ telemetry daemon): hạn mức **20 request/ngày**
+cho `gemini-3.6-flash`; thông báo yêu cầu chờ **21h49m** → reset **00:00
+UTC**.
+
 **Cách vượt (không tốn tiền):**
 
 1. Chờ sang ngày mới (hạn mức Gemini free-tier **reset 00:00 theo giờ UTC**).
 2. Hoặc dùng một API key khác / project GCP khác.
 3. Hoặc nâng cấp lên gói trả phí.
+
+**Đã xử lý trong bộ test:** `e2e_test/conftest.py` đọc telemetry của phiên và
+**skip** kèm lý do rõ ràng khi gặp hạn mức, thay vì để mỗi test cháy
+hết timeout rồi fail với thông báo trống.
 
 **Kinh nghiệm rút ra cho nhóm:** khi chạy ARTEMIS, **chạy 1 test để đo chi phí
 trước**, rồi mới chạy cả bộ. Một lần chạy đầy đủ 18 test tiêu tốn đủ hạn mức

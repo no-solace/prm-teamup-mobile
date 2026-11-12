@@ -178,7 +178,7 @@ ghi nhận xét về ca flaky vào §7.
 | TC-17 | skip nếu thiếu `ARTEMIS_ANALYTICS_DEBUG` | DebugView/Logcat chỉ có khi bật debug mode | Bật debug mode trong Console |
 | TC-18 | skip nếu thiếu `ARTEMIS_CRASHLYTICS` | Crash cố ý phá app, không chạy trong regression | Chạy riêng, ngoài vòng regression |
 | TC-01 | **fail** (1 lần chạy) | Agent không thể hoàn tất luồng Google account picker trên emulator | Cần **tài khoản Google đã đăng nhập sẵn** trên thiết bị thật; session `0797238d…` |
-| TC-03…TC-15 | **fail** (1 lần chạy) | **Hạn mức Gemini free-tier** — `429 Too Many Requests` trên `generate_content_free_tier_requests`; agent timeout sau 180s | Chờ reset 00:00 UTC, hoặc dùng key/project có quota, hoặc gói trả phí. **Chạy 1 ca để đo chi phí trước khi chạy cả bộ.** |
+| TC-03…TC-15 | **skip** (hạn mức) | **Hạn mức Gemini free-tier** — `429 Too Many Requests` trên `generate_content_free_tier_requests`; giới hạn **20 request/ngày** cho `gemini-3.6-flash` | Chờ reset 00:00 UTC, hoặc dùng key/project có quota, hoặc gói trả phí. **Chạy 1 ca để đo chi phí trước khi chạy cả bộ.** Bộ test giờ tự **skip** kèm lý do khi gặp hạn mức. |
 
 ## 8. Vì sao bộ test này đáng tin (theo yêu cầu §7)
 

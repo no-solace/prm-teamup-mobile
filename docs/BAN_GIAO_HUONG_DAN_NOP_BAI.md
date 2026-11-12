@@ -83,14 +83,22 @@ Log của daemon cho ra nguyên nhân gốc:
   generativelanguage.googleapis.com/generate_content_free_tier_requests
 ```
 
-Hạn mức Gemini free-tier **reset 00:00 theo giờ UTC**. Cách vượt:
-chờ ngày mới, hoặc dùng key/project khác, hoặc nâng cấp gói trả
-phí.
+Con số chính xác lấy từ log daemon: **hạn mức 20 request/ngày** cho
+`gemini-3.6-flash`, thông báo yêu cầu chờ **21h49m** (tức reset 00:00
+UTC). Cách vượt: chờ ngày mới, dùng key/project khác, hoặc nâng cấp gói
+trả phí.
+
+> **Đã xử lý trong bộ test:** `e2e_test/conftest.py` giờ đọc telemetry của
+> phiên và **skip** (kèm lý do rõ ràng) khi gặp hạn mức, thay vì để mỗi
+> test cháy hết timeout rồi fail với thông báo trống.
 
 > **Kinh nghiệm cho nhóm:** chạy 1 test để đo chi phí trước khi
-> chạy cả bộ — một lần chạy đệ đụ tiêu tốn đặ hạn
-> mức cả ngày. Chuẩn bề sẵn CSV + tài khoản Google + Analytics
+> chạy cả bộ — **một lần chạy đệ đụ tiêu tốn đặt hạn mức cả ngày**
+> (20 request). Chuẩn bị sẵn CSV + tài khoản Google + Analytics
 > debug mode **trước**, rồi chạy 1 lỗt cho cả bộ.
+>
+> **Mẹo:** đặt `ARTEMIS_TIMEOUT` thấp hơn (ví dụ `600`) khi quota đã cạn,
+> để bộ test skip nhanh thay vì chờ 3 phút mỗi ca.
 
 ### 2.3 Bằng chứng thật đã thu được
 
