@@ -52,6 +52,18 @@ class FirestoreProposalService implements ProposalService {
     return Proposal.fromMap(doc.id, doc.data()!);
   }
 
+  /// List streams skip one malformed document instead of failing the whole
+  /// list (finding F8). Single-document reads keep using [_parse] and report it.
+  Proposal? _parseOrNull(DocumentSnapshot<Map<String, dynamic>> doc) {
+    try {
+      return _parse(doc);
+    } on FormatException {
+      return null;
+    } on TypeError {
+      return null; // a required field is missing or has the wrong type
+    }
+  }
+
   Stream<T> _session<T>(Stream<T> Function(String) open) =>
       switchDataStream(_auth.authStateChanges(), (user) {
         if (user == null) {
@@ -76,7 +88,7 @@ class FirestoreProposalService implements ProposalService {
             .map(
               (snapshot) => [
                 for (final doc in snapshot.docs)
-                  if (doc.data()['mentorUid'] == uid) _parse(doc),
+                  if (doc.data()['mentorUid'] == uid) ?_parseOrNull(doc),
               ]..sort((a, b) => a.teamName.compareTo(b.teamName)),
             ),
   );
@@ -90,7 +102,7 @@ class FirestoreProposalService implements ProposalService {
         .snapshots()
         .map(
           (snapshot) =>
-              [for (final doc in snapshot.docs) _parse(doc)]
+              [for (final doc in snapshot.docs) ?_parseOrNull(doc)]
                 ..sort((a, b) => a.teamName.compareTo(b.teamName)),
         ),
   );
