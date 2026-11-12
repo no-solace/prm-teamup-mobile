@@ -41,7 +41,21 @@ evidence/artemis/<session-id>/
 | `6d112a1d-30cc-4542-b1c5-97454e548fe1` | ❌ failed | Import class list — timeout 429 |
 | `987c7899-6009-4aef-b440-3e0f3c995b02` | ❌ failed | Profile → Export PDF — timeout 429 |
 
-**Tổng: 22 ảnh chụp thật** từ 12 phiên.
+**Tổng: 22 ảnh chụp thật** từ 12 phiên có ảnh. Ngoài ra còn **5 phiên** chỉ có
+`session.json` (không có bước nào hoàn thành nên không có ảnh) — xem bảng dưới.
+
+| Session | Trạng thái | Nội dung |
+|---|---|---|
+| `5648ddd2-f5d2-4ce9-9f28-4d50b162da88` | ❌ failed | **TC-01** — chọn tài khoản Google trong account picker |
+| `60aa42a6-8552-408a-a40b-e665cad095c7` | ❌ failed | **TC-02** — hết hạn mức Gemini |
+| `3b30dd69-33da-47dc-9638-16a903aff7d4` | ❌ failed | **TC-03** — hết hạn mức Gemini |
+| `f27900f8-15f7-478c-8f78-e6ec7294fe3c` | ❌ failed | **TC-04** — hết hạn mức Gemini |
+
+> Các phiên `5648ddd2` / `60aa42a6` / `3b30dd69` / `f27900f8` là lần chạy lại 4 test
+> `test_auth.py` **sau khi hạn mức đã cạn** — cả 4 đều dừng ở bước `pre-planning`
+> với lỗi 429 `RESOURCE_EXHAUSTED`.
+>
+> Tổng cộng: **16 phiên** trong thư mục này (4 `completed` có ảnh, 12 `failed`).
 
 ## Vì sao phần lớn phiên `failed`
 
