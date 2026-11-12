@@ -185,7 +185,9 @@ class SignInViewModel extends Notifier<SignInState> {
                 info: 'Automatic SMS retrieval ended. Enter your code or request a new one.',
               );
             case PhoneSignedIn(:final user):
-              state = _copy(loading: false);
+              // Signed in: nothing left to resend or cancel (finding F9).
+              _resendTimer?.cancel();
+              state = _copy(loading: false, codeSent: false, resendSeconds: 0);
               unawaited(_recordLogin(user));
           }
         },
