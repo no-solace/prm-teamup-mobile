@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../models/proposal.dart';
@@ -5,15 +7,31 @@ import '../../models/student.dart';
 import '../../models/team.dart';
 import '../../providers/service_providers.dart';
 import '../../services/app_error.dart';
+import '../telemetry.dart';
 
 final pendingProposalsProvider = StreamProvider.autoDispose<List<Proposal>>(
   (ref) => ref.watch(proposalServiceProvider).watchAllPending(),
 );
 
+/// Streams one proposal and logs view_item for it on the first emission.
 final proposalDetailProvider = StreamProvider.autoDispose
-    .family<Proposal, String>(
-      (ref, id) => ref.watch(proposalServiceProvider).watchProposal(id),
-    );
+    .family<Proposal, String>((ref, id) async* {
+      var viewLogged = false;
+      await for (final proposal
+          in ref.watch(proposalServiceProvider).watchProposal(id)) {
+        if (!viewLogged && ref.mounted) {
+          viewLogged = true;
+          unawaited(
+            bestEffort(
+              () => ref
+                  .read(analyticsServiceProvider)
+                  .logViewItem(itemCategory: 'proposal', itemId: id),
+            ),
+          );
+        }
+        yield proposal;
+      }
+    });
 
 final proposalStudentsProvider = StreamProvider.autoDispose
     .family<List<Student>, String>(
@@ -32,7 +50,9 @@ class ProposalActionViewModel extends Notifier<bool> {
 
   Future<void> logMemberLimit() async {
     try {
-      await ref.read(analyticsServiceProvider).logMemberChangeBlocked(reason: 'max_6');
+      await ref
+          .read(analyticsServiceProvider)
+          .logMemberChangeBlocked(reason: 'max_6');
     } catch (_) {
       // Analytics is best effort and must not interrupt the edit flow.
     }

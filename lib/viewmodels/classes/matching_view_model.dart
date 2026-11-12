@@ -7,6 +7,7 @@ import '../../models/student.dart';
 import '../../models/team.dart';
 import '../../providers/service_providers.dart';
 import '../../services/app_error.dart';
+import '../telemetry.dart';
 import '../view_state.dart';
 
 /// Entire read/propose/save operation is bounded, not only the matcher call.
@@ -37,6 +38,7 @@ class MatchingViewModel extends Notifier<ViewState<List<Proposal>>> {
     final classes = ref.read(classServiceProvider);
     final matcher = ref.read(matchingServiceProvider);
     final proposals = ref.read(proposalServiceProvider);
+    final clock = Stopwatch()..start();
     try {
       final result = await (() async {
         final values = await Future.wait<Object>([
@@ -46,6 +48,16 @@ class MatchingViewModel extends Notifier<ViewState<List<Proposal>>> {
         final students = values[0] as List<Student>;
         final teams = values[1] as List<Team>;
         if (!_active(generation)) return <Proposal>[];
+        unawaited(
+          bestEffort(
+            () => ref
+                .read(analyticsServiceProvider)
+                .logAiMatchStart(
+                  studentCount: students.length,
+                  teamCount: teams.length,
+                ),
+          ),
+        );
         final result = await matcher.propose(
           classId: classId,
           students: students,
@@ -57,8 +69,19 @@ class MatchingViewModel extends Notifier<ViewState<List<Proposal>>> {
       })().timeout(ref.read(matchingTimeoutProvider));
       if (_active(generation)) {
         state = result.isEmpty ? const Empty() : Data(result);
+        unawaited(
+          bestEffort(
+            () => ref
+                .read(analyticsServiceProvider)
+                .logAiMatchResult(
+                  proposalCount: result.length,
+                  noMatch: result.isEmpty,
+                  durationMs: clock.elapsedMilliseconds,
+                ),
+          ),
+        );
       }
-    } on TimeoutException {
+    } on TimeoutException catch (error, stack) {
       if (_active(generation)) {
         _running = false;
         _generation++;
@@ -67,9 +90,17 @@ class MatchingViewModel extends Notifier<ViewState<List<Proposal>>> {
             'Matching timed out. Check your connection and try again.',
           ),
         );
+        unawaited(
+          reportHandledError(ref, error, stack, reason: 'ai_matching_timeout'),
+        );
       }
-    } catch (error) {
-      if (_active(generation)) state = Failure(toAppError(error));
+    } catch (error, stack) {
+      if (_active(generation)) {
+        state = Failure(toAppError(error));
+        unawaited(
+          reportHandledError(ref, error, stack, reason: 'ai_matching_failed'),
+        );
+      }
     } finally {
       if (_active(generation)) _running = false;
     }

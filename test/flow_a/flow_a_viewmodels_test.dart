@@ -12,6 +12,7 @@ import 'package:teamup_exe/providers/service_providers.dart';
 import 'package:teamup_exe/services/app_error.dart';
 import 'package:teamup_exe/services/class_service.dart';
 import 'package:teamup_exe/services/fakes/fake_class_service.dart';
+import 'package:teamup_exe/services/fakes/fake_infra_services.dart';
 import 'package:teamup_exe/services/fakes/fake_matching_service.dart';
 import 'package:teamup_exe/services/fakes/fake_proposal_service.dart';
 import 'package:teamup_exe/services/fakes/sample_data.dart';
@@ -289,6 +290,8 @@ void main() {
         classServiceProvider.overrideWithValue(_Classes()),
         matchingServiceProvider.overrideWithValue(matcher),
         proposalServiceProvider.overrideWithValue(proposals),
+        analyticsServiceProvider.overrideWithValue(FakeAnalyticsService()),
+        crashServiceProvider.overrideWithValue(FakeCrashService()),
       ],
     );
     addTearDown(container.dispose);
@@ -319,6 +322,8 @@ void main() {
         classServiceProvider.overrideWithValue(_Classes()),
         matchingServiceProvider.overrideWithValue(matcher),
         proposalServiceProvider.overrideWithValue(proposals),
+        analyticsServiceProvider.overrideWithValue(FakeAnalyticsService()),
+        crashServiceProvider.overrideWithValue(FakeCrashService()),
       ],
     );
     addTearDown(container.dispose);
@@ -351,6 +356,8 @@ void main() {
           classServiceProvider.overrideWithValue(_Classes()),
           matchingServiceProvider.overrideWithValue(matcher),
           proposalServiceProvider.overrideWithValue(proposals),
+          analyticsServiceProvider.overrideWithValue(FakeAnalyticsService()),
+          crashServiceProvider.overrideWithValue(FakeCrashService()),
         ],
       );
       addTearDown(container.dispose);
