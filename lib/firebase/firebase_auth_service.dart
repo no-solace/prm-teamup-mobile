@@ -63,15 +63,32 @@ class FirebaseAuthService implements AuthService {
   }
 
   @override
-  Stream<AppUser?> authStateChanges() =>
-      _auth.userChanges().asyncMap((user) async {
-        if (user == null) return null;
-        // Also runs for restored Firebase sessions after an app restart.
-        await _profiles.ensure(user);
-        // Sign-out/account switch can occur while Firestore is responding.
-        if (_auth.currentUser?.uid != user.uid) return null;
-        return _map(user);
-      });
+  Stream<AppUser?> authStateChanges() => _auth.userChanges().asyncMap((
+    user,
+  ) async {
+    if (user == null) return null;
+    // Also runs for restored Firebase sessions after an app restart.
+    try {
+      await _profiles.ensure(user);
+    } on NetworkError {
+      // Transient (finding F1): keep the valid Firebase session instead of
+      // showing the sign-in screen; the next userChanges event retries.
+    } on TimeoutAppError {
+      // Same as above.
+    } on PermissionDeniedError {
+      // Not a mentor, or the rules refuse the profile: do not leave the
+      // account signed in to Firebase while the app treats it as signed out.
+      try {
+        await _auth.signOut();
+      } catch (_) {
+        // The error below still blocks routing.
+      }
+      rethrow;
+    }
+    // Sign-out/account switch can occur while Firestore is responding.
+    if (_auth.currentUser?.uid != user.uid) return null;
+    return _map(user);
+  });
 
   @override
   AppUser? get currentUser => _map(_auth.currentUser);
