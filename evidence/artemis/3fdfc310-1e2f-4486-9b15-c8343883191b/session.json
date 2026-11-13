@@ -1,0 +1,20 @@
+{
+  "session_id": "3fdfc310-1e2f-4486-9b15-c8343883191b",
+  "initial_goal": "Open the TeamUp EXE app. Describe what is on the screen right now - the visible text and the main buttons.",
+  "start_time": 1794474132.7970788,
+  "end_time": 1794474318.1174464,
+  "status": "failed",
+  "device_info": "{\"host_platform\": \"WINDOWS\", \"mobile_platform\": \"android\", \"device_id\": \"emulator-5554\", \"device_width\": 1080, \"device_height\": 2400, \"profile\": \"flash\", \"hierarchy_backend\": \"helper\", \"hierarchy_backend_note\": \"UI hierarchy source: the Artemis accessibility helper v1.2.0.\"}",
+  "video_filepath": null,
+  "pid": 24624,
+  "device_id": "emulator-5554",
+  "device_serial": "emulator-5554",
+  "video_url": null,
+  "recording_status": "unavailable",
+  "model_info": {
+    "name": "Flash",
+    "id": "gemini-3.6-flash",
+    "provider": "google",
+    "architecture": "ARTEMIS Flash"
+  }
+}

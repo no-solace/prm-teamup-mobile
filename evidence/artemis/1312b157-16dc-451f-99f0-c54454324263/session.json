@@ -1,0 +1,20 @@
+{
+  "session_id": "1312b157-16dc-451f-99f0-c54454324263",
+  "initial_goal": "The TeamUp EXE app is already open on the My classes screen. Read the screen and report the visible class names and the student count for each.",
+  "start_time": 1794474784.730829,
+  "end_time": 1794474794.0584261,
+  "status": "completed",
+  "device_info": "{\"host_platform\": \"WINDOWS\", \"mobile_platform\": \"android\", \"device_id\": \"emulator-5554\", \"device_width\": 1080, \"device_height\": 2400, \"profile\": \"flash\", \"hierarchy_backend\": \"helper\", \"hierarchy_backend_note\": \"UI hierarchy source: the Artemis accessibility helper v1.2.0.\"}",
+  "video_filepath": null,
+  "pid": 29528,
+  "device_id": "emulator-5554",
+  "device_serial": "emulator-5554",
+  "video_url": null,
+  "recording_status": "unavailable",
+  "model_info": {
+    "name": "Flash",
+    "id": "gemini-3.6-flash",
+    "provider": "google",
+    "architecture": "ARTEMIS Flash"
+  }
+}

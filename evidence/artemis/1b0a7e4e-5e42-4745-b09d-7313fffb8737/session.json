@@ -1,0 +1,20 @@
+{
+  "session_id": "1b0a7e4e-5e42-4745-b09d-7313fffb8737",
+  "initial_goal": "In the TeamUp EXE app, signed in, open the 'Profile' tab and scroll down to the Remote Config area. Read the line that starts with 'max_proposals_shown'. Report the exact number that appears after the colon, and report whether the line 'ai_matching_enabled' is also visible.",
+  "start_time": 1794475735.7216299,
+  "end_time": 1794475919.7866447,
+  "status": "failed",
+  "device_info": "{\"host_platform\": \"WINDOWS\", \"mobile_platform\": \"android\", \"device_id\": \"emulator-5554\", \"device_width\": 1080, \"device_height\": 2400, \"profile\": \"flash\", \"hierarchy_backend\": \"helper\", \"hierarchy_backend_note\": \"UI hierarchy source: the Artemis accessibility helper v1.2.0.\"}",
+  "video_filepath": null,
+  "pid": 32868,
+  "device_id": "emulator-5554",
+  "device_serial": "emulator-5554",
+  "video_url": null,
+  "recording_status": "unavailable",
+  "model_info": {
+    "name": "Flash",
+    "id": "gemini-3.6-flash",
+    "provider": "google",
+    "architecture": "ARTEMIS Flash"
+  }
+}

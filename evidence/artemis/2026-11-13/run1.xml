@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="1" tests="14" time="1203.703" timestamp="2026-11-13T07:29:43.797867+07:00" hostname="Enma"><testcase classname="test_auth" name="test_tc01_google_sign_in_account_picker" time="64.134" /><testcase classname="test_auth" name="test_tc02_sign_out_returns_to_sign_in" time="68.992" /><testcase classname="test_auth" name="test_tc03_invalid_email_shows_error" time="84.405" /><testcase classname="test_detail" name="test_tc08_class_and_student_detail_values" time="124.335" /><testcase classname="test_detail" name="test_tc09_tabs_and_back_navigation" time="49.789" /><testcase classname="test_flow_a" name="test_tc04_import_csv_shows_counts" time="47.948" /><testcase classname="test_flow_a" name="test_tc05_match_with_ai_then_approve" time="103.245" /><testcase classname="test_flow_b" name="test_tc06_remove_members_blocks_approve_below_five" time="104.087"><failure message="AssertionError: assert 'Approval nee...st 6 members.' == 'Needs at lea...mbers (now 4)'&#10;  &#10;  - Needs at least 5 members (now 4)&#10;  + Approval needs at least 5 and at most 6 members.">artemis = &lt;function artemis.&lt;locals&gt;.run at 0x000002ACE5AF8EB0&gt;
+fixture_on_device = 'lab3-demo.csv'
+
+    @pytest.mark.error_path
+    async def test_tc06_remove_members_blocks_approve_below_five(artemis, fixture_on_device):
+        got = await artemis(
+            IMPORT_DEMO
+            + "Tap 'Match with AI' and wait. Open one proposal named 'Group 2'. Remove two of the "
+            "added members: tap the remove button of one added member, tap 'Remove' in the 'Remove "
+            "member?' dialog, and repeat once more. Report banner_text (the exact error banner text "
+            "shown, or null) and approve_enabled (true if the 'Approve proposal' button can be "
+            "tapped). Do not approve. Finally scroll down, tap 'Discard proposal' and tap 'Confirm' "
+            "so this test leaves no pending proposal behind.",
+            ["banner_text", "approve_enabled"],
+        )
+&gt;       assert got.values["banner_text"] == "Needs at least 5 members (now 4)"
+E       AssertionError: assert 'Approval nee...st 6 members.' == 'Needs at lea...mbers (now 4)'
+E         
+E         - Needs at least 5 members (now 4)
+E         + Approval needs at least 5 and at most 6 members.
+
+test_flow_b.py:20: AssertionError</failure></testcase><testcase classname="test_flow_c" name="test_tc07_discard_then_manual_add_search_empty" time="126.958" /><testcase classname="test_notifications" name="test_tc14_push_notification_opens_proposals" time="0.000"><skipped type="pytest.skip" message="needs a console-sent push message">D:\02. Project\prm-teamup-mobile\e2e_test\test_notifications.py:16: needs a console-sent push message</skipped></testcase><testcase classname="test_profile" name="test_tc10_remote_config_values_change_the_app" time="92.270" /><testcase classname="test_profile" name="test_tc11_export_pdf_and_upload" time="95.620" /><testcase classname="test_profile" name="test_tc12_notification_permission_dialog" time="117.306" /><testcase classname="test_profile" name="test_tc13_offline_matching_shows_error_with_retry" time="124.497" /></testsuite></testsuites>

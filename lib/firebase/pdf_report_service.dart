@@ -16,7 +16,7 @@ class PdfReportService implements ReportService {
   final ClassService _classes;
 
   @override
-  Future<List<int>> buildClassTeamsPdf(String classId) async {
+  Future<BuiltReport> buildClassTeamsPdf(String classId) async {
     final room = await _classes.watchClass(classId).first;
     final students = await _classes.watchStudents(classId).first;
     final teams = await _classes.watchTeams(classId).first;
@@ -70,7 +70,7 @@ class PdfReportService implements ReportService {
         ],
       ),
     );
-    return pdf.save();
+    return BuiltReport(bytes: await pdf.save(), teamCount: eligible.length);
   }
 
   pw.Widget _header(ClassRoom room) => pw.Container(

@@ -152,9 +152,13 @@ void main() {
   test('report export logs report_export with team count and size', () async {
     final c = container();
     final actions = c.read(reportDemoActionsProvider);
-    final bytes = await actions.buildPdf('class-a');
-    final events = await actions.upload('class-a', bytes).toList();
-    await actions.logExported('class-a', (events.last as UploadDone).report);
+    final built = await actions.buildPdf('class-a');
+    final events = await actions.upload('class-a', built.bytes).toList();
+    await actions.logExported(
+      'class-a',
+      (events.last as UploadDone).report,
+      teamCount: built.teamCount,
+    );
     expect(logged('report_export'), hasLength(1));
     expect(logged('report_export').single, contains('team_count'));
     expect(logged('report_export').single, contains('file_size_kb'));

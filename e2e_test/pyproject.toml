@@ -1,21 +1,37 @@
 [project]
 name = "teamup-e2e"
 version = "0.1.0"
-description = "ARTEMIS end-to-end tests for TeamUp EXE (PRM393 Lab 3)"
-requires-python = ">=3.12"
+description = "ARTEMIS end-to-end suite for TeamUp EXE (PRM393 Lab 3 §7)"
+requires-python = ">=3.10"
+
 dependencies = [
-  "artemis-client @ git+https://github.com/google/artemis.git@351ca8422f7b5b54e80a9c1ce03a222e02415b6b#subdirectory=packages/artemis-client",
-  "pytest>=8.3",
-  "pytest-asyncio>=0.24",
+    # Lab 3 §4: "Pin the versions you use in pubspec.yaml and README.md."
+    # ARTEMIS is a fast-moving open-source project, so the client is pinned to
+    # an exact commit instead of a branch.
+    #
+    # The installable client lives in the monorepo under packages/artemis-client:
+    #   pip install "artemis-client @ git+https://github.com/google/artemis.git#subdirectory=packages/artemis-client"
+    "pytest>=8.0",
+    "pytest-timeout>=2.3",
+    "pytest-asyncio>=0.24",
+]
+
+[project.optional-dependencies]
+artemis = [
+    "artemis-client @ git+https://github.com/google/artemis.git@351ca8422f7b5b54e80a9c1ce03a222e02415b6b#subdirectory=packages/artemis-client",
 ]
 
 [tool.pytest.ini_options]
+testpaths = ["."]
+python_files = ["test_*.py"]
+addopts = "-ra --strict-markers"
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "session"
 asyncio_default_test_loop_scope = "session"
-testpaths = ["."]
+timeout = 1800
 markers = [
-  "native: uses a native Android interaction (account picker, permission dialog, notification shade)",
-  "error_path: covers an error or empty state",
-  "analytics: also checks that an Analytics event was logged",
+    "native: uses a native Android interaction (account picker, permission dialog, notification shade)",
+    "error_path: covers an error or empty state",
+    "analytics: also checks that an Analytics event was logged",
+    "exploratory: the unscripted pro-profile session; excluded from the regression run",
 ]

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../models/major.dart';
 import '../../models/proposal.dart';
 import '../../viewmodels/proposals/proposal_view_model.dart';
 import '../../viewmodels/view_state.dart';
@@ -11,6 +12,10 @@ import '../../widgets/status_view.dart';
 import '../flow_a/flow_a_layout.dart';
 
 /// S11 and S13. Changes stay in a draft until the mentor approves S12.
+///
+/// S13: when the team is full the picker refuses the extra pick, shows
+/// "Max 6 members" and this screen locks its confirm button until the
+/// selection is fixed.
 class AddMemberScreen extends ConsumerStatefulWidget {
   const AddMemberScreen({super.key, required this.proposalId});
   final String proposalId;
@@ -21,6 +26,9 @@ class AddMemberScreen extends ConsumerStatefulWidget {
 
 class _AddMemberScreenState extends ConsumerState<AddMemberScreen> {
   Set<String>? _selected;
+
+  /// False while the S13 error is on screen: the confirm button is locked.
+  bool _selectionValid = true;
 
   @override
   Widget build(BuildContext context) {
@@ -52,8 +60,12 @@ class _AddMemberScreenState extends ConsumerState<AddMemberScreen> {
                   .where((s) => !value.currentMemberIds.contains(s.mssv))
                   .toList(),
               selected: _selected!,
-              capacity: 6 - value.currentMemberIds.length,
+              capacity: TeamRules.maxMembers - value.currentMemberIds.length,
+              teamName: value.teamName,
+              currentSize: value.currentMemberIds.length,
               onChanged: (next) => setState(() => _selected = next),
+              onValidityChanged: (valid) =>
+                  setState(() => _selectionValid = valid),
               onLimit: () async =>
                   ref.read(proposalActionProvider.notifier).logMemberLimit(),
             ),
@@ -67,7 +79,8 @@ class _AddMemberScreenState extends ConsumerState<AddMemberScreen> {
           : AppButton(
               label: 'Save selection',
               loading: busy,
-              onPressed: busy
+              // S13: the button is locked exactly while the error is visible.
+              onPressed: busy || !_selectionValid
                   ? null
                   : () async {
                       try {

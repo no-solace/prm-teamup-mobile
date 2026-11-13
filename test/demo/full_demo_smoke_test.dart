@@ -131,7 +131,8 @@ void main() {
     );
     await tester.tap(find.text('Approve proposal'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Confirm'));
+    // The shared Lab 2 confirmation dialog names the action, not "Confirm".
+    await tester.tap(find.widgetWithText(FilledButton, 'Approve'));
     await tester.pumpAndSettle();
     expect(classes.teamsFor(classId).singleWhere((team) => team.id == '2').size, 6);
     expect(classes.studentsFor(classId).where((student) => !student.hasTeam), isEmpty);

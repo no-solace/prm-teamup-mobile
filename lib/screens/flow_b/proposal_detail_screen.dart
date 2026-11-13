@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../models/major.dart';
 import '../../models/proposal.dart';
 import '../../router/routes.dart';
 import '../../theme/app_spacing.dart';
@@ -9,37 +10,21 @@ import '../../viewmodels/proposals/proposal_view_model.dart';
 import '../../viewmodels/view_state.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_card.dart';
+import '../../widgets/confirm_dialog.dart';
+import '../../widgets/error_banner.dart';
+import '../../widgets/fit_chip.dart';
+import '../../widgets/major_slot.dart';
 import '../../widgets/status_view.dart';
 import '../flow_a/flow_a_layout.dart';
 
 /// S10/S12/S14/S17/S20/S24/S25.
+///
+/// The Lab 2 components are used as designed: the row of major slots
+/// (48 dp on S10), the fit chip, the "Added by you" tag on a hand-built team
+/// and the shared confirmation dialog.
 class ProposalDetailScreen extends ConsumerWidget {
   const ProposalDetailScreen({super.key, required this.proposalId});
   final String proposalId;
-
-  Future<bool> _confirm(
-    BuildContext context,
-    String title,
-    String details,
-  ) async =>
-      await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(title),
-          content: Text(details),
-          actions: [
-            TextButton(
-              onPressed: () => context.pop(false),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () => context.pop(true),
-              child: const Text('Confirm'),
-            ),
-          ],
-        ),
-      ) ??
-      false;
 
   void _message(BuildContext context, String message) {
     ScaffoldMessenger.of(context)
@@ -48,6 +33,8 @@ class ProposalDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // view_item is logged once per visit (docs/analytics-plan.md).
+    ref.watch(proposalViewTrackerProvider(proposalId));
     final result = ref.watch(proposalDetailProvider(proposalId));
     final busy = ref.watch(proposalActionProvider);
     final actions = ref.read(proposalActionProvider.notifier);
@@ -62,11 +49,28 @@ class ProposalDetailScreen extends ConsumerWidget {
         data: (proposal) => ListView(
           padding: kScreenPadding,
           children: [
-            Text(
-              proposal.teamName,
-              style: Theme.of(context).textTheme.headlineSmall,
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    proposal.teamName,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                ),
+                FitChip(fit: proposal.fit),
+              ],
             ),
             const SizedBox(height: kSpaceSm),
+            if (proposal.source == ProposalSource.manual)
+              const TagChip(label: 'Added by you'),
+            const SizedBox(height: kSpaceSm),
+            // S10 uses the 48 dp major slot row.
+            MajorSlotRow(
+              members: proposal.currentMajors,
+              proposed: proposal.addMajors,
+              size: kMajorSlotLarge,
+            ),
+            const SizedBox(height: kSpaceMd),
             Wrap(
               spacing: kSpaceSm,
               children: [
@@ -100,7 +104,7 @@ class ProposalDetailScreen extends ConsumerWidget {
                     ),
                   const Divider(),
                   Text(
-                    'Suggested members',
+                    'New member',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   for (var i = 0; i < proposal.addStudentIds.length; i++)
@@ -115,10 +119,15 @@ class ProposalDetailScreen extends ConsumerWidget {
                               onPressed: busy
                                   ? null
                                   : () async {
-                                      final confirmed = await _confirm(
+                                      final remaining =
+                                          proposal.resultingSize - 1;
+                                      final confirmed = await showConfirmDialog(
                                         context,
-                                        'Remove member?',
-                                        'Remove this student from the proposal?',
+                                        title: 'Remove member?',
+                                        message:
+                                            'Team will have $remaining members.',
+                                        confirmLabel: 'Remove',
+                                        destructive: true,
                                       );
                                       if (!confirmed || !context.mounted) {
                                         return;
@@ -165,7 +174,17 @@ class ProposalDetailScreen extends ConsumerWidget {
               ),
             ),
             if (proposal.status == ProposalStatus.pending) ...[
-              const SizedBox(height: kSpaceLg),
+              const SizedBox(height: kSpaceMd),
+              // S25: the approval is blocked below five members and the
+              // reason is shown, not just a disabled button.
+              if (!proposal.canApprove)
+                ErrorBanner(
+                  message: proposal.resultingSize < TeamRules.minMembers
+                      ? 'Needs at least ${TeamRules.minMembers} members '
+                            '(now ${proposal.resultingSize})'
+                      : 'A team can have at most ${TeamRules.maxMembers} members',
+                ),
+              const SizedBox(height: kSpaceMd),
               AppButton(
                 label: 'Add member',
                 variant: AppButtonVariant.tonal,
@@ -174,18 +193,20 @@ class ProposalDetailScreen extends ConsumerWidget {
                     : () => context.push(Routes.addMember(proposal.id)),
               ),
               const SizedBox(height: kSpaceSm),
-              if (!proposal.canApprove)
-                const Text('Approval needs at least 5 and at most 6 members.'),
               AppButton(
                 label: 'Approve proposal',
                 loading: busy,
                 onPressed: !proposal.canApprove || busy
                     ? null
                     : () async {
-                        final confirmed = await _confirm(
+                        final confirmed = await showConfirmDialog(
                           context,
-                          'Approve team?',
-                          'Assign ${proposal.addStudentIds.length} students to ${proposal.teamName}?',
+                          title: 'Approve team?',
+                          message:
+                              'Students will be notified. '
+                              '${proposal.addStudentIds.length} students are '
+                              'assigned to ${proposal.teamName}.',
+                          confirmLabel: 'Approve',
                         );
                         if (!confirmed || !context.mounted) return;
                         try {
@@ -196,7 +217,7 @@ class ProposalDetailScreen extends ConsumerWidget {
                           messenger.showSnackBar(
                             SnackBar(
                               duration: const Duration(seconds: 5),
-                              content: const Text('Team approved'),
+                              content: const Text('Approved'),
                               action: SnackBarAction(
                                 label: 'Undo',
                                 onPressed: () async {
@@ -231,10 +252,12 @@ class ProposalDetailScreen extends ConsumerWidget {
                 onPressed: busy
                     ? null
                     : () async {
-                        final confirmed = await _confirm(
+                        final confirmed = await showConfirmDialog(
                           context,
-                          'Discard proposal?',
-                          'This suggestion will be removed from pending proposals.',
+                          title: 'Discard proposal?',
+                          message: 'AI will not suggest it again.',
+                          confirmLabel: 'Discard',
+                          destructive: true,
                         );
                         if (!confirmed || !context.mounted) return;
                         try {

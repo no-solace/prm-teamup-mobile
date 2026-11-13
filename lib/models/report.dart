@@ -14,6 +14,10 @@ class Report {
   final String classId;
   final int sizeKb;
   final DateTime createdAt;
+
+  /// The Firestore path of the PDF bytes (Lab 3 rubric: the storage path of
+  /// the uploaded file must be visible).
+  String get filePath => 'reports/$id/files/pdf';
 }
 
 /// Upload progress shown on the Firebase demo area (0.0 .. 1.0).

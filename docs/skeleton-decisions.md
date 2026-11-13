@@ -32,7 +32,7 @@
 | Flutter | 3.47.9 stable | Cả nhóm nên dùng **cùng bản**; ghi vào README |
 | Dart | 3.13.7 | Có sẵn sealed class và pattern matching (dùng cho C4) |
 | JDK | 25.0.5 | **Rủi ro:** Gradle/AGP của Android thường chưa hỗ trợ JDK mới nhất. Nên trỏ Flutter về JDK 17 hoặc 21 (JBR của Android Studio): `flutter config --jdk-dir <đường dẫn>` |
-| Firebase CLI | **chưa cài** | Cần cho `firebase deploy` rules và Emulator: `npm i -g firebase-tools` |
+| Firebase CLI | **15.35.0** (chạy qua `npx firebase-tools@15.35.0`) | Cần cho `firebase deploy` rules và Emulator: `npm i -g firebase-tools` hoặc dùng `npx` |
 | FlutterFire CLI | **chưa cài** | Cần cho `flutterfire configure`: `dart pub global activate flutterfire_cli` |
 
 Mỗi thành viên kiểm tra lại máy mình bằng `flutter doctor -v` trước ngày 1.
@@ -311,8 +311,8 @@ Cách ghim: chạy `flutter pub add …` để lấy bản mới nhất tương 
 
 | # | Việc | Ai | Ghi chú |
 |---|---|---|---|
-| 1 | Vào console.firebase.google.com, chấp nhận điều khoản Firebase, thêm Firebase vào dự án GCP **`teamup-exe-group6`** có sẵn (số 409603737127) | Ken | `firebase projects:addfirebase` đang báo 403 vì chưa chấp nhận điều khoản |
-| 2 | `flutterfire configure --project teamup-exe-group6 --platforms android --android-package-name com.group6.teamup_exe` | Ken | Ghi đè `lib/firebase_options.dart` (hiện là file tạm, `main.dart` sẽ báo lỗi khi mở) và sinh `google-services.json`; commit cả hai |
+| 1 | Vào console.firebase.google.com, chấp nhận điều khoản Firebase, thêm Firebase vào dự án GCP **`teamup-exe-group6`** có sẵn (số 409603737127) | Ken | `firebase projects:addfirebase` đang báo 403 vì chưa chấp nhận điều khoản. **Lưu ý:** `.firebaserc` hiện trỏ `prm-lab3-cc39e` — hai tên project không khớp, cần chốt lại một tên trước khi đổi. |
+| 2 | `flutterfire configure --project <project-id> --platforms android --android-package-name com.group6.teamup_exe` | Ken | Ghi đè `lib/firebase_options.dart` (hiện là file tạm, `main.dart` sẽ báo lỗi khi mở) và sinh `google-services.json`; commit cả hai |
 | 3 | Bật Google Sign-In trong Authentication | Ken | |
 | 4 | Thêm SHA-1 debug của 4 máy (`cd android && ./gradlew signingReport`) | Cả nhóm | Tải lại `google-services.json` sau khi thêm |
 | 5 | ~~Nâng Blaze, đặt cảnh báo ngân sách, tạo bucket Storage ở `us-central1`~~ (bỏ: ở lại gói Spark, 12/11) | Cuong | |

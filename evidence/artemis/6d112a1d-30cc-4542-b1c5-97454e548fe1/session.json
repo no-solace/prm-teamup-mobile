@@ -1,0 +1,20 @@
+{
+  "session_id": "6d112a1d-30cc-4542-b1c5-97454e548fe1",
+  "initial_goal": "In the TeamUp EXE app, signed in, on the 'Classes' tab, tap 'Import class list', choose the file 'lab3-demo.csv' and then tap the button that starts with 'Import'. Wait for the import result screen. Report the number shown next to 'imported', the number shown next to 'in a group' and the number shown next to 'available'.",
+  "start_time": 1794476498.6954267,
+  "end_time": 1794476682.7520823,
+  "status": "failed",
+  "device_info": "{\"host_platform\": \"WINDOWS\", \"mobile_platform\": \"android\", \"device_id\": \"emulator-5554\", \"device_width\": 1080, \"device_height\": 2400, \"profile\": \"flash\", \"hierarchy_backend\": \"helper\", \"hierarchy_backend_note\": \"UI hierarchy source: the Artemis accessibility helper v1.2.0.\"}",
+  "video_filepath": null,
+  "pid": 32416,
+  "device_id": "emulator-5554",
+  "device_serial": "emulator-5554",
+  "video_url": null,
+  "recording_status": "unavailable",
+  "model_info": {
+    "name": "Flash",
+    "id": "gemini-3.6-flash",
+    "provider": "google",
+    "architecture": "ARTEMIS Flash"
+  }
+}

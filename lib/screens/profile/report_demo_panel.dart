@@ -27,6 +27,9 @@ class _ReportDemoPanelState extends ConsumerState<ReportDemoPanel> {
   double? _progress;
   String? _status;
 
+  /// Lab 3 rubric: the path of the uploaded file must be visible.
+  String? _filePath;
+
   void _feedback(String message) {
     if (mounted) setState(() => _status = message);
   }
@@ -36,12 +39,13 @@ class _ReportDemoPanelState extends ConsumerState<ReportDemoPanel> {
       _busy = true;
       _progress = null;
       _status = null;
+      _filePath = null;
     });
     try {
       final actions = ref.read(reportDemoActionsProvider);
-      final bytes = await actions.buildPdf(classId);
+      final built = await actions.buildPdf(classId);
       Report? saved;
-      await for (final event in actions.upload(classId, bytes)) {
+      await for (final event in actions.upload(classId, built.bytes)) {
         if (!mounted) return;
         if (event is UploadProgress) {
           setState(() => _progress = event.fraction);
@@ -51,10 +55,13 @@ class _ReportDemoPanelState extends ConsumerState<ReportDemoPanel> {
       if (saved == null) {
         throw const UnknownError('Report upload was interrupted');
       }
-      unawaited(actions.logExported(classId, saved));
-      _feedback('Uploaded ${saved.sizeKb} KB. Opening the PDF share dialog.');
+      unawaited(
+        actions.logExported(classId, saved, teamCount: built.teamCount),
+      );
+      _feedback('Uploaded ${saved.sizeKb} KB to ${saved.filePath}.');
+      setState(() => _filePath = saved!.filePath);
       await Printing.sharePdf(
-        bytes: Uint8List.fromList(bytes),
+        bytes: Uint8List.fromList(built.bytes),
         filename: 'teamup_$classId.pdf',
       );
     } catch (error, stack) {
@@ -132,6 +139,15 @@ class _ReportDemoPanelState extends ConsumerState<ReportDemoPanel> {
           const SizedBox(height: kSpaceSm),
           Text(_status!, style: text.bodyMedium),
         ],
+        if (_filePath != null) ...[
+          const SizedBox(height: kSpaceSm),
+          Text('Storage path', style: text.titleSmall),
+          SelectableText(
+            _filePath!,
+            style: text.bodySmall,
+            semanticsLabel: 'Storage path $_filePath',
+          ),
+        ],
         const SizedBox(height: kSpaceMd),
         Text('Saved reports', style: text.titleMedium),
         if (reports.isLoading) const LinearProgressIndicator(),
@@ -152,8 +168,16 @@ class _ReportDemoPanelState extends ConsumerState<ReportDemoPanel> {
                       .firstOrNull ??
                   report.classId,
             ),
-            subtitle: Text(
-              '${report.sizeKb} KB · ${report.createdAt.toLocal()}',
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('${report.sizeKb} KB · ${report.createdAt.toLocal()}'),
+                Text(
+                  report.filePath,
+                  style: text.bodySmall,
+                  semanticsLabel: 'Storage path ${report.filePath}',
+                ),
+              ],
             ),
             trailing: IconButton(
               tooltip: 'Share saved PDF',

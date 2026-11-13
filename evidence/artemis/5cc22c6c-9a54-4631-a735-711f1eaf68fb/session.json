@@ -1,0 +1,20 @@
+{
+  "session_id": "5cc22c6c-9a54-4631-a735-711f1eaf68fb",
+  "initial_goal": "In the TeamUp EXE app, signed in, open the 'Profile' tab, scroll to the bottom and tap the 'Sign out' button. Wait for the app to settle. Report the title of the screen that is now visible and whether the text 'Continue with Google' is visible.",
+  "start_time": 1794475925.6641023,
+  "end_time": 1794476109.954464,
+  "status": "failed",
+  "device_info": "{\"host_platform\": \"WINDOWS\", \"mobile_platform\": \"android\", \"device_id\": \"emulator-5554\", \"device_width\": 1080, \"device_height\": 2400, \"profile\": \"flash\", \"hierarchy_backend\": \"helper\", \"hierarchy_backend_note\": \"UI hierarchy source: the Artemis accessibility helper v1.2.0.\"}",
+  "video_filepath": null,
+  "pid": 32740,
+  "device_id": "emulator-5554",
+  "device_serial": "emulator-5554",
+  "video_url": null,
+  "recording_status": "unavailable",
+  "model_info": {
+    "name": "Flash",
+    "id": "gemini-3.6-flash",
+    "provider": "google",
+    "architecture": "ARTEMIS Flash"
+  }
+}

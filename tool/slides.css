@@ -1,0 +1,140 @@
+/* Print stylesheet for the Lab 3 slide deck (16:9, one slide per page). */
+@page {
+  size: 297mm 167mm;
+  margin: 0;
+}
+
+html {
+  font-size: 11pt;
+}
+
+body {
+  font-family: "Segoe UI", "Be Vietnam Pro", Roboto, system-ui, sans-serif;
+  color: #22201c;
+  margin: 0;
+  padding: 0;
+  background: #ffffff;
+}
+
+/* Every level-2 heading starts a new slide. */
+h2 {
+  font-size: 21pt;
+  color: #b23e00;
+  margin: 0 0 10pt 0;
+  page-break-before: always;
+  page-break-after: avoid;
+  border-bottom: 2px solid #b23e00;
+  padding-bottom: 5pt;
+}
+
+h2:first-of-type {
+  page-break-before: avoid;
+}
+
+h3 {
+  font-size: 14pt;
+  color: #2f2e2a;
+  margin: 12pt 0 4pt 0;
+  page-break-after: avoid;
+}
+
+h4 {
+  font-size: 11.5pt;
+  color: #5a564e;
+  margin: 9pt 0 3pt 0;
+  page-break-after: avoid;
+}
+
+p {
+  margin: 4pt 0;
+}
+
+ul,
+ol {
+  margin: 4pt 0 4pt 16pt;
+  padding: 0;
+}
+
+li {
+  margin: 2pt 0;
+}
+
+a {
+  color: #b23e00;
+  text-decoration: none;
+}
+
+code {
+  font-family: "Cascadia Mono", Consolas, "Courier New", monospace;
+  font-size: 9pt;
+  background: #f4f1ec;
+  padding: 0 2px;
+  border-radius: 3px;
+}
+
+pre {
+  font-family: "Cascadia Mono", Consolas, "Courier New", monospace;
+  font-size: 8pt;
+  line-height: 1.3;
+  background: #f4f1ec;
+  border-left: 3px solid #b23e00;
+  padding: 5pt 7pt;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
+
+blockquote {
+  margin: 5pt 0 5pt 10pt;
+  padding-left: 8pt;
+  border-left: 3px solid #cfcac2;
+  color: #55504a;
+  font-size: 10pt;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 6pt 0;
+  font-size: 10pt;
+}
+
+th {
+  background: #efece6;
+  text-align: left;
+  font-weight: 600;
+  color: #2f2e2a;
+}
+
+th,
+td {
+  border: 1px solid #d5d0c8;
+  padding: 3pt 5pt;
+  vertical-align: top;
+}
+
+tr:nth-child(even) td {
+  background: #faf8f5;
+}
+
+figure {
+  margin: 8pt 0;
+  text-align: center;
+  page-break-inside: avoid;
+}
+
+figure img {
+  max-width: 100%;
+  max-height: 105mm;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #d8d4cd;
+  margin: 8pt 0;
+}
