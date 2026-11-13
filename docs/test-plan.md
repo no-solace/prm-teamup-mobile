@@ -218,7 +218,8 @@ Bộ test kiểu JSON (các hàm `async def test_tcNN_…`) đã chạy thật *
 (fallback `gemini-3.5-flash`), Flash profile. Lần 1 chạy đủ bộ; lần 2 dừng sau TC12 vì
 key Gemini hết tiền (`402`), key free-tier chỉ có 20 request/ngày nên không chạy được lần 3.
 Bằng chứng: `evidence/artemis/2026-11-13/` (`runs.jsonl` có trace ID và giá trị agent báo
-về, `run1.xml`, `runs_suite.log`).
+về, `run1.xml`, `runs_suite.log`) và ảnh từng bước của cả 24 lần chạy trong
+`evidence/artemis/2026-11-13/screenshots.md` (email và tên tài khoản test đã được làm mờ).
 
 Lần chạy này dùng `google-services.json` đã có SHA-1 debug của máy chạy test
 (`7E:D4:B9:…:9B:F6`), nên đăng nhập Google qua account picker chạy được. Lần `TC-01`
