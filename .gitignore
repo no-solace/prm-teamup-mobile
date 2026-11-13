@@ -85,3 +85,10 @@ e2e_test/artifacts/
 e2e_test/.venv/
 e2e_test/__pycache__/
 e2e_test/.pytest_cache/
+# Raw per-run output, overwritten by run_suite.sh; kept copies go to evidence/
+e2e_test/runs/
+# Run logs kept as evidence are committed despite the *.log rule above
+!evidence/**/*.log
+
+# Claude Code personal settings
+.claude/settings.local.json

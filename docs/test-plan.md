@@ -4,12 +4,12 @@ Hai lớp kiểm thử:
 
 | Lớp | Công cụ | Số lượng | Chạy ở đâu |
 |---|---|---|---|
-| Unit, ViewModel, widget | `flutter test` | 159 test | CI và máy dev, không cần thiết bị |
+| Unit, ViewModel, widget | `flutter test` | 170 test (pass hết ngày 12/11/2026) | CI và máy dev, không cần thiết bị |
 | Rules Firestore | `@firebase/rules-unit-testing` trên emulator | 25 test | `firebase/test` |
 | **E2E trên thiết bị** | **Google ARTEMIS** + pytest | **14 ca** (13 chạy tự động, 1 cần người gửi push) | thiết bị/emulator Android |
 
-> **Trạng thái 12/11/2026: bộ ARTEMIS đã viết và thu thập được 14 ca (`pytest --collect-only`), nhưng chưa chạy lần nào trên thiết bị.**
-> Mục 5 (kết quả) và mục 6 (exploratory) còn trống có chủ đích: chỉ điền sau khi chạy thật, kèm trace.
+> **Trạng thái 13/11/2026: bộ ARTEMIS đã chạy trên emulator Pixel 7 (Android, Google Play): lượt 1 đủ 13 ca, lượt 2 được 11 ca, lượt 3 chưa chạy vì hết hạn mức Gemini API.** Kết quả và lý do ở mục 5.
+> Mục 6 (exploratory) vẫn chưa làm.
 
 ## 1. Luồng quan trọng → màn hình
 
@@ -35,19 +35,19 @@ Mỗi ca là một hàm pytest trong `e2e_test/`, gửi **một** chỉ dẫn qu
 
 | ID | Tên | Flow / mục đề | Tiền điều kiện | Kết quả mong đợi (giá trị agent báo, test so sánh) | Đánh dấu | Đã chạy |
 |---|---|---|---|---|---|---|
-| TC01 | Đăng nhập Google bằng account picker | Đăng nhập | Đã đăng xuất, tài khoản mentor | `signed_in = true`; tab = Classes, Proposals, Topics, Schedule, Profile; logcat có `login` | native, analytics | Chưa |
-| TC02 | Đăng xuất | Sign-out | Đã đăng nhập | Hiện nút Continue with Google; không còn thanh tab; mở lại app vẫn ở màn đăng nhập | | Chưa |
-| TC03 | Email sai | Flow A, S19 (lỗi) | Đã đăng xuất | `error_text = "Enter a valid email"`; không vào My classes | error_path | Chưa |
-| TC04 | Nhập CSV | Flow A, S22, S23 | Đã đăng nhập | Nút `Import 12 students`; kết quả 12 / 9 / 3; logcat có `class_import` | analytics | Chưa |
-| TC05 | Ghép AI rồi duyệt | Flow A, hành động chính | Đã đăng nhập | Có thẻ Group 2; sau khi thêm có 6 thành viên; snackbar `Team approved`; số thẻ Group 2 giảm 1; logcat có `ai_match_start`, `ai_match_result`, `proposal_approve` | analytics | Chưa |
-| TC06 | Bỏ thành viên, nhóm dưới 5 | Flow B, S24, S25 (lỗi) | Đã đăng nhập | Banner `Needs at least 5 members (now 4)`; Approve bị khóa; ca tự Discard để dọn | error_path | Chưa |
-| TC07 | Hủy đề xuất rồi ghép tay, tìm không ra | Flow C, S17, S21 (lỗi) | Đã đăng nhập | Số thẻ Group 2 giảm 1; tiêu đề rỗng `No student results` | error_path | Chưa |
-| TC08 | Chi tiết lớp và sinh viên | màn chi tiết | Đã đăng nhập | 3 SV chưa có nhóm, 1 nhóm thiếu người; ID `AI000012`, `GD000011`, `MK000010`; SV Dương Yến có ngành AI | | Chưa |
-| TC09 | 3 tab và Back | điều hướng | Đã đăng nhập | Tiêu đề Proposals, Profile đúng; Back về đúng My classes | | Chưa |
-| TC10 | Remote Config đổi hành vi | Remote Config | Đã đăng nhập | `ai_matching_enabled` và `max_proposals_shown` khớp giá trị console; nút Match with AI hiện/ẩn theo cờ | | Chưa |
-| TC11 | Xuất PDF và lưu | export/upload | Đã đăng nhập | Thấy tiến độ `% uploaded`; thông báo bắt đầu bằng `Uploaded`; danh sách Saved reports có mục; logcat có `report_export`. Gói Spark: PDF lưu trong Firestore (`reports/{id}/files/pdf`) | analytics | Chưa |
-| TC12 | Hộp thoại quyền thông báo | native | Đã thu hồi `POST_NOTIFICATIONS` | Hộp thoại hệ thống xuất hiện; sau khi Allow app hiện trạng thái đã cho phép | native | Chưa |
-| TC13 | Mất mạng khi ghép | Flow A, S18 (lỗi) | Đã đăng nhập, có mạng lúc nhập | Hiện lỗi và nút `Try again`; tắt Airplane rồi thử lại thì phục hồi | error_path | Chưa |
+| TC01 | Đăng nhập Google bằng account picker | Đăng nhập | Đã đăng xuất, tài khoản mentor | `signed_in = true`; tab = Classes, Proposals, Topics, Schedule, Profile; logcat có `login` | native, analytics | 2/2 pass |
+| TC02 | Đăng xuất | Sign-out | Đã đăng nhập | Hiện nút Continue with Google; không còn thanh tab; mở lại app vẫn ở màn đăng nhập | | 2/2 pass |
+| TC03 | Email sai | Flow A, S19 (lỗi) | Đã đăng xuất | `error_text = "Enter a valid email"`; không vào My classes | error_path | 2/2 pass |
+| TC04 | Nhập CSV | Flow A, S22, S23 | Đã đăng nhập | Nút `Import 12 students`; kết quả 12 / 9 / 3; logcat có `class_import` | analytics | 2/2 pass |
+| TC05 | Ghép AI rồi duyệt | Flow A, hành động chính | Đã đăng nhập | Có thẻ Group 2; sau khi thêm có 6 thành viên; snackbar `Team approved`; số thẻ Group 2 giảm 1; logcat có `ai_match_start`, `ai_match_result`, `proposal_approve` | analytics | 2/2 pass |
+| TC06 | Bỏ thành viên, nhóm dưới 5 | Flow B, S24, S25 (lỗi) | Đã đăng nhập | Banner `Needs at least 5 members (now 4)`; Approve bị khóa; ca tự Discard để dọn | error_path | 0/2 (fail, xem mục 5) |
+| TC07 | Hủy đề xuất rồi ghép tay, tìm không ra | Flow C, S17, S21 (lỗi) | Đã đăng nhập | Số thẻ Group 2 giảm 1; tiêu đề rỗng `No student results` | error_path | 2/2 pass |
+| TC08 | Chi tiết lớp và sinh viên | màn chi tiết | Đã đăng nhập | 3 SV chưa có nhóm, 1 nhóm thiếu người; ID `AI000012`, `GD000011`, `MK000010`; SV Dương Yến có ngành AI | | 2/2 pass |
+| TC09 | 3 tab và Back | điều hướng | Đã đăng nhập | Tiêu đề Proposals, Profile đúng; Back về đúng My classes | | 1/2 (harness, xem mục 5) |
+| TC10 | Remote Config đổi hành vi | Remote Config | Đã đăng nhập | `ai_matching_enabled` và `max_proposals_shown` khớp giá trị console; nút Match with AI hiện/ẩn theo cờ | | 2/2 pass |
+| TC11 | Xuất PDF và lưu | export/upload | Đã đăng nhập | Thấy tiến độ `% uploaded`; thông báo bắt đầu bằng `Uploaded`; danh sách Saved reports có mục; logcat có `report_export`. Gói Spark: PDF lưu trong Firestore (`reports/{id}/files/pdf`) | analytics | 2/2 pass |
+| TC12 | Hộp thoại quyền thông báo | native | Đã thu hồi `POST_NOTIFICATIONS` | Hộp thoại hệ thống xuất hiện; sau khi Allow app hiện trạng thái đã cho phép | native | 1/1 pass |
+| TC13 | Mất mạng khi ghép | Flow A, S18 (lỗi) | Đã đăng nhập, có mạng lúc nhập | Hiện lỗi và nút `Try again`; tắt Airplane rồi thử lại thì phục hồi | error_path | 1/1 pass |
 | TC14 | Chạm thông báo đẩy từ notification shade | native, FCM | Cần người gửi tin từ console, `TEAMUP_PUSH_READY=1` | Mở màn Proposals; thông báo có trong danh sách | native | Mặc định bỏ qua |
 
 ### Đối chiếu yêu cầu của đề (mục 7)
@@ -95,13 +95,40 @@ Lệnh chạy, trace ID và ảnh chụp của từng lần chạy lưu ở `evi
 
 ## 5. Kết quả chạy
 
-*Chưa có. Điền sau khi chạy `run_suite.sh`:*
+Chạy ngày 13/11/2026 trên emulator Pixel 7 (`emulator-5554`), bản debug, Firebase thật (`prm-lab3-cc39e`), hồ sơ ARTEMIS **flash**. Bằng chứng: `evidence/artemis/2026-11-13/` (`runs.jsonl` có trace ID và giá trị agent báo của từng lần, `run1.xml`, `runs_suite.log`).
 
 | Test | Runs | Passed | Pass rate | Avg time (s) | Verdict |
 |---|---|---|---|---|---|
-| (chưa chạy) | | | | | |
+| TC01 Đăng nhập Google (account picker) | 2 | 2 | 100% | 66 | OK |
+| TC02 Đăng xuất | 2 | 2 | 100% | 68 | OK |
+| TC03 Email sai | 2 | 2 | 100% | 85 | OK |
+| TC04 Nhập CSV | 2 | 2 | 100% | 72 | OK |
+| TC05 Ghép AI rồi duyệt | 2 | 2 | 100% | 155 | OK |
+| TC06 Bỏ thành viên, nhóm dưới 5 | 2 | 0 | 0% | 193 | **FAILED** (app lệch spec) |
+| TC07 Hủy đề xuất, ghép tay | 2 | 2 | 100% | 149 | OK |
+| TC08 Chi tiết lớp và sinh viên | 2 | 2 | 100% | 143 | OK |
+| TC09 Tab và Back | 2 | 1 | 50% | 55 | FLAKY (lỗi harness, đã sửa) |
+| TC10 Remote Config | 2 | 2 | 100% | 112 | OK |
+| TC11 Xuất PDF và lưu | 2 | 2 | 100% | 140 | OK |
+| TC12 Hộp thoại quyền thông báo | 1 | 1 | 100% | 117 | OK (thiếu 2 lần chạy) |
+| TC13 Mất mạng khi ghép | 1 | 1 | 100% | 124 | OK (thiếu 2 lần chạy) |
+| TC14 Chạm thông báo đẩy | 0 | 0 | n/a | n/a | SKIPPED |
 
-Giải thích từng ca flaky/fail/bỏ qua: *(chưa có)*
+**Chưa đạt luật ≥ 3 lần chạy (mục 3).** Lượt 2 dừng ở TC12 vì key Gemini hết credit trả trước (`402 Payment Required`). Thử key miễn phí thì bị chặn ở 20 request/ngày/model (`429`, quota `GenerateRequestsPerDayPerProjectPerModel-FreeTier`), mà mỗi ca cần khoảng 13–26 lần gọi. Còn thiếu: TC12 và TC13 của lượt 2, cả lượt 3. Chạy bù: `bash run_suite.sh` khi có key còn hạn mức.
+
+Giải thích từng ca fail/flaky/bỏ qua:
+
+- **TC06 – fail thật, cả 2 lần, cùng giá trị.** Logic đúng: bỏ 2 thành viên thì nút Approve bị khóa (`approve_enabled = false`). Nhưng màn S25 hiện dòng chữ tĩnh `Approval needs at least 5 and at most 6 members.` (`lib/screens/flow_b/proposal_detail_screen.dart:178`), không phải `ErrorBanner` `Needs at least 5 members (now 4)` như spec S25. Câu đúng spec chỉ có trong `FakeProposalService.approve`, nên widget test bản fake không bắt được lỗi này. **Cách sửa:** đổi dòng chữ tĩnh thành `ErrorBanner` dùng `proposal.resultingSize`.
+- **TC09 – flaky do harness, không phải app.** Lần 2 agent báo đúng (`back_title = "My classes"`, trace `5d42bec7…`). Nhưng host ARTEMIS ở commit đã ghim để trống `output` và đánh dấu session xong *trước* khi ghi bước cuối, nên `conftest.py` đọc kết quả quá sớm và nhận `null`. Đã sửa: `final_report()` đọc lại `report_task_status` từ `/api/sessions/{id}/steps` và thử lại tối đa khoảng 15 giây. Đọc lại trace đó bằng bản sửa thì ra đúng 4 giá trị.
+- **TC12, TC13 – mới chạy 1 lần** vì hết hạn mức API (xem trên). Lần chạy đó pass.
+- **TC14 – bỏ qua có chủ đích** (`TEAMUP_PUSH_READY` không bật), cần người gửi push từ console.
+
+Ghi chú môi trường (để chạy lại cho giống):
+
+- Host ARTEMIS cài bằng `uv sync --python 3.13` (Python 3.15 không có wheel `grpcio`). Không dùng `start.bat`, chạy `uv run python -m artemis ui --port 8000 --no-open`.
+- `config/artemis.jsonc` của host sửa ở máy chạy: model mặc định `gemini-3.6-flash` (dự phòng `3.5-flash`), vì key dùng lúc đó gọi `3.8-flash`/`3.7-flash` bị treo. Lượt 1 và 2 chạy với `step_summarizer` **bật**. Bộ này đã được tắt sau đó để giảm khoảng một nửa số lần gọi, nhưng chưa đo được vì hết hạn mức.
+- TC01 sửa chỉ dẫn: tự đăng xuất trước nếu đang đăng nhập, để không phụ thuộc thứ tự chạy.
+- Đăng nhập Google trên máy chạy cần SHA-1 debug key của máy đó trong Firebase (`google-services.json` hiện có 2 SHA-1). Thiếu thì báo `UNREGISTERED_ON_API_CONSOLE`.
 
 ## 6. Phiên exploratory (Pro, 15–30 phút)
 
