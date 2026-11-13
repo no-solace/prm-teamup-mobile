@@ -133,6 +133,11 @@ figure img {
   max-height: 105mm;
 }
 
+/* A diagram that shares its slide with a table must leave room for it. */
+figure:has(+ table) img {
+  max-height: 75mm;
+}
+
 hr {
   border: none;
   border-top: 1px solid #d8d4cd;

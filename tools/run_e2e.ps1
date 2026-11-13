@@ -1,18 +1,22 @@
-"""Local helper for the ARTEMIS end-to-end suite (Lab 3 §7).
+<#
+.SYNOPSIS
+    Local helper for the ARTEMIS end-to-end suite (Lab 3 §7).
 
-Wraps the environment the suite needs so the tests can be started with a
-single command on a machine that has the ARTEMIS host and an Android device
-(or emulator) attached.
+.DESCRIPTION
+    Wraps the environment the suite needs so the tests can be started with a
+    single command on a machine that has the ARTEMIS host and an Android device
+    (or emulator) attached.
 
-Usage (PowerShell):
+    The script does NOT invent credentials: it reads them from the environment
+    and fails with a clear message when something is missing.
 
-    .\\tools\\run_e2e.ps1                 # whole regression suite
-    .\\tools\\run_e2e.ps1 -TestPath e2e_test/test_auth.py
-    .\\tools\\run_e2e.ps1 -Mark "not exploratory"
-
-The script does NOT invent credentials: it reads them from the environment and
-fails with a clear message when something is missing.
-"""
+.EXAMPLE
+    .\tools\run_e2e.ps1                 # whole regression suite
+.EXAMPLE
+    .\tools\run_e2e.ps1 -TestPath e2e_test/test_auth.py
+.EXAMPLE
+    .\tools\run_e2e.ps1 -Mark "not exploratory"
+#>
 
 [CmdletBinding()]
 param(

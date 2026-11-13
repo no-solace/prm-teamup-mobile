@@ -57,6 +57,18 @@ def find_browser() -> str:
     raise SystemExit("No Chromium/Chrome binary found for PDF export.")
 
 
+def mermaid_cli() -> list[str]:
+    """Resolve the mermaid CLI. On Windows npm installs it as mmdc.cmd, which
+    subprocess only finds through shutil.which. Falls back to npx."""
+    mmdc = shutil.which("mmdc")
+    if mmdc:
+        return [mmdc]
+    npx = shutil.which("npx")
+    if npx:
+        return [npx, "-y", "@mermaid-js/mermaid-cli"]
+    return ["mmdc"]
+
+
 def render_mermaid(block: str, target: Path) -> bool:
     """Render one mermaid block to SVG. Returns False when it cannot be done."""
     if target.exists():
@@ -66,13 +78,19 @@ def render_mermaid(block: str, target: Path) -> bool:
     ) as handle:
         handle.write(block)
         temp = handle.name
+    target.parent.mkdir(parents=True, exist_ok=True)
     try:
         result = subprocess.run(
-            ["mmdc", "-i", temp, "-o", str(target), "-b", "transparent"],
+            [*mermaid_cli(), "-i", temp, "-o", str(target), "-b", "transparent"],
             capture_output=True,
             text=True,
         )
+        if result.returncode != 0:
+            print(f"[WARN] mermaid failed for {target.name}: {result.stderr.strip()[:300]}")
         return result.returncode == 0 and target.exists()
+    except FileNotFoundError:
+        print("[WARN] mermaid CLI not found (install: npm i -g @mermaid-js/mermaid-cli)")
+        return False
     finally:
         Path(temp).unlink(missing_ok=True)
 
@@ -101,12 +119,14 @@ def convert(source: Path, css: str, title: str, diagram_dir: Path) -> str:
     for index, block in enumerate(blocks):
         target = diagram_dir / f"{source.stem}-{index + 1}.svg"
         if render_mermaid(block, target):
-            body = body.replace(
-                f"@@MERMAID{index}@@",
-                f'<figure><img src="{svg_data_uri(target)}" alt="diagram"/></figure>',
-            )
+            figure = f'<figure><img src="{svg_data_uri(target)}" alt="diagram"/></figure>'
         else:
-            body = body.replace(f"@@MERMAID{index}@@", "<p>(diagram)</p>")
+            figure = "<p>(diagram)</p>"
+        # Markdown wraps the placeholder in <p>; a <figure> inside <p> is
+        # invalid HTML and leaves an empty <p> between the figure and the
+        # next block, so replace the wrapper too.
+        placeholder = f"@@MERMAID{index}@@"
+        body = body.replace(f"<p>{placeholder}</p>", figure).replace(placeholder, figure)
 
     return f"""<!doctype html>
 <html lang="vi">
