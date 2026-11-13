@@ -146,7 +146,7 @@ assert (got.values["imported"], got.values["in_a_group"], got.values["available"
 | Quy tắc | Cơ chế |
 |---|---|
 | Test độc lập thứ tự | Mỗi test nêu precondition; `pytest` chạy được theo bất kỳ thứ tự nào. |
-| Không phụ thuộc trạng thái test trước | Dữ liệu dùng lại là fixture `tool/fixtures/lab3-demo.csv` (12 SV). Import lại lớp sẽ tạo bản ghi mới, app xử lý trùng lặp an toàn. |
+| Không phụ thuộc trạng thái test trước | Dữ liệu dùng lại là fixture `tools/fixtures/lab3-demo.csv` (12 SV). Import lại lớp sẽ tạo bản ghi mới, app xử lý trùng lặp an toàn. |
 | Không commit bí mật | `ARTEMIS_API_KEY`, `ARTEMIS_DEVICE` đọc từ biến môi trường; tài khoản Google test nằm trên thiết bị. |
 | Tài khoản test riêng | Dùng tài khoản Google dành cho test, không dùng tài khoản cá nhân. |
 | Test destructive được skip mặc định | TC-16/17/18 chỉ chạy khi bật biến `ARTEMIS_FCM_TRIGGER` / `ARTEMIS_ANALYTICS_DEBUG` / `ARTEMIS_CRASHLYTICS`. |

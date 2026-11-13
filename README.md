@@ -51,7 +51,7 @@ Trước mỗi PR:
 ```bash
 flutter analyze
 flutter test
-bash tool/check_layers.sh        # Windows: "C:\Program Files\Git\bin\bash.exe" tool/check_layers.sh
+bash tools/check_layers.sh        # Windows: "C:\Program Files\Git\bin\bash.exe" tools/check_layers.sh
 ```
 
 ## Cấu trúc
@@ -116,10 +116,10 @@ Hoặc dùng script có sẵn — tự kiểm tra đủ kiện (daemon sống, t
 có mặt, app đã cài) rồi mới chạy `pytest`:
 
 ```bash
-tool/run_e2e.ps1                                  # PowerShell
-tool/run_e2e.py                                   # Python / Git Bash
-tool/run_e2e.ps1 -TestPath e2e_test/test_auth.py  # một nhóm test
-python tool/collect_artemis_evidence.py            # tải ảnh + log vào evidence/
+tools/run_e2e.ps1                                  # PowerShell
+tools/run_e2e.py                                   # Python / Git Bash
+tools/run_e2e.ps1 -TestPath e2e_test/test_auth.py  # một nhóm test
+python tools/collect_artemis_evidence.py            # tải ảnh + log vào evidence/
 ```
 
 Chi tiết: [e2e_test/README.md](e2e_test/README.md) và [docs/test-plan.md](docs/test-plan.md).
@@ -128,7 +128,7 @@ Chi tiết: [e2e_test/README.md](e2e_test/README.md) và [docs/test-plan.md](doc
 
 ```bash
 pip install markdown
-python tool/build_report.py --student-id <StudentID>
+python tools/build_report.py --student-id <StudentID>
 ```
 
 Kết quả: `report/Lab03_<StudentID>.pdf` và `slides/Lab03_<StudentID>_slides.pdf`. Cần có `mmdc` (mermaid CLI) và một Chromium để in PDF.
@@ -185,7 +185,7 @@ Chi tiết và quyết định cho từng phát hiện: [docs/code-review.md](do
 | `flutter analyze` | ✅ **No issues found** | 0 cảnh báo |
 | `flutter test` | ✅ **175/175 pass** | unit + widget |
 | Firestore rules test | ✅ **30/30 pass** | `npx firebase-tools@15.35.0 emulators:exec --only firestore "node --test firebase/test/firestore.rules.test.mjs"` |
-| `tool/check_layers.sh` | ✅ **Layers OK** | 0 vi phạm layer |
+| `tools/check_layers.sh` | ✅ **Layers OK** | 0 vi phạm layer |
 | Ca ARTEMIS | ⚠️ **đã chạy thật 1 ca** (TC-02 pass 110.82s, 22 ảnh trong `evidence/artemis/`) | cần chạy ≥ 3 lần/ca trên build release + thiết bị thật → điền `docs/test-plan.md` §6 |
 | Ảnh Console (dịch vụ Firebase) | ⚠️ **chưa chụp** | checklist trong `evidence/README.md` |
 | `android/app/google-services.json` | ✅ **đã commit** | sinh bởi `flutterfire configure` (đề §9 cho phép commit) |

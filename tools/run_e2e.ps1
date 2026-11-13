@@ -6,9 +6,9 @@ single command on a machine that has the ARTEMIS host and an Android device
 
 Usage (PowerShell):
 
-    .\\tool\\run_e2e.ps1                 # whole regression suite
-    .\\tool\\run_e2e.ps1 -TestPath e2e_test/test_auth.py
-    .\\tool\\run_e2e.ps1 -Mark "not exploratory"
+    .\\tools\\run_e2e.ps1                 # whole regression suite
+    .\\tools\\run_e2e.ps1 -TestPath e2e_test/test_auth.py
+    .\\tools\\run_e2e.ps1 -Mark "not exploratory"
 
 The script does NOT invent credentials: it reads them from the environment and
 fails with a clear message when something is missing.

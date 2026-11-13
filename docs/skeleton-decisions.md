@@ -233,8 +233,8 @@ Cách ghim: chạy `flutter pub add …` để lấy bản mới nhất tương 
 ### D14. Lint và kiểm lớp
 
 - `flutter_lints` (mặc định) + `analysis_options.yaml` bật thêm: `prefer_const_constructors`, `avoid_print`, `require_trailing_commas`.
-- Script `tool/check_layers.sh` dùng grep để báo lỗi nếu `lib/screens/` hoặc `lib/widgets/` có `import 'package:firebase_` / `cloud_firestore`, hoặc nếu `lib/screens/` có `Color(0x` / `fontSize:` / `EdgeInsets.all(<số>)` hard-code. Chạy trước mỗi PR. Đây cũng là bằng chứng tốt cho tiêu chí "Layer separation".
-- **Đề xuất thêm:** GitHub Actions chạy `flutter analyze`, `flutter test`, `tool/check_layers.sh` cho mỗi PR. Mất khoảng 15 phút để cài, nhưng đỡ được lỗi khi merge.
+- Script `tools/check_layers.sh` dùng grep để báo lỗi nếu `lib/screens/` hoặc `lib/widgets/` có `import 'package:firebase_` / `cloud_firestore`, hoặc nếu `lib/screens/` có `Color(0x` / `fontSize:` / `EdgeInsets.all(<số>)` hard-code. Chạy trước mỗi PR. Đây cũng là bằng chứng tốt cho tiêu chí "Layer separation".
+- **Đề xuất thêm:** GitHub Actions chạy `flutter analyze`, `flutter test`, `tools/check_layers.sh` cho mỗi PR. Mất khoảng 15 phút để cài, nhưng đỡ được lỗi khi merge.
 
 ### D15. Quy ước Git
 
@@ -299,13 +299,13 @@ Cách ghim: chạy `flutter pub add …` để lấy bản mới nhất tương 
 - [x] Interface + fake cho mọi service trong PROPOSAL mục 4; provider nối sẵn
 - [x] Firebase khởi tạo trong `main.dart`: Crashlytics bắt lỗi, handler FCM nền, Remote Config sau `runApp` *(chưa chạy thật được vì thiếu `firebase_options.dart`)*
 - [x] `firebase/` có rules mặc định **từ chối tất cả** (sau đó mỗi người mở dần cho collection của mình). `firebase.json`, `.firebaserc` đặt ở gốc repo vì Firebase CLI yêu cầu
-- [x] `tool/check_layers.sh`, `analysis_options.yaml` xanh; CI đã viết (`.github/workflows/ci.yml`), chạy lần đầu khi push
+- [x] `tools/check_layers.sh`, `analysis_options.yaml` xanh; CI đã viết (`.github/workflows/ci.yml`), chạy lần đầu khi push
 - [x] `docs/architecture.md` bản đầu: cây thư mục, sơ đồ lớp (Mermaid), bảng ViewModel → Service (để trống, mỗi người điền)
 - [x] README: lệnh chạy, phiên bản Flutter/Dart/JDK, cách thêm SHA-1
 
 ### 5.1. Trạng thái (cập nhật 05/11/2026)
 
-**Đã kiểm:** `flutter analyze` không lỗi, `flutter test` 3/3 qua, `bash tool/check_layers.sh` báo "Layers OK", `flutter build apk --debug -t lib/main_fake.dart` thành công. Chưa commit.
+**Đã kiểm:** `flutter analyze` không lỗi, `flutter test` 3/3 qua, `bash tools/check_layers.sh` báo "Layers OK", `flutter build apk --debug -t lib/main_fake.dart` thành công. Chưa commit.
 
 **Việc còn lại, theo thứ tự:**
 

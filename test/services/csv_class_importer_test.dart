@@ -86,7 +86,7 @@ void main() {
 
   test('fixture contains both available students and full/incomplete teams', () {
     final preview = importer.parse(fileName: 'lab3-demo.csv',
-        bytes: File('tool/fixtures/lab3-demo.csv').readAsBytesSync());
+        bytes: File('tools/fixtures/lab3-demo.csv').readAsBytesSync());
     final teams = importer.teams(preview, 'demo');
     expect(preview.rowCount, 12);
     expect(preview.students.where((s) => !s.hasTeam).length, 3);

@@ -2,7 +2,7 @@
 """Build the Lab 3 final report (PDF) and the slide deck (PDF) from Markdown.
 
 Usage:
-    python tool/build_report.py --student-id SE180776
+    python tools/build_report.py --student-id SE180776
 
 The script
   1. renders every ```mermaid block of the source Markdown to SVG
@@ -164,7 +164,7 @@ def main() -> int:
 
     build(
         ROOT / "report" / "Lab03_report.md",
-        ROOT / "tool" / "report.css",
+        ROOT / "tools" / "report.css",
         "TeamUp EXE - PRM393 Lab 3 report",
         ROOT / "report" / f"Lab03_{args.student_id}.pdf",
         ROOT / "report" / "Lab03_report.html",
@@ -172,7 +172,7 @@ def main() -> int:
     )
     build(
         ROOT / "slides" / "Lab03_slides.md",
-        ROOT / "tool" / "slides.css",
+        ROOT / "tools" / "slides.css",
         "TeamUp EXE - PRM393 Lab 3 slides",
         ROOT / "slides" / f"Lab03_{args.student_id}_slides.pdf",
         ROOT / "slides" / "Lab03_slides.html",

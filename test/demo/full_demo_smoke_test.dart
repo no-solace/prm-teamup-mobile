@@ -39,7 +39,7 @@ void main() {
     final auth = FakeAuthService(latency: Duration.zero);
     final classes = _CsvDemoClasses();
     final storage = FakeStorageService();
-    final fixture = File('tool/fixtures/lab3-demo.csv').readAsBytesSync();
+    final fixture = File('tools/fixtures/lab3-demo.csv').readAsBytesSync();
     List<int>? sharedPdf;
     String? sharedFilename;
     const printingChannel = MethodChannel('net.nfet.printing');

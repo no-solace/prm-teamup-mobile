@@ -404,7 +404,7 @@ hr {
 </tr>
 </tbody>
 </table>
-<p><strong>Quyết định kiến trúc:</strong> chỉ <code>lib/providers/service_providers.dart</code> nối interface → bản cài đặt, nên test thay fake bằng <code>overrideWithValue</code> mà không sửa ViewModel. <code>tool/check_layers.sh</code> kiểm 6 quy tắc tự động — lần chạy cuối: <strong>Layers OK, 0 vi phạm</strong>.</p>
+<p><strong>Quyết định kiến trúc:</strong> chỉ <code>lib/providers/service_providers.dart</code> nối interface → bản cài đặt, nên test thay fake bằng <code>overrideWithValue</code> mà không sửa ViewModel. <code>tools/check_layers.sh</code> kiểm 6 quy tắc tự động — lần chạy cuối: <strong>Layers OK, 0 vi phạm</strong>.</p>
 <h2 id="08-sequence-diagram-ben-trong-mot-lan-duyet-nhom-wf-02">08 · Sequence Diagram — bên trong một lần duyệt nhóm (WF-02)</h2>
 <p><p>(diagram)</p></p>
 <p><strong>Vì sao dùng transaction:</strong> roster là dữ liệu dùng chung — transaction + <code>rosterChangeProposalId</code> trong rules chặn hai mentor duyệt trùng một sinh viên. Đây là một trong các ca lỗi thật được Crashlytics ghi lại.</p>
@@ -659,7 +659,7 @@ hr {
 <tr>
 <td>01</td>
 <td><strong>WF-01 · Ghép nhóm cho một lớp</strong></td>
-<td>Lớp <code>EXE101 Demo</code> (12 SV, <code>tool/fixtures/lab3-demo.csv</code>)</td>
+<td>Lớp <code>EXE101 Demo</code> (12 SV, <code>tools/fixtures/lab3-demo.csv</code>)</td>
 <td>≥ 1 thẻ đề xuất ở tab Proposals, có chip fit và ô ngành</td>
 </tr>
 <tr>
@@ -784,7 +784,7 @@ Bốn phát hiện gần nhất là loại "mồi lỗi" — đều là thứ <s
 <tr>
 <td>MVVM 4 lớp, phụ thuộc chỉ đi xuống</td>
 <td>✅ <strong>0 vi phạm</strong> / 6 quy tắc, kiểm tự động</td>
-<td><code>tool/check_layers.sh</code> → <code>Layers OK</code></td>
+<td><code>tools/check_layers.sh</code> → <code>Layers OK</code></td>
 </tr>
 <tr>
 <td>Design system Lab 2 trong code</td>
@@ -1122,6 +1122,6 @@ Bốn phát hiện gần nhất là loại "mồi lỗi" — đều là thứ <s
 </tr>
 </tbody>
 </table>
-<p>Mọi phát hiện đều được kiểm lại bằng <code>flutter analyze</code>, <code>flutter test</code> (150 test) và <code>tool/check_layers.sh</code> trước khi commit.</p>
+<p>Mọi phát hiện đều được kiểm lại bằng <code>flutter analyze</code>, <code>flutter test</code> (150 test) và <code>tools/check_layers.sh</code> trước khi commit.</p>
 </body>
 </html>

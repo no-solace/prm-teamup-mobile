@@ -16,7 +16,7 @@
 | `flutter analyze` | ✅ **No issues found** | `flutter analyze` |
 | Unit + widget test | ✅ **150/150 pass** | `flutter test` |
 | Firestore rules test | ✅ **21/21 pass** | `npx firebase-tools@15.35.0 emulators:exec --only firestore --project demo-teamup-data "node --test firebase/test/firestore.rules.test.mjs"` |
-| Luật layer (MVVM) | ✅ **Layers OK** | `bash tool/check_layers.sh` |
+| Luật layer (MVVM) | ✅ **Layers OK** | `bash tools/check_layers.sh` |
 | Bộ test ARTEMIS | ✅ 19 test, API khớp SDK thật | `cd e2e_test && pytest --collect-only -q` |
 | AI code review | ✅ **12 finding / 5 commit sửa** | `docs/code-review.md` |
 | Report PDF | ✅ 10 trang (yêu cầu 8–12) | `report/Lab03_group6.pdf` |
@@ -48,10 +48,10 @@ mục ảnh cần chụp).
 
 ### 1.2 Công cụ dựng PDF
 
-`tool/build_report.py` — chạy 1 lệnh ra cả report lẫn slides:
+`tools/build_report.py` — chạy 1 lệnh ra cả report lẫn slides:
 
 ```bash
-python tool/build_report.py --student-id <MSSV>
+python tools/build_report.py --student-id <MSSV>
 ```
 
 Cơ chế: Markdown → HTML có print stylesheet → headless Chromium in PDF.
@@ -439,9 +439,9 @@ trong API client.
 
 | File | Tác dụng |
 |---|---|
-| `tool/run_e2e.ps1` | Kiểm tra đủ kiện (daemon sống? có device? có key? app đã cài?) rồi chạy pytest. Sai điều kiện → thông báo rõ ràng, không phải stack trace |
-| `tool/run_e2e.py` | Bản Python tương đương cho CI / Git Bash |
-| `tool/collect_artemis_evidence.py` | Tải ảnh, **bản ghi hành động**, summary từng step từ daemon → `evidence/artemis/<session-id>/` (kèm `screenshots/step-NN-before.jpg`) |
+| `tools/run_e2e.ps1` | Kiểm tra đủ kiện (daemon sống? có device? có key? app đã cài?) rồi chạy pytest. Sai điều kiện → thông báo rõ ràng, không phải stack trace |
+| `tools/run_e2e.py` | Bản Python tương đương cho CI / Git Bash |
+| `tools/collect_artemis_evidence.py` | Tải ảnh, **bản ghi hành động**, summary từng step từ daemon → `evidence/artemis/<session-id>/` (kèm `screenshots/step-NN-before.jpg`) |
 
 ### 5b.4 Kết quả ARTEMIS thật trên máy này
 
@@ -465,7 +465,7 @@ vào `evidence/artemis/`.
 
 **Tổng bằng chứng thu được:** **12 phiên** ARTEMIS (4 `completed`, 8 `failed`) với
 **22 ảnh chụp thật** — xem `evidence/artemis/README.md` để biết từng phiên làm gì.
-Tool thu thập: `python tool/collect_artemis_evidence.py` (chỉ gọi `GET` trên daemon).
+Tool thu thập: `python tools/collect_artemis_evidence.py` (chỉ gọi `GET` trên daemon).
 
 ### 5b.5 Phần CHƯA làm được là do đúng thiếu project Firebase
 
@@ -541,7 +541,7 @@ Rồi điền `docs/test-plan.md` §6 (test ID · số lần chạy · pass rate
 TB) và chụp trace vào `evidence/artemis/TC-xx/run-1..3/`.
 
 > **Cần chuẩn bị trước:** APK release (`flutter build apk`), CSV
-> `tool/fixtures/lab3-demo.csv` **đẩy lên thiết bị** (TC-05/TC-06 chọn file
+> `tools/fixtures/lab3-demo.csv` **đẩy lên thiết bị** (TC-05/TC-06 chọn file
 > qua file picker), tài khoản Google test **đã đăng nhập sẵn** trên thiết bị,
 > bật Analytics debug mode.
 >
@@ -583,7 +583,7 @@ live runs"). Upload YouTube/Drive và dán link vào `README.md`.
 Rồi dựng lại PDF với MSSV thật:
 
 ```bash
-python tool/build_report.py --student-id <MSSV>
+python tools/build_report.py --student-id <MSSV>
 ```
 
 ### 5.5 Cập nhật Figma (30 phút)
@@ -640,11 +640,11 @@ Lệnh kiểm chứng lại toàn bộ:
 ```bash
 flutter analyze
 flutter test
-bash tool/check_layers.sh          # Git Bash: "C:\Program Files\Git\bin\bash.exe"
+bash tools/check_layers.sh          # Git Bash: "C:\Program Files\Git\bin\bash.exe"
 npx firebase-tools@15.35.0 emulators:exec --only firestore \
     --project demo-teamup-data "node --test firebase/test/firestore.rules.test.mjs"
 cd e2e_test && pytest --collect-only -q
-python tool/build_report.py --student-id group6
+python tools/build_report.py --student-id group6
 ```
 
 ---

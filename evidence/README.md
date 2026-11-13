@@ -65,7 +65,7 @@ adb shell setprop debug.firebase.analytics.app com.group6.teamup_exe
 
 | Mục | Nội dung |
 |---|---|
-| Lệnh đã dùng | `tool/run_e2e.ps1` (bọc `pytest -m "not exploratory" -v`, Flash) và `ARTEMIS_PROFILE=pro pytest test_exploratory.py -s -m exploratory` |
+| Lệnh đã dùng | `tools/run_e2e.ps1` (bọc `pytest -m "not exploratory" -v`, Flash) và `ARTEMIS_PROFILE=pro pytest test_exploratory.py -s -m exploratory` |
 | Trace mỗi lần chạy | `evidence/artemis/<session-id>/` — `session.json` + `report.md` + `screenshots/step-NN-before/after.jpg` |
 | Bảng kết quả | `docs/test-plan.md` §6 — test ID, số lần chạy, pass rate, thời gian TB |
 | Ca flaky / fail | `docs/test-plan.md` §7 — nguyên nhân và cách xử lý |

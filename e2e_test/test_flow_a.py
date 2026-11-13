@@ -1,7 +1,7 @@
 """Flow A: import a class, run the AI matching, open and approve a proposal.
 
 The class used by these tests is the CSV fixture committed at
-``tool/fixtures/lab3-demo.csv`` (12 students, 1 class, 2 groups).
+``tools/fixtures/lab3-demo.csv`` (12 students, 1 class, 2 groups).
 
 Two flavours of the same journey live here:
 

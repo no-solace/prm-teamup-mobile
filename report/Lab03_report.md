@@ -95,7 +95,7 @@ Token nằm đúng một chỗ và được đọc qua theme, không có giá tr
 `StudentRow`, `MajorFilterChips`, `StudentPicker`, …), mỗi widget có các trạng thái
 của Lab 2 làm tham số.
 
-`tool/check_layers.sh` chặn `Color(0x…)`, `fontSize:` và `EdgeInsets.all(<số>)`
+`tools/check_layers.sh` chặn `Color(0x…)`, `fontSize:` và `EdgeInsets.all(<số>)`
 trong `lib/screens/` — đây là cơ chế **tự động** bảo đảm "tokens come from the
 theme", không chỉ là quy ước trên giấy.
 
@@ -127,7 +127,7 @@ flowchart LR
   M --- I
 ```
 
-Bốn quy tắc bị **kiểm tự động** bằng `tool/check_layers.sh` (chạy trước mỗi PR):
+Bốn quy tắc bị **kiểm tự động** bằng `tools/check_layers.sh` (chạy trước mỗi PR):
 
 | Quy tắc | Kết quả |
 |---|---|
@@ -458,9 +458,9 @@ logcat dùng cho ARTEMIS (test `TC-17` kiểm `ai_match_start` **và** `ai_match
 |---|---|---|
 | Unit / widget / integration Dart | `flutter test` | **150/150 pass** |
 | Firestore Security Rules | `npx firebase-tools@15.35.0 emulators:exec --only firestore --project demo-teamup-data "node --test firebase/test/firestore.rules.test.mjs"` | **21/21 pass** |
-| Ràng buộc kiến trúc | `bash tool/check_layers.sh` | **Layers OK** — 0 vi phạm |
+| Ràng buộc kiến trúc | `bash tools/check_layers.sh` | **Layers OK** — 0 vi phạm |
 | Phân tích tĩnh | `flutter analyze` | **No issues found** |
-| ARTEMIS TC-02 trên emulator | `tool/run_e2e.ps1 -TestPath e2e_test/test_auth.py` | **1 passed in 110.82s** |
+| ARTEMIS TC-02 trên emulator | `tools/run_e2e.ps1 -TestPath e2e_test/test_auth.py` | **1 passed in 110.82s** |
 
 ---
 
@@ -521,7 +521,7 @@ Mỗi phát hiện gắn với file và dòng cụ thể.
 4. **Nhận xét của AI phải được kiểm lại trước khi làm.** CR-05 được **modified**
    vì sửa theo gợi ý sẽ vi phạm một quy tắc khác của §5.
 5. **Quy tắc kiến trúc nên được kiểm bằng script, không bằng quy ước miệng.**
-   `tool/check_layers.sh` + `flutter analyze` + `flutter test` chạy trước mỗi PR là
+   `tools/check_layers.sh` + `flutter analyze` + `flutter test` chạy trước mỗi PR là
    lý do 0 vi phạm layer ở lần chạy cuối.
 
 ---
@@ -537,7 +537,7 @@ Mỗi phát hiện gắn với file và dòng cụ thể.
 | Mermaid CLI (`mmdc`) | Vẽ sơ đồ activity / state / sequence / layer | `build/diagrams/*.svg` → nhúng vào báo cáo và slide |
 
 Mọi phát hiện đều được kiểm lại bằng `flutter analyze`, `flutter test` (150 test) và
-`tool/check_layers.sh` trước khi commit. Không có phần code nào được nộp mà
+`tools/check_layers.sh` trước khi commit. Không có phần code nào được nộp mà
 sinh viên không giải thích được.
 
 ---

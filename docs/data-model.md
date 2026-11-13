@@ -238,7 +238,7 @@ network thay vì dữ liệu.
 
 ## 10. Dữ liệu mẫu
 
-`tool/fixtures/lab3-demo.csv` — file import đúng định dạng S22 (CSV, xem
+`tools/fixtures/lab3-demo.csv` — file import đúng định dạng S22 (CSV, xem
 sai lệch D2 trong `docs/design-traceability.md`):
 
 ```csv

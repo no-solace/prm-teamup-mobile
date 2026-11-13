@@ -16,8 +16,8 @@
 | `flutter analyze` | ✅ **0 issue** | `flutter analyze` |
 | Unit + widget test | ✅ **150/150 pass** | `flutter test` |
 | Firestore rules test | ✅ **21/21 pass** | xem §5.1 |
-| Luật layer MVVM | ✅ **Layers OK** | `bash tool/check_layers.sh` |
-| Bộ test E2E | ✅ 19 test · **TC-02 đã chạy thật (pass 110.82s)** | `tool/run_e2e.ps1` |
+| Luật layer MVVM | ✅ **Layers OK** | `bash tools/check_layers.sh` |
+| Bộ test E2E | ✅ 19 test · **TC-02 đã chạy thật (pass 110.82s)** | `tools/run_e2e.ps1` |
 | ARTEMIS host + agent | ✅ **đã dựng & chạy thật** (12 phiên, 22 ảnh) | xem §4 |
 | AI code review | ✅ **12 finding / 5 commit sửa** | `docs/code-review.md` |
 | Report PDF | ✅ **10 trang** (yêu cầu 8–12) | `report/Lab03_group6.pdf` |
@@ -128,9 +128,9 @@ Proposals, Profile, My classes
 
 | File | Tác dụng |
 |---|---|
-| `tool/run_e2e.ps1` | Kiểm tra đủ kiện → chạy pytest, báo lỗi rõ ràng |
-| `tool/run_e2e.py` | Bản Python cho CI / Git Bash |
-| `tool/collect_artemis_evidence.py` | Tải ảnh + log + summary từ daemon vào `evidence/artemis/` |
+| `tools/run_e2e.ps1` | Kiểm tra đủ kiện → chạy pytest, báo lỗi rõ ràng |
+| `tools/run_e2e.py` | Bản Python cho CI / Git Bash |
+| `tools/collect_artemis_evidence.py` | Tải ảnh + log + summary từ daemon vào `evidence/artemis/` |
 
 ### 2.5 Tài liệu đã cập nhật cho khớp với thực tế
 
@@ -210,16 +210,16 @@ flutter build apk --release
 adb install -r build/app/outputs/flutter-apk/app-release.apk
 
 # Chạy suite 3 lần để có pass rate
-tool/run_e2e.ps1 -Mark "not exploratory"     # lặp 3 lần
-tool/run_e2e.ps1 -Mark exploratory -TestPath e2e_test/test_exploratory.py
+tools/run_e2e.ps1 -Mark "not exploratory"     # lặp 3 lần
+tools/run_e2e.ps1 -Mark exploratory -TestPath e2e_test/test_exploratory.py
 
 # Gom bằng chứng
-python tool/collect_artemis_evidence.py
+python tools/collect_artemis_evidence.py
 ```
 
 **Cần chuẩn bị trước:**
 
-- CSV `tool/fixtures/lab3-demo.csv` **đẩy lên thiết bị** (TC-05/TC-06 dùng
+- CSV `tools/fixtures/lab3-demo.csv` **đẩy lên thiết bị** (TC-05/TC-06 dùng
   file picker).
 - Tài khoản Google test **đã đăng nhập sẵn** trên thiết bị.
 - Bật **Analytics debug mode** (Console → Analytics → Settings → DebugView).
@@ -269,7 +269,7 @@ Upload YouTube/Drive, dán link vào `README.md`.
 ### 3.5 Dựng lại PDF với MSSV thật (5 phút)
 
 ```bash
-python tool/build_report.py --student-id <MSSV>
+python tools/build_report.py --student-id <MSSV>
 ```
 
 Ra `report/Lab03_<MSSV>.pdf` và `slides/Lab03_<MSSV>_slides.pdf` đúng tên đề
@@ -310,7 +310,7 @@ cd C:/Workspace/PRM393/prm-teamup-mobile
 export ARTEMIS_DEVICE=emulator-5554
 export ARTEMIS_API_KEY=<key>
 export ARTEMIS_BASE_URL=http://127.0.0.1:8000
-tool/run_e2e.ps1
+tools/run_e2e.ps1
 ```
 
 Các biến môi trường ARTEMIS đã dùng:
@@ -332,11 +332,11 @@ Các biến môi trường ARTEMIS đã dùng:
 ```bash
 flutter analyze
 flutter test
-bash tool/check_layers.sh          # Git Bash: "C:\Program Files\Git\bin\bash.exe"
+bash tools/check_layers.sh          # Git Bash: "C:\Program Files\Git\bin\bash.exe"
 npx firebase-tools@15.35.0 emulators:exec --only firestore \
     --project demo-teamup-data "node --test firebase/test/firestore.rules.test.mjs"
 cd e2e_test && pytest --collect-only -q
-python tool/build_report.py --student-id <MSSV>
+python tools/build_report.py --student-id <MSSV>
 ```
 
 ### 5.2 Checklist bài nộp theo đề §11

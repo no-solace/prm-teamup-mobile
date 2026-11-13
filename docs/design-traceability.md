@@ -116,7 +116,7 @@ dùng đúng bộ component, token và quy tắc trạng thái của Lab 2.
 | Spacing / radius / kích thước | `lib/theme/app_spacing.dart` | `kSpaceXs..kSpaceXl`, `kRadiusSm..kRadiusFull`, `kTouchTarget = 48`, `kMajorSlotSmall = 40`, `kMajorSlotLarge = 48`, `kMaxContentWidth = 600`. |
 | Theme | `lib/theme/app_theme.dart` | `ThemeData(useMaterial3: true)` + `ColorScheme.fromSeed` theo seed brand, chỉ theme sáng. |
 
-`tool/check_layers.sh` chặn `Color(0x...)`, `fontSize:` và `EdgeInsets.all(<số>)` trong
+`tools/check_layers.sh` chặn `Color(0x...)`, `fontSize:` và `EdgeInsets.all(<số>)` trong
 `lib/screens/` — bảo đảm không có màu/kích thước hard-code trong màn.
 
 ---

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Layer check (D14). Run before every PR: bash tool/check_layers.sh
+# Layer check (D14). Run before every PR: bash tools/check_layers.sh
 # Fails if UI code touches Firebase, or screens hard-code colours / sizes.
 set -u
 cd "$(dirname "$0")/.."

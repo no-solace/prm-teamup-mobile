@@ -26,7 +26,7 @@ flowchart LR
   M --- I
 ```
 
-Quy tắc bắt buộc (kiểm bằng `tool/check_layers.sh`, chạy trước mỗi PR):
+Quy tắc bắt buộc (kiểm bằng `tools/check_layers.sh`, chạy trước mỗi PR):
 
 | Quy tắc | Công cụ kiểm |
 |---|---|
@@ -92,7 +92,7 @@ lib/
 firebase/                firestore.rules, indexes, remote-config-defaults.json,
                          remote-config-template.json (KHÔNG có storage.rules)
 firebase.json  .firebaserc
-tool/                    check_layers.sh, fixtures/ (CSV mẫu)
+tools/                    check_layers.sh, fixtures/ (CSV mẫu)
 test/                    unit + widget test dùng fake service
 e2e_test/                ARTEMIS pytest suite (Lab 3 §7)
 docs/                    tài liệu Lab 3: design-traceability, architecture,

@@ -365,7 +365,7 @@ trong cột "Đã cập nhật Figma?" của <code>docs/design-traceability.md</
 <code>ErrorBanner</code>, <code>StatusView</code>, <code>showConfirmDialog</code>, <code>ProposalsBadge</code>, <code>StatTriple</code>,
 <code>StudentRow</code>, <code>MajorFilterChips</code>, <code>StudentPicker</code>, …), mỗi widget có các trạng thái
 của Lab 2 làm tham số.</p>
-<p><code>tool/check_layers.sh</code> chặn <code>Color(0x…)</code>, <code>fontSize:</code> và <code>EdgeInsets.all(&lt;số&gt;)</code>
+<p><code>tools/check_layers.sh</code> chặn <code>Color(0x…)</code>, <code>fontSize:</code> và <code>EdgeInsets.all(&lt;số&gt;)</code>
 trong <code>lib/screens/</code> — đây là cơ chế <strong>tự động</strong> bảo đảm "tokens come from the
 theme", không chỉ là quy ước trên giấy.</p>
 <h3 id="24-accessibility">2.4 Accessibility</h3>
@@ -378,7 +378,7 @@ ARTEMIS đọc cây accessibility thay vì đoán từ ảnh.</p>
 <h2 id="3-kien-truc-va-hien-thuc-mvvm">3. Kiến trúc và hiện thực MVVM</h2>
 <h3 id="31-bon-lop-phu-thuoc-chi-i-xuong">3.1 Bốn lớp, phụ thuộc chỉ đi xuống</h3>
 <p><p>(diagram)</p></p>
-<p>Bốn quy tắc bị <strong>kiểm tự động</strong> bằng <code>tool/check_layers.sh</code> (chạy trước mỗi PR):</p>
+<p>Bốn quy tắc bị <strong>kiểm tự động</strong> bằng <code>tools/check_layers.sh</code> (chạy trước mỗi PR):</p>
 <table>
 <thead>
 <tr>
@@ -1025,7 +1025,7 @@ thiết bị; mỗi lần chạy có trace/screenshot trong <code>evidence/artem
 </tr>
 <tr>
 <td>Ràng buộc kiến trúc</td>
-<td><code>bash tool/check_layers.sh</code></td>
+<td><code>bash tools/check_layers.sh</code></td>
 <td><strong>Layers OK</strong> — 0 vi phạm</td>
 </tr>
 <tr>
@@ -1035,7 +1035,7 @@ thiết bị; mỗi lần chạy có trace/screenshot trong <code>evidence/artem
 </tr>
 <tr>
 <td>ARTEMIS TC-02 trên emulator</td>
-<td><code>tool/run_e2e.ps1 -TestPath e2e_test/test_auth.py</code></td>
+<td><code>tools/run_e2e.ps1 -TestPath e2e_test/test_auth.py</code></td>
 <td><strong>1 passed in 110.82s</strong></td>
 </tr>
 </tbody>
@@ -1197,7 +1197,7 @@ Mỗi phát hiện gắn với file và dòng cụ thể.</p>
 <li><strong>Nhận xét của AI phải được kiểm lại trước khi làm.</strong> CR-05 được <strong>modified</strong>
    vì sửa theo gợi ý sẽ vi phạm một quy tắc khác của §5.</li>
 <li><strong>Quy tắc kiến trúc nên được kiểm bằng script, không bằng quy ước miệng.</strong>
-   <code>tool/check_layers.sh</code> + <code>flutter analyze</code> + <code>flutter test</code> chạy trước mỗi PR là
+   <code>tools/check_layers.sh</code> + <code>flutter analyze</code> + <code>flutter test</code> chạy trước mỗi PR là
    lý do 0 vi phạm layer ở lần chạy cuối.</li>
 </ol>
 <hr />
@@ -1239,7 +1239,7 @@ Mỗi phát hiện gắn với file và dòng cụ thể.</p>
 </tbody>
 </table>
 <p>Mọi phát hiện đều được kiểm lại bằng <code>flutter analyze</code>, <code>flutter test</code> (150 test) và
-<code>tool/check_layers.sh</code> trước khi commit. Không có phần code nào được nộp mà
+<code>tools/check_layers.sh</code> trước khi commit. Không có phần code nào được nộp mà
 sinh viên không giải thích được.</p>
 <hr />
 <h2 id="11-ket-luan">11. Kết luận</h2>

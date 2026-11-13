@@ -435,7 +435,7 @@ def analytics_log():
 @pytest.fixture
 def fixture_on_device() -> str:
     """Pushes the demo CSV to the device Download folder; returns its file name."""
-    local = REPO_ROOT / "tool" / "fixtures" / "lab3-demo.csv"
+    local = REPO_ROOT / "tools" / "fixtures" / "lab3-demo.csv"
     adb("push", str(local), "/sdcard/Download/lab3-demo.csv")
     return "lab3-demo.csv"
 

@@ -6,7 +6,7 @@
 > Thu thập lại bằng:
 >
 > ```bash
-> python tool/collect_artemis_evidence.py
+> python tools/collect_artemis_evidence.py
 > ```
 >
 > Script chỉ gọi `GET` trên daemon ARTEMIS (`http://127.0.0.1:8000`) — không

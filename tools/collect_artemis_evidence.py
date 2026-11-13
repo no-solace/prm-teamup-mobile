@@ -7,9 +7,9 @@ actually produced by a run - not by hand.
 
 Usage:
 
-    python tool/collect_artemis_evidence.py
-    python tool/collect_artemis_evidence.py --session <session-id>
-    python tool/collect_artemis_evidence.py --base-url http://127.0.0.1:8000
+    python tools/collect_artemis_evidence.py
+    python tools/collect_artemis_evidence.py --session <session-id>
+    python tools/collect_artemis_evidence.py --base-url http://127.0.0.1:8000
 
 The script is read-only with respect to the ARTEMIS host: it only issues GET
 requests.
@@ -58,7 +58,7 @@ def main() -> int:
         sessions = sessions[: args.limit]
 
     if not sessions:
-        print("[WARN] No ARTEMIS session found. Run the suite first:  tool\\run_e2e.ps1")
+        print("[WARN] No ARTEMIS session found. Run the suite first:  tools\\run_e2e.ps1")
         return 1
 
     EVIDENCE_ROOT.mkdir(parents=True, exist_ok=True)

@@ -123,7 +123,7 @@ flowchart LR
 | **AI/Logic** | `RuleBasedMatchingService` (thuật toán quy tắc thuần Dart) | "AI" ghép theo ngành — giải thích được, test được, không cần ML |
 | **Dev / Test** | Git · Figma · Copilot Code Review · `flutter_test` · Google ARTEMIS | Review truy vết + unit/widget + E2E trên thiết bị thật |
 
-**Quyết định kiến trúc:** chỉ `lib/providers/service_providers.dart` nối interface → bản cài đặt, nên test thay fake bằng `overrideWithValue` mà không sửa ViewModel. `tool/check_layers.sh` kiểm 6 quy tắc tự động — lần chạy cuối: **Layers OK, 0 vi phạm**.
+**Quyết định kiến trúc:** chỉ `lib/providers/service_providers.dart` nối interface → bản cài đặt, nên test thay fake bằng `overrideWithValue` mà không sửa ViewModel. `tools/check_layers.sh` kiểm 6 quy tắc tự động — lần chạy cuối: **Layers OK, 0 vi phạm**.
 
 ## 08 · Sequence Diagram — bên trong một lần duyệt nhóm (WF-02)
 
@@ -243,7 +243,7 @@ sequenceDiagram
 
 | # | Workflow | Dữ liệu | Kết quả mong đợi |
 |---|---|---|---|
-| 01 | **WF-01 · Ghép nhóm cho một lớp** | Lớp `EXE101 Demo` (12 SV, `tool/fixtures/lab3-demo.csv`) | ≥ 1 thẻ đề xuất ở tab Proposals, có chip fit và ô ngành |
+| 01 | **WF-01 · Ghép nhóm cho một lớp** | Lớp `EXE101 Demo` (12 SV, `tools/fixtures/lab3-demo.csv`) | ≥ 1 thẻ đề xuất ở tab Proposals, có chip fit và ô ngành |
 | 02 | **WF-02 · Duyệt một nhóm đề xuất** | Đề xuất đầu tiên | Nhóm 5–6 người; snackbar "Approved" + Undo; badge tab giảm 1 |
 | 03 | **WF-03 · Ghép tay** | Nhóm còn thiếu người | Đề xuất tay, chip "Added by you", duyệt xong |
 
@@ -285,7 +285,7 @@ Bốn phát hiện gần nhất là loại "mồi lỗi" — đều là thứ **
 |---|---|---|
 | 25 màn + 3 flow Lab 2, có đường lỗi | ✅ 25/25 route/state · 3/3 flow | `docs/design-traceability.md`, `e2e_test/` |
 | 6 dịch vụ Firebase, mỗi dịch vụ có ca lỗi | ✅ Auth · Storage · Analytics · FCM · Crashlytics · Remote Config (+ Firestore) | `evidence/`, `docs/architecture.md` §5 |
-| MVVM 4 lớp, phụ thuộc chỉ đi xuống | ✅ **0 vi phạm** / 6 quy tắc, kiểm tự động | `tool/check_layers.sh` → `Layers OK` |
+| MVVM 4 lớp, phụ thuộc chỉ đi xuống | ✅ **0 vi phạm** / 6 quy tắc, kiểm tự động | `tools/check_layers.sh` → `Layers OK` |
 | Design system Lab 2 trong code | ✅ 18 component dùng chung, token trong `ThemeData` | `docs/design-traceability.md` §3–§4 |
 | Analytics ≥ 7 event, **không PII** | ✅ **10 event** có câu hỏi sản phẩm | `docs/analytics-plan.md`, DebugView |
 | Remote Config ≥ 2 tham số đổi hành vi | ✅ `ai_matching_enabled` + `max_proposals_shown` | ảnh trước/sau |
@@ -362,4 +362,4 @@ Tất cả gọi qua `lib/viewmodels/instrumentation.dart` (`trackAnalytics`) �
 | Cursor Agent | Dựng & chạy hạ tầng ARTEMIS thật trên emulator | CR-11, CR-12 |
 | Mermaid CLI (`mmdc`) | Vẽ sơ đồ activity / state / sequence / layer | `build/diagrams/*.svg` |
 
-Mọi phát hiện đều được kiểm lại bằng `flutter analyze`, `flutter test` (150 test) và `tool/check_layers.sh` trước khi commit.
+Mọi phát hiện đều được kiểm lại bằng `flutter analyze`, `flutter test` (150 test) và `tools/check_layers.sh` trước khi commit.
