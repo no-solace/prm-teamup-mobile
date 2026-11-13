@@ -90,7 +90,7 @@ lib/
 ├── router/              routes.dart (hằng số route) + app_router.dart (go_router)
 └── theme/               app_colors, app_typography, app_spacing, app_theme
 firebase/                firestore.rules, indexes, remote-config-defaults.json,
-                         remote-config-template.json (KHÔNG có storage.rules)
+                         remote-config-template.json, storage.rules (chỉ dùng khi bật Storage)
 firebase.json  .firebaserc
 tools/                    check_layers.sh, fixtures/ (CSV mẫu)
 test/                    unit + widget test dùng fake service

@@ -1,0 +1,26 @@
+rules_version = '2';
+
+// Cloud Storage rules for exported class reports (Lab 3 section 6).
+//
+// On the Spark plan the app keeps exported PDFs in Firestore
+// (reports/{id}/files/pdf, see firestore.rules), because a new Storage bucket
+// needs the Blaze plan. These rules apply when the bucket is enabled: each
+// signed-in user can read and write only their own folder, only PDF files of
+// at most 5 MiB. Everything else is denied. Never `allow read, write: if true`.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /reports/{uid}/{fileName} {
+      allow read, delete: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null
+        && request.auth.uid == uid
+        && fileName.matches('[A-Za-z0-9_-]{1,128}\\.pdf')
+        && request.resource.size > 0
+        && request.resource.size <= 5 * 1024 * 1024
+        && request.resource.contentType == 'application/pdf';
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

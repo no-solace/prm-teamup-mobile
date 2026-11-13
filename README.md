@@ -186,7 +186,7 @@ Chi tiết và quyết định cho từng phát hiện: [docs/code-review.md](do
 | `flutter test` | ✅ **175/175 pass** | unit + widget |
 | Firestore rules test | ✅ **30/30 pass** | `npx firebase-tools@15.35.0 emulators:exec --only firestore "node --test firebase/test/firestore.rules.test.mjs"` |
 | `tools/check_layers.sh` | ✅ **Layers OK** | 0 vi phạm layer |
-| Ca ARTEMIS | ⚠️ **đã chạy thật 1 ca** (TC-02 pass 110.82s, 22 ảnh trong `evidence/artemis/`) | cần chạy ≥ 3 lần/ca trên build release + thiết bị thật → điền `docs/test-plan.md` §6 |
+| Ca ARTEMIS | ⚠️ **đã chạy thật 24 lần** (bộ JSON, 21 pass; ảnh từng bước trong `evidence/artemis/2026-11-13/`) | còn thiếu lần chạy thứ 3 của mỗi ca (hết quota Gemini); kết quả ở `docs/test-plan.md` §6.1 |
 | Ảnh Console (dịch vụ Firebase) | ⚠️ **chưa chụp** | checklist trong `evidence/README.md` |
 | `android/app/google-services.json` | ✅ **đã commit** | sinh bởi `flutterfire configure` (đề §9 cho phép commit) |
 | Video demo | ⚠️ **chưa quay** | xem mục trên |

@@ -185,16 +185,16 @@ stateDiagram-v2
 |---|---|---|---|---|
 | `ownerUid` | string | ✔ | 1..128, **immutable** | chủ sở hữu |
 | `classId` | string | ✔ | `safeId`, **immutable** | mentor phải sở hữu lớp |
-| `storagePath` | string | ✔ | ≤ 512; đúng 3 đoạn `reports/{uid}/{file}.pdf` | đường dẫn Cloud Storage |
-| `downloadUrl` | string | ✔ | ≤ 2048; khớp `^https://.*` | URL tải về |
-| `sizeKb` | int | ✔ | 1..10240 | dung lượng |
-| `createdAt` | timestamp | ✔ | `== request.time` khi tạo | |
+| `sizeKb` | int | ✔ | 1..900 | dung lượng |
+| `createdAt` | timestamp | ✔ | `== request.time` khi tạo, **immutable** | |
 
-File PDF **không** nằm trong Firestore. Nó nằm ở Cloud Storage tại
-`reports/{ownerUid}/{reportId}.pdf`; `firebase/storage.rules` chỉ cho
-`request.auth.uid == ownerUid` đọc/ghi/xoá. `downloadUrl` là URL có thời hạn —
-tài liệu này lưu URL tại thời điểm upload, nếu URL hết hạn thì app gọi lại
-`getDownloadURL`.
+File PDF nằm **trong Firestore**, không dùng Cloud Storage (gói Spark không tạo được
+bucket mới). Nội dung file là một document con `reports/{id}/files/pdf` chỉ có trường
+`bytes` (kiểu bytes, tối đa 900 KB để vừa giới hạn 1 MiB của một document), được tạo
+cùng batch với metadata ở trên. `firestore.rules` chỉ cho chủ sở hữu
+(`ownerUid == request.auth.uid`) đọc file này. `firebase/storage.rules` là rules cho
+trường hợp bật Cloud Storage (gói Blaze): mỗi user chỉ đọc/ghi `reports/{uid}/*.pdf` của
+mình, ≤ 5 MiB, `contentType = application/pdf`, còn lại bị chặn.
 
 ---
 
