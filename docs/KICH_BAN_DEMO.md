@@ -25,7 +25,7 @@ Máy demo: điện thoại Android thật, cài `teamup-exe-release.apk` (build 
 | 3 | Import đúng | A: import `EXE101-demo.csv` | Một batch ghi Firestore | Lớp EXE101-SE1801: 25 SV, 4 nhóm, 6 SV chưa có nhóm |
 | 4 | Ghép nhóm | A: Match with AI, duyệt một đề xuất | Rule-based matching; đề xuất cần 5-6 người đủ ngành | Snackbar `Team approved` |
 | 5 | Remote Config | C: đổi `max_proposals_shown` trên Console, publish; A: mở lại app | Đổi hành vi không cần build lại | Số đề xuất hiển thị đổi |
-| 6 | Upload | A: Profile → xuất PDF | Firebase Storage `reports/{uid}`, có tiến độ | `Uploaded ...`; B: web admin hiện dòng mới ở "Báo cáo PDF" |
+| 6 | Upload | A: Profile → xuất PDF | Gói Spark không có Storage: PDF lưu trong Firestore `reports/{id}/files/pdf` (tối đa 900 KB) | `Uploaded ...`; B: web admin hiện dòng mới ở "Báo cáo PDF" |
 | 7 | FCM | C: `node send_fcm.mjs ../serviceAccount.json <uid> "Xin chào" "Thông báo từ server" /notifications` | Token do FCM cấp, client lưu Firestore, server gửi bằng Admin SDK | Thông báo hiện trên máy; vào Notifications thấy lịch sử |
 | 8 | Crashlytics | A: Profile → **Test crash**; mở lại app | Crash native, báo cáo gửi lần mở sau | B: web admin hiện dòng crash ngay; Dev: Firebase Console → Crashlytics (chờ vài phút) |
 
@@ -37,7 +37,7 @@ Bước 8 để cuối vì app đóng. Nếu Crashlytics Console chưa cập nh�
 | Đăng nhập Google lỗi 10 / DEVELOPER_ERROR | APK không phải bản build từ máy đã đăng ký SHA-1; cài lại đúng APK |
 | Không nhận FCM | Chưa Allow thông báo, hoặc thiếu `data.uid` (app bỏ tin không khớp uid), hoặc token cũ: mở app, Notifications → bật lại |
 | Web admin báo không phải admin | Thiếu `admins/<uid>` trong Firestore |
-| Upload PDF lỗi | Kiểm tra mạng; Storage rules; dùng ảnh/PDF đã chụp lúc chạy thử |
+| Upload PDF lỗi | Kiểm tra mạng và rules Firestore; dùng ảnh/PDF đã chụp lúc chạy thử |
 | Crash không thấy trên Console | Phải là bản release; mở lại app sau crash; chờ vài phút |
 
 ## Câu hỏi thầy có thể hỏi (FCM)
