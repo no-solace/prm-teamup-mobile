@@ -5,5 +5,12 @@
   },
   "remoteconfig": {
     "template": "firebase/remote-config-template.json"
+  },
+  "hosting": {
+    "public": "admin-web",
+    "ignore": [
+      "firebase.json",
+      "**/.*"
+    ]
   }
 }

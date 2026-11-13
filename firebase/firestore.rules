@@ -30,6 +30,11 @@ service cloud.firestore {
       return signedIn()
         && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'mentor';
     }
+    // Admin web: a document admins/{uid} created by hand in the console.
+    function isAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
     function ownsClass(classId) {
       return isMentor()
         && get(/databases/$(database)/documents/classes/$(classId)).data.mentorUid == request.auth.uid;
@@ -449,8 +454,17 @@ service cloud.firestore {
     match /{path=**}/proposals/{id} {
       allow read: if isMentor() && resource.data.mentorUid == request.auth.uid;
     }
+    match /crashReports/{id} {
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['uid', 'kind', 'platform', 'createdAt'])
+        && request.resource.data.createdAt == request.time;
+      allow read: if isAdmin();
+    }
+    match /admins/{uid} {
+      allow read: if isSelf(uid);
+    }
     match /reports/{id} {
-      allow read: if isMentor() && resource.data.ownerUid == request.auth.uid;
+      allow read: if isAdmin() || (isMentor() && resource.data.ownerUid == request.auth.uid);
       allow create: if isMentor() && validReport(request.resource.data)
         && request.resource.data.ownerUid == request.auth.uid
         && request.resource.data.createdAt == request.time;

@@ -100,7 +100,7 @@ class FakeCrashService implements CrashService {
     required String reason,
   }) async => nonFatals.add('$reason: $error');
   @override
-  void testCrash() => throw StateError('Test crash (fake)');
+  Future<void> testCrash() async => throw StateError('Test crash (fake)');
 }
 
 class FakeConfigService implements ConfigService {

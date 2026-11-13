@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TeamUp Admin</title>
+<style>
+  body{font-family:system-ui,sans-serif;margin:0;background:#f4f6f8;color:#1b1f23}
+  header{background:#0b57d0;color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}
+  main{max-width:960px;margin:20px auto;padding:0 16px}
+  section{background:#fff;border-radius:10px;padding:16px;margin-bottom:20px;box-shadow:0 1px 3px #0002}
+  h2{margin-top:0;font-size:18px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:8px;border-bottom:1px solid #e3e6ea}
+  button{background:#0b57d0;color:#fff;border:0;border-radius:6px;padding:8px 14px;cursor:pointer}
+  #msg{color:#b3261e}
+  .muted{color:#666;font-size:13px}
+</style>
+</head>
+<body>
+<header><strong>TeamUp EXE - Admin</strong><span><span id="who"></span> <button id="out" hidden>Đăng xuất</button></span></header>
+<main>
+  <section id="login">
+    <h2>Đăng nhập admin</h2>
+    <button id="in">Đăng nhập bằng Google</button>
+    <p id="msg"></p>
+  </section>
+  <div id="app" hidden>
+    <section>
+      <h2>Crash từ app (<span id="ccount">0</span>)</h2>
+      <p class="muted">Cập nhật tự động. Chi tiết stack trace: Firebase Console → Crashlytics (team Dev).</p>
+      <table><thead><tr><th>Thời gian</th><th>Loại</th><th>UID</th><th>Nền tảng</th></tr></thead><tbody id="crashes"></tbody></table>
+    </section>
+    <section>
+      <h2>Báo cáo PDF đã xuất (<span id="rcount">0</span>)</h2>
+      <table><thead><tr><th>Thời gian</th><th>Lớp</th><th>Kích thước</th><th>Tải</th></tr></thead><tbody id="reports"></tbody></table>
+    </section>
+  </div>
+</main>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+import {getFirestore,doc,getDoc,collection,query,orderBy,limit,onSnapshot} from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+const app = initializeApp({
+  apiKey:"AIzaSyDDn6w_pUyOfXGP9pYJ_RFdbZkDyZUouOw",
+  authDomain:"prm-lab3-cc39e.firebaseapp.com",
+  projectId:"prm-lab3-cc39e",
+  appId:"1:508852657563:web:0f3bdc1879cfffc36a553e"
+});
+const auth=getAuth(app), db=getFirestore(app);
+const $=id=>document.getElementById(id);
+const fmt=t=>t?.toDate?t.toDate().toLocaleString("vi-VN"):"(đang ghi)";
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let unsubs=[];
+
+$("in").onclick=()=>signInWithPopup(auth,new GoogleAuthProvider()).catch(e=>$("msg").textContent=e.message);
+$("out").onclick=()=>signOut(auth);
+
+onAuthStateChanged(auth,async user=>{
+  unsubs.forEach(u=>u()); unsubs=[];
+  $("app").hidden=true; $("login").hidden=!!user; $("out").hidden=!user; $("who").textContent=user?.email??"";
+  if(!user) return;
+  const isAdmin=(await getDoc(doc(db,"admins",user.uid))).exists();
+  if(!isAdmin){ $("login").hidden=false; $("msg").textContent="Tài khoản này không phải admin (thiếu document admins/"+user.uid+")."; return; }
+  $("msg").textContent=""; $("login").hidden=true; $("app").hidden=false;
+  unsubs.push(onSnapshot(query(collection(db,"crashReports"),orderBy("createdAt","desc"),limit(100)),s=>{
+    $("ccount").textContent=s.size;
+    $("crashes").innerHTML=s.docs.map(d=>{const x=d.data();return `<tr><td>${fmt(x.createdAt)}</td><td>${esc(x.kind)}</td><td>${esc(x.uid)}</td><td>${esc(x.platform)}</td></tr>`}).join("");
+  },e=>$("msg").textContent=e.message));
+  unsubs.push(onSnapshot(query(collection(db,"reports"),orderBy("createdAt","desc"),limit(100)),s=>{
+    $("rcount").textContent=s.size;
+    $("reports").innerHTML=s.docs.map(d=>{const x=d.data();return `<tr><td>${fmt(x.createdAt)}</td><td>${esc(x.classId)}</td><td>${esc(x.sizeKb)} KB</td><td><a href="${esc(x.downloadUrl)}" target="_blank" rel="noopener">PDF</a></td></tr>`}).join("");
+  },e=>$("msg").textContent=e.message));
+});
+</script>
+</body>
+</html>

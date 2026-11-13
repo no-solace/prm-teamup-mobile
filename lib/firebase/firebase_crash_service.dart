@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 import '../services/crash_service.dart';
@@ -27,7 +29,27 @@ class FirebaseCrashService implements CrashService {
   Future<void> recordNonFatal(Object error, StackTrace? stack, {required String reason}) =>
       _c.recordError(error, stack, reason: reason, fatal: false);
 
-  /// Report appears in the console after the app is opened again.
+  /// Demo: log the crash to Firestore (feeds the admin web), then crash
+  /// natively. Crashlytics shows the report in the Firebase console (team Dev
+  /// view) after the app is opened again.
   @override
-  void testCrash() => _c.crash();
+  Future<void> testCrash() async {
+    try {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid != null) {
+        await FirebaseFirestore.instance
+            .collection('crashReports')
+            .add({
+              'uid': uid,
+              'kind': 'test_crash',
+              'platform': 'android',
+              'createdAt': FieldValue.serverTimestamp(),
+            })
+            .timeout(const Duration(seconds: 4));
+      }
+    } catch (_) {
+      /* Never block the crash demo on logging. */
+    }
+    _c.crash();
+  }
 }

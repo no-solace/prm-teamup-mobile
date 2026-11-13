@@ -56,7 +56,7 @@ class ProfileViewModel extends Notifier<ProfileState> {
     }
   }
 
-  void testCrash() => ref.read(crashServiceProvider).testCrash();
+  Future<void> testCrash() => ref.read(crashServiceProvider).testCrash();
 }
 
 final profileViewModelProvider =

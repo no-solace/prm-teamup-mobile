@@ -9,5 +9,5 @@ abstract interface class CrashService {
   Future<void> recordNonFatal(Object error, StackTrace? stack, {required String reason});
 
   /// Demo area only (S6). Never reachable in normal use.
-  void testCrash();
+  Future<void> testCrash();
 }
