@@ -149,7 +149,7 @@ Bốn quy tắc bị **kiểm tự động** bằng `tools/check_layers.sh` (ch�
 | Service interface thuần Dart + fake trong `services/fakes/` | ViewModel test được với fake, không cần Firebase |
 | `RuleBasedMatchingService` thay vì mô hình ML | Lab 3 §3 nói "no ML model, as in Lab 2"; thuật toán quy tắc giải thích được và test thuần Dart |
 | Approve/undo bằng Firestore **transaction** | Roster là dữ liệu dùng chung; transaction chặn hai mentor duyệt trùng một sinh viên |
-| Đường dẫn Storage theo user `reports/{uid}/…` | Rubric Storage: "security rules allow each user to read and write only their own folder" |
+| PDF lưu trong Firestore, rules chỉ cho chủ sở hữu (`ownerUid`) | Gói Spark không tạo được bucket Storage; vẫn giữ ý rubric "each user can read and write only their own" (và có sẵn `storage.rules` theo `reports/{uid}/…`) |
 
 ### 3.3 Sequence — Flow A đầy đủ
 
@@ -203,10 +203,10 @@ sequenceDiagram
   SV->>FB: đọc lại classes/{id}/teams (cùng dữ liệu đang hiển thị)
   SV-->>VM: BuiltReport(bytes, teamCount)
   VM->>SV: StorageService.uploadReport(classId, bytes)
-  SV->>FB: Storage: reports/{uid}/{id}.pdf (snapshotEvents → progress)
-  SV-->>VM: UploadDone(Report + downloadUrl)
+  SV->>FB: batch: reports/{id} (metadata) + reports/{id}/files/pdf (bytes)
+  SV-->>VM: UploadProgress 0 → 1, UploadDone(Report)
   VM->>FB: Analytics: report_export(team_count, file_size_kb)
-  VM-->>S: hiện progress + download URL
+  VM-->>S: hiện progress + đường dẫn file + danh sách Saved reports
 ```
 
 ### 3.4 Bảng ViewModel → Service (rút gọn)
@@ -220,7 +220,7 @@ sequenceDiagram
 | `ImportClassViewModel` | `ClassService`, `AnalyticsService`, `CrashService` | `CsvClassImporter` + Firestore batch |
 | `MatchingViewModel` | `ClassService`, `MatchingService`, `ProposalService`, `AnalyticsService`, `CrashService` | Firestore + `RuleBasedMatchingService` |
 | `ProposalActionViewModel` | `ProposalService`, `ClassService`, `AnalyticsService`, `CrashService` | Firestore transaction |
-| `ReportDemoActions` | `ReportService`, `StorageService`, `AnalyticsService`, `CrashService` | `pdf` → Cloud Storage |
+| `ReportDemoActions` | `ReportService`, `StorageService`, `AnalyticsService`, `CrashService` | `pdf` → Firestore (`FirestoreReportStorage`) |
 | `appConfigProvider` | `ConfigService` | Firebase Remote Config (realtime) |
 | `inboxProvider` | `NotificationService`, `NotificationStore` | Firestore + FCM |
 | (toàn cục) `instrumentation.dart` | `AnalyticsService`, `CrashService` | Analytics / Crashlytics |
@@ -229,7 +229,7 @@ Bảng đầy đủ 20 dòng ở `docs/architecture.md` §4.
 
 ### 3.5 Kiểm thử tự động ở tầng unit
 
-`flutter test` chạy **150 test** (unit + widget + integration) và **150/150 pass**:
+`flutter test` chạy **175 test** (unit + widget + integration) và **175/175 pass**:
 
 | Nhóm | Số test | Nội dung |
 |---|---|---|
@@ -271,19 +271,30 @@ Bảng đầy đủ 20 dòng ở `docs/architecture.md` §4.
 * **Bằng chứng:** `firebase/firestore.rules` + bộ test luật
   `firebase/test/firestore.rules.test.mjs` (chạy trên Rules emulator).
 
-### 4.3 Cloud Storage
+### 4.3 Lưu file (thay Cloud Storage trên gói Spark)
 
-* **Cài đặt:** `lib/firebase/firebase_storage_service.dart`,
+* **Vì sao không dùng Cloud Storage:** project chạy gói **Spark**; tạo bucket Storage
+  mới cần gói Blaze (gắn thẻ thanh toán). Nhóm giữ nguyên interface `StorageService`
+  và lưu file trong **Firestore**, nên đổi sang Cloud Storage sau này chỉ cần thay
+  một lớp cài đặt.
+* **Cài đặt:** `lib/firebase/firestore_report_storage.dart` (cài `StorageService`),
   `lib/firebase/pdf_report_service.dart`.
 * **Hành vi:** sinh PDF bằng package `pdf` từ **cùng stream Firestore mà mentor đang
-  xem** (nên file phản ánh đúng màn hình), upload vào `reports/{uid}/{id}.pdf`,
-  theo dõi tiến độ bằng `snapshotEvents`, hiển thị **storage path + download URL**
-  (dùng `SelectableText` để copy được).
-* **Ca lỗi:** upload lỗi → thông báo + Crashlytics non-fatal; mất mạng → retry.
-* **Bảo mật:** `firebase/storage.rules` chỉ cho `request.auth.uid == uid` đọc/ghi
-  đúng thư mục của mình, chỉ nhận `.pdf`, ≤ 5 MiB, `contentType` phải là
-  `application/pdf`. **Không** dùng `allow read, write: if true`.
-* **Bằng chứng:** ảnh Storage Console (danh sách file), ảnh màn hiển thị URL.
+  xem** (nên file phản ánh đúng màn hình). Một `batch` ghi cùng lúc metadata
+  `reports/{id}` (`ownerUid`, `classId`, `sizeKb`, `createdAt`) và nội dung file
+  `reports/{id}/files/pdf` (`bytes`, ≤ 900 KB vì một document tối đa 1 MiB), nên không
+  bao giờ có metadata mà thiếu file. Màn S6 hiện **tiến độ**, **đường dẫn file**
+  (`SelectableText`, copy được) và danh sách **Saved reports**; chạm một mục để tải
+  lại và chia sẻ PDF.
+* **Ca lỗi:** file rỗng hoặc quá 900 KB → `ValidationError`; lớp không thuộc mentor →
+  `PermissionDeniedError`; ghi lỗi → thông báo + Crashlytics non-fatal.
+* **Bảo mật:** `firestore.rules` chỉ cho chủ sở hữu (`ownerUid == request.auth.uid`)
+  đọc metadata và file, file chỉ được tạo cùng batch với metadata của chính mình.
+  `firebase/storage.rules` để sẵn cho khi bật Cloud Storage: mỗi user chỉ đọc/ghi
+  `reports/{uid}/*.pdf` của mình, ≤ 5 MiB, `contentType = application/pdf`. **Không**
+  dùng `allow read, write: if true`.
+* **Bằng chứng:** ảnh Firestore Console (`reports/{id}` và `files/pdf`), ảnh màn S6 hiện
+  tiến độ và đường dẫn file; ca ARTEMIS `test_tc11_export_pdf_and_upload` pass 2/2.
 
 ### 4.4 Cloud Messaging (FCM)
 
@@ -378,7 +389,7 @@ logcat dùng cho ARTEMIS (test `TC-17` kiểm `ai_match_start` **và** `ai_match
 | User ID trong Crashlytics | Ảnh hiển thị user ID | `evidence/crashlytics/` |
 | Remote Config `ai_matching_enabled` | Ảnh Console giá trị `false` + ảnh app **không** có nút Match with AI | `evidence/remote-config/` |
 | Remote Config `max_proposals_shown` | Ảnh Console giá trị `5` + ảnh app hiện 5 thẻ | `evidence/remote-config/` |
-| Storage download URL | Ảnh màn S6 hiện URL + ảnh Storage Console | `evidence/storage/` |
+| Lưu file PDF | Ảnh màn S6 hiện tiến độ + đường dẫn file + ảnh Firestore Console (`reports/{id}/files/pdf`) | `evidence/storage/` |
 | Authentication users | Ảnh Console → Authentication → Users | `evidence/auth/` |
 | FCM 3 trạng thái | 3 ảnh: foreground, background, terminated | `evidence/fcm/` |
 
@@ -401,16 +412,20 @@ logcat dùng cho ARTEMIS (test `TC-17` kiểm `ai_match_start` **và** `ai_match
 | Flow A | 4 | Import CSV → kết quả import → Match with AI → chi tiết đề xuất |
 | Flow B | 3 | Add member, **lỗi vượt 6**, **lỗi dưới 5** |
 | Flow C | 3 | Need members, **lỗi không tìm ra SV**, Discard |
-| Export / FCM / Analytics / Crash | 4 | Upload PDF có URL, thông báo (native: notification shade), logcat Analytics, crash thử (native) |
+| Export / FCM / Analytics / Crash | 4 | Lưu PDF có đường dẫn file, thông báo (native: notification shade), logcat Analytics, crash thử (native) |
 | Khám phá | 1 | Phiên 15–30 phút, Pro profile, không kịch bản |
 
 **Tổng: 18 ca script + 1 phiên khám phá** (yêu cầu ≥ 10).
 
-> **Trạng thái:** bộ test đã **được viết đầy đủ và kiểm tra cú pháp**, và
-> **đã chạy thật trên emulator `emulator-5554`** (Android 14) với daemon ARTEMIS thật:
-> `TC-02` (3 tab) **pass trong 110.82s**. Các ca còn lại **chưa chạy** — bảng kết quả §7.3
-> ghi rõ từng trạng thái, không bịa báo cáo. Đề §7 yêu cầu **chạy ≥ 3 lần/ca**
-> **trên build release + thiết bị thật**; phần đó được ghi ở §9.
+Ngoài 18 ca kiểu free-text ở trên, `e2e_test/` còn **13 ca kiểu JSON** (agent trả
+về JSON, test so sánh đúng từng giá trị) và 1 ca thông báo đẩy chỉ chạy khi có người
+gửi tin từ Console.
+
+> **Trạng thái:** bộ JSON đã **chạy thật 24 lần** trên emulator Pixel 7 (Android 14),
+> ARTEMIS host commit `351ca84`, model `gemini-3.6-flash`: **21 pass, 3 fail**. Lần chạy
+> 1 đủ 13 ca, lần 2 dừng sau ca thứ 11 vì hết quota Gemini, nên **chưa đạt 3 lần/ca**.
+> Bộ free-text mới chạy 2 ca (`TC-01` fail, `TC-02` pass). Bảng §7.3 ghi đúng từng
+> trạng thái, không bịa kết quả.
 
 ### 7.2 Vì sao kết quả đáng tin
 
@@ -431,36 +446,50 @@ logcat dùng cho ARTEMIS (test `TC-17` kiểm `ai_match_start` **và** `ai_match
 
 ### 7.3 Bảng kết quả
 
-> Bảng đầy đủ (test ID, số lần chạy, pass rate, thời gian trung bình, giải thích
-> ca flaky) ở `docs/test-plan.md` §6–§7. Số liệu được điền sau khi chạy thật trên
-> thiết bị; mỗi lần chạy có trace/screenshot trong `evidence/artemis/`.
+> Bảng đầy đủ (số lần chạy, thời gian trung bình, giải thích ca fail/flaky) ở
+> `docs/test-plan.md` §6–§7. Ảnh từng bước của cả 24 lần chạy ở
+> `evidence/artemis/2026-11-13/screenshots.md`.
 
-| Test ID | Nhóm | Loại | Pass rate | Bằng chứng |
+**Bộ JSON (chạy 2026-11-13):**
+
+| Ca | Nhóm | Loại | Pass | TG TB |
 |---|---|---|---|---|
-| TC-01 | Sign-in | Native | chưa chạy | `evidence/artemis/` |
-| TC-02 | 3 tab | Happy path | **1/1 pass** (110.82s, emulator) | `evidence/artemis/0797238d-da09-49d8-b3c4-49e5c9041348/` |
-| TC-03 | Remote Config | Happy path | chưa chạy | `evidence/artemis/` |
-| TC-04 | Sign-out | Happy path | chưa chạy | `evidence/artemis/` |
-| TC-05…TC-08 | Flow A | Happy path | chưa chạy | `evidence/artemis/` |
-| TC-09 | Add member | Happy path | chưa chạy | `evidence/artemis/` |
-| TC-10 | Vượt 6 | **Error path** | chưa chạy | `evidence/artemis/` |
-| TC-11 | Dưới 5 | **Error path** | chưa chạy | `evidence/artemis/` |
-| TC-12…TC-14 | Flow C | Happy + error | chưa chạy | `evidence/artemis/` |
-| TC-15 | Export/upload | Happy path | chưa chạy | `evidence/artemis/` |
-| TC-16 | FCM | **Native** | chưa chạy | `evidence/artemis/` |
-| TC-17 | Analytics logcat | Happy path | chưa chạy | `evidence/artemis/` |
-| TC-18 | Crash thử | **Native** | chưa chạy | `evidence/artemis/` |
-| EX-01 | Khám phá | Exploratory | chưa chạy | `evidence/artemis/exploratory/` |
+| TC-19 Đăng nhập Google | Sign-in | **Native**, analytics | 2/2 | 66s |
+| TC-20 Đăng xuất | Sign-out | Happy path | 2/2 | 68s |
+| TC-21 Email sai | Sign-in | **Error path** | 2/2 | 85s |
+| TC-22 Nhập CSV (12 / 9 / 3) | Flow A | Analytics | 2/2 | 72s |
+| TC-23 Ghép AI rồi duyệt | Flow A | Hành động chính | 2/2 | 155s |
+| S25 Bỏ thành viên, nhóm dưới 5 | Flow B | **Error path** | **0/2** | 193s |
+| S17 + S21 Hủy đề xuất, tìm không ra | Flow C | **Error path** | 2/2 | 149s |
+| Chi tiết lớp và sinh viên | Màn chi tiết | Happy path | 2/2 | 143s |
+| Tab và Back | Điều hướng | Happy path | 1/2 | 55s |
+| Remote Config đổi hành vi | Remote Config | Happy path | 2/2 | 112s |
+| Xuất PDF và lưu | Export | Analytics | 2/2 | 140s |
+| Hộp thoại quyền thông báo | Native | **Native** | 1/1 | 117s |
+| S18 Mất mạng khi ghép | Flow A | **Error path** | 1/1 | 124s |
+
+* **S25 fail 0/2 là lỗi thật của app, test bắt đúng:** bản `main` lúc chạy hiện câu
+  `Approval needs at least 5 and at most 6 members.` thay vì banner Lab 2
+  `Needs at least 5 members (now 4)`. Đã sửa bằng `ErrorBanner` trong
+  `proposal_detail_screen.dart`; ca này cần chạy lại để xác nhận.
+* **Tab và Back 1/2 là lỗi harness:** host đánh dấu session xong trước khi lưu bước báo
+  cáo cuối, nên test đọc thiếu. Đã thêm thử lại trong `_fetch_session_steps`.
+
+**Bộ free-text:** `TC-02` (3 tab) **pass** 110.82s
+(`evidence/artemis/b495eec3-ff06-485e-812c-0ee943068945/`); `TC-01` **fail** 245.05s
+(`evidence/artemis/0797238d-da09-49d8-b3c4-49e5c9041348/`), lúc đó máy chạy test chưa
+có SHA-1 trong Firebase nên đăng nhập Google không qua được. Các ca free-text còn lại
+và phiên khám phá EX-01 chưa chạy.
 
 **Các kiểm thử đã chạy thật và xanh:**
 
 | Bộ test | Lệnh | Kết quả |
 |---|---|---|
-| Unit / widget / integration Dart | `flutter test` | **150/150 pass** |
-| Firestore Security Rules | `npx firebase-tools@15.35.0 emulators:exec --only firestore --project demo-teamup-data "node --test firebase/test/firestore.rules.test.mjs"` | **21/21 pass** |
+| Unit / widget / integration Dart | `flutter test` | **175/175 pass** |
+| Firestore Security Rules | `npx firebase-tools@15.35.0 emulators:exec --only firestore --project demo-teamup-data "node --test firebase/test/firestore.rules.test.mjs"` | **30/30 pass** |
 | Ràng buộc kiến trúc | `bash tools/check_layers.sh` | **Layers OK** — 0 vi phạm |
 | Phân tích tĩnh | `flutter analyze` | **No issues found** |
-| ARTEMIS TC-02 trên emulator | `tools/run_e2e.ps1 -TestPath e2e_test/test_auth.py` | **1 passed in 110.82s** |
+| ARTEMIS bộ JSON trên emulator | `pytest -m "not exploratory"` (2 lần) | **21/24 pass** (xem §7.3) |
 
 ---
 
@@ -480,7 +509,7 @@ Mỗi phát hiện gắn với file và dòng cụ thể.
 | CR-01 | 5 event Analytics + `recordNonFatal` có trong interface nhưng **không có call site** | Accepted | Vi phạm §6; 0/10 event có dữ liệu trong DebugView | `1b6fea8` |
 | CR-02 | `max_proposals_shown` chỉ được **in ra**, không giới hạn danh sách | Accepted | Rubric ghi rõ "Values only printed, not used" → 0 điểm | `9cf68f5` |
 | CR-03 | Màn dùng `Chip`/`AlertDialog` tự chế thay vì component Lab 2 | Accepted | §10 trừ điểm "one-off widgets instead of Lab 2 components" | `000f51b` |
-| CR-04 | Thiếu **download URL** ở khu demo Storage | Accepted | §6 yêu cầu "show progress and the download URL" | `7c0fc66` |
+| CR-04 | Thiếu **download URL** ở khu demo Storage | Accepted | §6 yêu cầu "show progress and the download URL". Sau khi chuyển sang lưu trong Firestore (gói Spark), màn S6 hiện đường dẫn file thay cho URL | `7c0fc66` |
 | CR-05 | `report_export.teamCount` là số bịa | **Modified** | Sửa theo gợi ý AI sẽ vi phạm luật layer (ViewModel đọc Firestore) → đổi hợp đồng interface thành `BuiltReport(bytes, teamCount)` | `1b6fea8` |
 | CR-06 | Constructor gọi `Firebase*.instance` ngay khi provider được đọc | Accepted | Crash nếu Firebase chưa sẵn sàng; §6 yêu cầu xử lý lỗi bằng thông báo | `1b6fea8` |
 | CR-07 | Ghi `ai_match_result` cho màn đã dispose | Accepted | Phễu DebugView lệch → kết luận sai kiểu "AI thất bại nhiều" | `1b6fea8` |
@@ -506,7 +535,9 @@ Mỗi phát hiện gắn với file và dòng cụ thể.
 | `max_proposals_shown` làm smoke test chọn khác nhóm so với trước | Sửa fake + cập nhật kỳ vọng test theo hành vi mới |
 | Rubric đòi tên event chuẩn của Firebase khi phù hợp | Dùng `login`, `logout`, `view_item`; các event còn lại `snake_case` |
 | Figma chưa cập nhật cho 4 sai lệch D1–D4 | Ghi rõ trong `design-traceability.md` §5; cập nhật Figma trước khi nộp |
-| Cloud Storage cần gói Blaze để upload | Dùng `us-central1` (trong hạn mức miễn phí) + budget alert 1 USD; gỡ thẻ hoặc hạ về Spark sau khi chấm |
+| Cloud Storage cần gói Blaze (gắn thẻ) để tạo bucket | Giữ gói Spark, lưu PDF trong Firestore (`reports/{id}/files/pdf`, ≤ 900 KB) sau cùng interface `StorageService`; `storage.rules` để sẵn cho khi nâng gói |
+| Đăng nhập Google lỗi `UNREGISTERED_ON_API_CONSOLE` trên máy chạy test | Thêm SHA-1 debug của máy đó vào Firebase, tải lại `google-services.json` |
+| Quota Gemini cho ARTEMIS: key trả trước hết tiền, key miễn phí chỉ 20 request/ngày (1 ca ≈ 26 request) | Tắt `step_summarizer` (giảm ~nửa số request), ghi kết quả từng phần, chạy tiếp khi có quota |
 
 ### 9.2 Bài học
 
@@ -536,7 +567,7 @@ Mỗi phát hiện gắn với file và dòng cụ thể.
 | GitHub Copilot Code Review | Rà soát pull request, sinh danh sách phát hiện | CR-01, CR-02, CR-03, CR-04, CR-06, CR-08 |
 | Mermaid CLI (`mmdc`) | Vẽ sơ đồ activity / state / sequence / layer | `build/diagrams/*.svg` → nhúng vào báo cáo và slide |
 
-Mọi phát hiện đều được kiểm lại bằng `flutter analyze`, `flutter test` (150 test) và
+Mọi phát hiện đều được kiểm lại bằng `flutter analyze`, `flutter test` (175 test) và
 `tools/check_layers.sh` trước khi commit. Không có phần code nào được nộp mà
 sinh viên không giải thích được.
 

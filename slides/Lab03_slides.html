@@ -176,7 +176,7 @@ hr {
 </tr>
 <tr>
 <td><strong>Bằng chứng</strong></td>
-<td>App chạy thật trên máy · 150/150 test Dart · 21/21 test Firestore rules · 18 ca ARTEMIS + 1 phiên khám phá (đã viết) · 10 phát hiện AI review có 5 commit sửa</td>
+<td>App chạy thật trên máy · 175/175 test Dart · 30/30 test Firestore rules · 18 ca ARTEMIS + 1 phiên khám phá (đã viết) · 10 phát hiện AI review có 5 commit sửa</td>
 </tr>
 </tbody>
 </table>
@@ -356,7 +356,7 @@ hr {
 <tr>
 <td><strong>BR-07</strong></td>
 <td>Chỉ mentor sở hữu lớp được sửa lớp đó</td>
-<td><code>firestore.rules</code>, <code>storage.rules</code></td>
+<td><code>firestore.rules</code> (<code>ownsClass</code>, <code>ownerUid</code>)</td>
 <td>rules test</td>
 </tr>
 </tbody>
@@ -512,11 +512,11 @@ hr {
 <p><strong>Cloud Firestore</strong> — đọc realtime bằng <code>Stream</code>, ghi bằng <code>batch</code> (import) hoặc <code>transaction</code> (duyệt/undo). <code>firestore.rules</code> khoá theo <code>mentorUid</code>, chặn sửa <code>status</code>/<code>source</code> sau khi tạo, và chỉ cho <code>approve</code> khi roster 5–6.
 <em>Ca lỗi:</em> <code>permission-denied</code> → <code>PermissionDeniedError</code> · <code>unavailable</code> → <code>NetworkError</code> · <code>deadline-exceeded</code> → <code>TimeoutAppError</code> — tất cả ra <code>Failure</code> kèm nút "Try again".
 <em>Bằng chứng:</em> <code>firebase/firestore.rules</code> + bộ test luật trên Rules emulator (<code>firebase/test/firestore.rules.test.mjs</code>).</p>
-<h2 id="11-firebase-cloud-storage-cloud-messaging">11 · Firebase — Cloud Storage &amp; Cloud Messaging</h2>
-<p><strong>Cloud Storage</strong> — sinh PDF bằng package <code>pdf</code> từ <strong>cùng stream Firestore mà mentor đang xem</strong> (nên file phản ánh đúng màn hình) → upload <code>reports/{uid}/{id}.pdf</code> → hiện <strong>tiến độ + storage path + download URL</strong> (copy được).
-<code>storage.rules</code>: chỉ <code>request.auth.uid == uid</code> đọc/ghi thư mục của mình, chỉ nhận <code>.pdf</code>, ≤ 5 MiB, <code>contentType = application/pdf</code>. <strong>Không</strong> dùng <code>allow read, write: if true</code>.
-<em>Ca lỗi:</em> upload lỗi → thông báo + Crashlytics non-fatal; mất mạng → retry.
-<em>Bằng chứng:</em> ảnh Storage Console (danh sách file) + ảnh màn S6 hiện URL.</p>
+<h2 id="11-firebase-luu-file-pdf-cloud-messaging">11 · Firebase — Lưu file PDF &amp; Cloud Messaging</h2>
+<p><strong>Lưu file PDF (gói Spark)</strong> — tạo bucket Cloud Storage cần gói Blaze, nên PDF lưu <strong>trong Firestore</strong> sau cùng interface <code>StorageService</code>. Sinh PDF bằng package <code>pdf</code> từ <strong>cùng stream Firestore mà mentor đang xem</strong> → một <code>batch</code> ghi metadata <code>reports/{id}</code> + nội dung <code>reports/{id}/files/pdf</code> (≤ 900 KB) → hiện <strong>tiến độ + đường dẫn file</strong> (copy được) + danh sách <strong>Saved reports</strong>.
+<em>Bảo mật:</em> <code>firestore.rules</code> chỉ cho chủ sở hữu (<code>ownerUid</code>) đọc file của mình; <code>storage.rules</code> để sẵn cho khi nâng gói (mỗi user chỉ <code>reports/{uid}/*.pdf</code>, ≤ 5 MiB). <strong>Không</strong> dùng <code>allow read, write: if true</code>.
+<em>Ca lỗi:</em> file rỗng / quá 900 KB → báo lỗi; ghi lỗi → thông báo + Crashlytics non-fatal.
+<em>Bằng chứng:</em> ảnh Firestore Console (<code>reports/{id}/files/pdf</code>) + ảnh màn S6; ca ARTEMIS "Xuất PDF và lưu" pass 2/2.</p>
 <p><strong>Cloud Messaging (FCM)</strong> — xin quyền thông báo Android 13+; token lưu ở <code>users/{uid}/fcmTokens/{tokenId}</code>; thông báo nhận được lưu vào <strong>trung tâm thông báo trong app</strong>; chạm thông báo điều hướng theo payload <code>route</code> — <strong>chỉ</strong> khi route nằm trong allow-list (chống deep-link tới màn ngoài phạm vi).
 <em>Ca lỗi:</em> người dùng từ chối quyền → app vẫn chạy, hiện thông báo rõ, các tính năng khác không bị chặn.
 <em>Bằng chứng:</em> ảnh nhận thông báo ở <strong>3 trạng thái</strong> — mở / nền / đã đóng.</p>
@@ -681,7 +681,7 @@ hr {
 </tr>
 </tbody>
 </table>
-<p><strong>Thứ tự video:</strong> đăng nhập → 3 flow (kèm đường lỗi) → xuất &amp; upload PDF → nhận thông báo → đổi Remote Config không build lại → demo Crashlytics → chạy 1 ca ARTEMIS trên thiết bị → 1 phát hiện AI review kèm fix.</p>
+<p><strong>Thứ tự video:</strong> đăng nhập → 3 flow (kèm đường lỗi) → xuất &amp; lưu PDF → nhận thông báo → đổi Remote Config không build lại → demo Crashlytics → chạy 1 ca ARTEMIS trên thiết bị → 1 phát hiện AI review kèm fix.</p>
 <h2 id="14-testing-ai-code-review-hai-phan-chung-minh">14 · Testing &amp; AI Code Review — hai phần "chứng minh"</h2>
 <p><strong>Testing — Google ARTEMIS</strong></p>
 <table>
@@ -697,26 +697,26 @@ hr {
 <tr>
 <td>Unit / widget / integration</td>
 <td><code>flutter_test</code></td>
-<td><strong>150 test</strong></td>
-<td><strong>150/150 pass</strong></td>
+<td><strong>175 test</strong></td>
+<td><strong>175/175 pass</strong></td>
 </tr>
 <tr>
 <td>E2E / UI</td>
 <td><strong>Google ARTEMIS</strong> (pytest)</td>
-<td><strong>18 ca + 1 phiên khám phá</strong></td>
-<td><strong>đã chạy thật</strong> trên emulator <code>emulator-5554</code>: <code>TC-02</code> pass trong <strong>110.82s</strong>; các ca còn lại cần chạy ≥ 3 lần trên build release</td>
+<td><strong>18 ca free-text + 13 ca JSON + 1 phiên khám phá</strong></td>
+<td>Bộ JSON <strong>chạy thật 24 lần</strong> trên emulator Pixel 7: <strong>21 pass</strong>; 2 fail S25 (app lệch spec, đã sửa) + 1 lỗi harness (đã sửa)</td>
 </tr>
 <tr>
 <td>Rules test</td>
 <td>Firestore Rules emulator</td>
 <td><code>firestore.rules.test.mjs</code></td>
-<td><strong>21/21 pass</strong></td>
+<td><strong>30/30 pass</strong></td>
 </tr>
 </tbody>
 </table>
-<p>Assert trên <strong>giá trị agent báo lại</strong> (<code>Observed.number()</code>, <code>Observed.contains()</code>), không chỉ <code>status == "SUCCESS"</code>; có 3 ca lỗi thật (vượt 6 · dưới 5 · không tìm ra SV) và 3 native interaction (account picker · notification shade · test crash); kế hoạch chạy mỗi ca ≥ 3 lần, trace lưu ở <code>evidence/artemis/</code>.</p>
+<p>Assert trên <strong>giá trị agent báo lại</strong> (<code>Observed.number()</code>, <code>Observed.contains()</code>), không chỉ <code>status == "SUCCESS"</code>; có 3 ca lỗi thật (vượt 6 · dưới 5 · không tìm ra SV) và 3 native interaction (account picker · notification shade · test crash); ảnh từng bước của mọi lần chạy ở <code>evidence/artemis/2026-11-13/</code>.</p>
 <blockquote>
-<p><strong>Trạng thái bằng chứng:</strong> 150/150 test Dart, 21/21 test Firestore rules và <strong>TC-02 ARTEMIS</strong> <strong>đã chạy thật</strong> và xanh. 17 ca ARTEMIS còn lại <strong>cần chạy ≥ 3 lần</strong> trên build release + thiết bị thật, điền <code>docs/test-plan.md</code> §6 + ảnh vào <code>evidence/artemis/</code> trước khi nộp.</p>
+<p><strong>Trạng thái bằng chứng:</strong> 175/175 test Dart, 30/30 test Firestore rules đều xanh. ARTEMIS: 13 ca JSON đã chạy 2 lần (2 ca cuối 1 lần), <strong>21/24 pass</strong>; ca S25 fail đúng vì app lệch spec Lab 2 → đã sửa banner. Còn thiếu lần chạy thứ 3 (hết quota Gemini) — kết quả ở <code>docs/test-plan.md</code> §6.1.</p>
 </blockquote>
 <p><strong>AI code review — 12 phát hiện, 5 commit sửa có tên mã</strong></p>
 <p>Bảng đầy đủ 12 phát hiện (kèm file:line và lý do) nằm ở <strong>slide dự phòng A3</strong>.
@@ -783,7 +783,7 @@ Bốn phát hiện gần nhất là loại "mồi lỗi" — đều là thứ <s
 </tr>
 <tr>
 <td>6 dịch vụ Firebase, mỗi dịch vụ có ca lỗi</td>
-<td>✅ Auth · Storage · Analytics · FCM · Crashlytics · Remote Config (+ Firestore)</td>
+<td>✅ Auth · lưu file (trong Firestore, thay Storage vì gói Spark) · Analytics · FCM · Crashlytics · Remote Config (+ Firestore)</td>
 <td><code>evidence/</code>, <code>docs/architecture.md</code> §5</td>
 </tr>
 <tr>
@@ -808,7 +808,7 @@ Bốn phát hiện gần nhất là loại "mồi lỗi" — đều là thứ <s
 </tr>
 <tr>
 <td>ARTEMIS ≥ 10 ca, ≥ 3 lần/ca, exploratory</td>
-<td>⚠️ <strong>18 ca + 1 phiên khám phá đã viết; đã chạy thật 1 ca (TC-02) — cần chạy ≥ 3 lần</strong></td>
+<td>⚠️ <strong>31 ca + 1 phiên khám phá đã viết; bộ JSON chạy thật 24 lần, 21 pass — còn thiếu lần thứ 3</strong></td>
 <td><code>e2e_test/</code>, <code>docs/test-plan.md</code> §6, <code>evidence/artemis/</code></td>
 </tr>
 <tr>
@@ -818,8 +818,8 @@ Bốn phát hiện gần nhất là loại "mồi lỗi" — đều là thứ <s
 </tr>
 </tbody>
 </table>
-<p><strong>Giới hạn trung thực:</strong> ① <strong>Figma chưa cập nhật</strong> cho D1–D4 (đã ghi ở traceability, cần sửa trước khi nộp) — ưu tiên <strong>Cao</strong>; ② <strong>17 ca ARTEMIS còn lại chưa chạy ≥ 3 lần trên thiết bị thật</strong> (TC-02 đã chạy thật) — cần chạy + chụp bằng chứng vào <code>evidence/artemis/</code> — ưu tiên <strong>Cao</strong>; ③ "AI" là thuật toán quy tắc, chưa dùng kỹ năng/lịch — Final thay bằng Gemini; ④ chưa có web admin và luồng liên vai — Final bổ sung; ⑤ chưa test tải 2 mentor duyệt đồng thời — thấp.</p>
-<p><strong>Kết luận:</strong> <em>PROBLEM SOLVED</em> — chia nhóm thủ công mất hàng giờ và dễ sai quy tắc 5–6 người / ≥ 3 ngành → 25 màn + 3 workflow tự động hoá, có ràng buộc ở cả UI lẫn Firestore rules. <em>WORKING PRODUCT</em> — app Flutter + Firebase chạy thật trên Android: import → ghép theo ngành → sửa &amp; duyệt → undo → xuất PDF lên Cloud Storage. <em>VERIFIED RESULT</em> — 150/150 test Dart · 21/21 test Firestore rules · 18 ca ARTEMIS + 1 phiên khám phá (đã viết; TC-02 đã chạy thật) · 12 phát hiện AI review có 5 commit sửa · 6 dịch vụ Firebase có ca lỗi.</p>
+<p><strong>Giới hạn trung thực:</strong> ① <strong>Figma chưa cập nhật</strong> cho D1–D4 (đã ghi ở traceability, cần sửa trước khi nộp) — ưu tiên <strong>Cao</strong>; ② <strong>ARTEMIS chưa đủ 3 lần/ca</strong> (hết quota Gemini sau 24 lần chạy), bộ free-text và phiên khám phá chưa chạy, ca S25 cần chạy lại sau khi sửa — ưu tiên <strong>Cao</strong>; ③ "AI" là thuật toán quy tắc, chưa dùng kỹ năng/lịch — Final thay bằng Gemini; ④ chưa có web admin và luồng liên vai — Final bổ sung; ⑤ chưa test tải 2 mentor duyệt đồng thời — thấp.</p>
+<p><strong>Kết luận:</strong> <em>PROBLEM SOLVED</em> — chia nhóm thủ công mất hàng giờ và dễ sai quy tắc 5–6 người / ≥ 3 ngành → 25 màn + 3 workflow tự động hoá, có ràng buộc ở cả UI lẫn Firestore rules. <em>WORKING PRODUCT</em> — app Flutter + Firebase chạy thật trên Android: import → ghép theo ngành → sửa &amp; duyệt → undo → xuất và lưu PDF. <em>VERIFIED RESULT</em> — 175/175 test Dart · 30/30 test Firestore rules · ARTEMIS 21/24 lần chạy pass (bắt được 1 lỗi thật ở S25) · 12 phát hiện AI review có 5 commit sửa · 6 dịch vụ Firebase có ca lỗi.</p>
 <p><strong>Repo:</strong> <code>github.com/no-solace/prm-teamup-mobile</code> · <strong>Figma:</strong> file Lab 2 Final UI · <strong>Video demo:</strong> 5–10 phút (link trong README). <strong>Hướng tiếp:</strong> web admin cho Điều phối khoa, luồng duyệt mobile → web, và Gemini thay thuật toán quy tắc — giữ nguyên interface <code>MatchingService</code>/<code>ProposalService</code>.</p>
 <hr />
 <h1 id="phu-luc-slide-du-phong-khong-trinh-bay-mo-khi-bi-hoi">Phụ lục — slide dự phòng (không trình bày, mở khi bị hỏi)</h1>
@@ -1127,6 +1127,6 @@ Bốn phát hiện gần nhất là loại "mồi lỗi" — đều là thứ <s
 </tr>
 </tbody>
 </table>
-<p>Mọi phát hiện đều được kiểm lại bằng <code>flutter analyze</code>, <code>flutter test</code> (150 test) và <code>tools/check_layers.sh</code> trước khi commit.</p>
+<p>Mọi phát hiện đều được kiểm lại bằng <code>flutter analyze</code>, <code>flutter test</code> (175 test) và <code>tools/check_layers.sh</code> trước khi commit.</p>
 </body>
 </html>
