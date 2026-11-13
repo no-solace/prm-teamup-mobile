@@ -193,7 +193,8 @@ Lệnh chạy, trace ID và ảnh chụp của từng lần chạy lưu ở `evi
 
 ## 6. Bảng kết quả
 
-> **Trạng thái: ĐÃ CHẠY 1 CA THẬT.** Bảng này được điền **sau khi chạy thật trên thiết bị
+> **Trạng thái:** bộ free-text mới chạy thật 2 ca (bảng dưới); bộ JSON đã chạy thật
+> 24 lần (xem §6.1). Bảng này được điền **sau khi chạy thật trên thiết bị
 > thật** (emulator có Google Play hoặc máy Android). Cột "Pass rate" = số lần đạt
 > / tổng số lần chạy (mỗi test ≥ 3 lần).
 >
@@ -209,6 +210,39 @@ Lệnh chạy, trace ID và ảnh chụp của từng lần chạy lưu ở `evi
 | TC-03 … TC-18 | 0 | chưa chạy | — | |
 | TC-19 … TC-23 | 0 | chưa chạy | — | Bộ JSON của nhánh integration, mới hợp nhất vào `e2e_test/` |
 | EX-01 | 0 | chưa chạy | — | Pro profile, báo cáo trong `evidence/artemis/exploratory/` |
+
+### 6.1. Kết quả bộ JSON (chạy 2026-11-13, nhánh `test/artemis-e2e-results`)
+
+Bộ test kiểu JSON (các hàm `async def test_tcNN_…`) đã chạy thật **24 lần** trên emulator
+`Pixel_7` (Android 14) với ARTEMIS host commit `351ca84`, model `gemini-3.6-flash`
+(fallback `gemini-3.5-flash`), Flash profile. Lần 1 chạy đủ bộ; lần 2 dừng sau TC12 vì
+key Gemini hết tiền (`402`), key free-tier chỉ có 20 request/ngày nên không chạy được lần 3.
+Bằng chứng: `evidence/artemis/2026-11-13/` (`runs.jsonl` có trace ID và giá trị agent báo
+về, `run1.xml`, `runs_suite.log`).
+
+Lần chạy này dùng `google-services.json` đã có SHA-1 debug của máy chạy test
+(`7E:D4:B9:…:9B:F6`), nên đăng nhập Google qua account picker chạy được. Lần `TC-01`
+fail ở trên (session `0797238d…`) có thể do thiếu SHA-1 này (chưa xác minh lại).
+
+| Ca chạy (hàm pytest) | Ứng với | Runs | Pass | Thời gian TB | Ghi chú |
+|---|---|---|---|---|---|
+| `test_auth.py::test_tc01_google_sign_in_account_picker` | TC-19 | 2 | 2 | 66s | Native account picker, logcat có `login` |
+| `test_auth.py::test_tc02_sign_out_returns_to_sign_in` | TC-20 | 2 | 2 | 68s | |
+| `test_auth.py::test_tc03_invalid_email_shows_error` | TC-21 | 2 | 2 | 85s | error_path |
+| `test_flow_a.py::test_tc04_import_csv_shows_counts` | TC-22 | 2 | 2 | 72s | 12 / 9 / 3, logcat có `class_import` |
+| `test_flow_a.py::test_tc05_match_with_ai_then_approve` | TC-23 | 2 | 2 | 155s | Hành động chính |
+| `test_flow_b.py::test_tc06_remove_members_blocks_approve_below_five` | S25 (như TC-11) | 2 | **0** | 193s | **Fail trên `main`**: app hiện `Approval needs at least 5 and at most 6 members.` thay vì banner `Needs at least 5 members (now 4)`. **Nhánh này đã sửa** (`ErrorBanner` trong `proposal_detail_screen.dart`), **cần chạy lại** để xác nhận |
+| `test_flow_c.py::test_tc07_discard_then_manual_add_search_empty` | S17, S21 (như TC-13, TC-14) | 2 | 2 | 149s | error_path |
+| `test_detail.py::test_tc08_class_and_student_detail_values` | Màn chi tiết | 2 | 2 | 143s | |
+| `test_detail.py::test_tc09_tabs_and_back_navigation` | Điều hướng | 2 | 1 | 55s | Lần fail do harness đọc báo cáo trước khi host lưu bước cuối; đã thêm thử lại trong `_fetch_session_steps` |
+| `test_profile.py::test_tc10_remote_config_values_change_the_app` | Remote Config | 2 | 2 | 112s | |
+| `test_profile.py::test_tc11_export_pdf_and_upload` | Export (như TC-15) | 2 | 2 | 140s | logcat có `report_export` |
+| `test_profile.py::test_tc12_notification_permission_dialog` | Native | 1 | 1 | 117s | Thiếu 2 lần chạy (hết quota) |
+| `test_profile.py::test_tc13_offline_matching_shows_error_with_retry` | S18 | 1 | 1 | 124s | Thiếu 2 lần chạy (hết quota) |
+| `test_notifications.py::test_tc14_push_notification_opens_proposals` | Như TC-16 | 0 | — | — | Skip mặc định, cần gửi tin từ console |
+
+Tổng: 24 lần chạy, 21 pass, 3 fail (2 lần S25 do app lệch spec, đã sửa ở nhánh này; 1 lần
+lỗi harness, đã sửa). Chưa ai chạy lại sau hai bản sửa này.
 
 > **Ghi chú:** `TC-02` là ca **đã chạy thật và pass**. Các ca còn lại được ghi `chưa chạy`
 > vì lần chạy đầu tiên của cả bộ bị **hạn mức Gemini free-tier** (`429 Too Many Requests`
@@ -242,6 +276,8 @@ ghi nhận xét về ca flaky vào §7.
 | TC-17 | skip nếu thiếu `ARTEMIS_ANALYTICS_DEBUG` | DebugView/Logcat chỉ có khi bật debug mode | Bật debug mode trong Console |
 | TC-18 | skip nếu thiếu `ARTEMIS_CRASHLYTICS` | Crash cố ý phá app, không chạy trong regression | Chạy riêng, ngoài vòng regression |
 | TC-01 | **fail** (1 lần chạy) | Agent không thể hoàn tất luồng Google account picker trên emulator | Cần **tài khoản Google đã đăng nhập sẵn** trên thiết bị thật; session `0797238d…` |
+| `test_tc06_remove_members_blocks_approve_below_five` | **fail** 0/2 (trên `main`) | App hiện câu `Approval needs at least 5 and at most 6 members.`, không phải banner S25 | Đã sửa ở nhánh này; chạy lại ca này để xác nhận |
+| `test_tc09_tabs_and_back_navigation` | **flaky** 1/2 | Host đánh dấu session xong trước khi lưu bước `report_task_status`, harness đọc thiếu báo cáo | `_fetch_session_steps` giờ thử lại tối đa 10 lần, cách 1.5s |
 | TC-03…TC-23 | **skip** (hạn mức) | **Hạn mức Gemini free-tier** — `429 Too Many Requests` trên `generate_content_free_tier_requests`; giới hạn **20 request/ngày** cho `gemini-3.6-flash` | Chờ reset 00:00 UTC, hoặc dùng key/project có quota, hoặc gói trả phí. **Chạy 1 ca để đo chi phí trước khi chạy cả bộ.** Bộ test giờ tự **skip** kèm lý do khi gặp hạn mức. |
 
 ---

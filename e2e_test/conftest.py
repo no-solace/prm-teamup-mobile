@@ -41,6 +41,7 @@ import json
 import os
 import re
 import subprocess
+import time
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
@@ -145,15 +146,29 @@ def _fetch_session_steps(session_id: str) -> list[dict]:
     The ARTEMIS daemon stores the final report of a Flash run as a step whose
     ``action_taken`` is ``report_task_status``. The remote client only
     receives the session metadata, so the steps are read back from the host.
+
+    The host marks a session completed before it saves the last step, so a read
+    right after the run can miss the report. Retry briefly until the
+    ``report_task_status`` step shows up.
     """
     base = os.environ.get("ARTEMIS_BASE_URL", "http://127.0.0.1:8000").rstrip("/")
     url = f"{base}/api/sessions/{session_id}/steps"
-    try:
-        with urllib.request.urlopen(url, timeout=30) as response:
-            payload = json.loads(response.read().decode("utf-8"))
-    except (urllib.error.URLError, TimeoutError, ValueError):
-        return []
-    return payload if isinstance(payload, list) else []
+    steps: list[dict] = []
+    for attempt in range(10):
+        if attempt:
+            time.sleep(1.5)
+        try:
+            with urllib.request.urlopen(url, timeout=30) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+        except (urllib.error.URLError, TimeoutError, ValueError):
+            continue
+        steps = payload if isinstance(payload, list) else []
+        if any(
+            (step.get("action_taken") or {}).get("action") == "report_task_status"
+            for step in steps
+        ):
+            break
+    return steps
 
 
 def _extract_final_report(steps: list[dict]) -> str:

@@ -1,0 +1,94 @@
+============================= test session starts =============================
+platform win32 -- Python 3.15.2, pytest-9.2.0, pluggy-1.7.0 -- D:\02. Project\prm-teamup-mobile\e2e_test\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: D:\02. Project\prm-teamup-mobile\e2e_test
+configfile: pyproject.toml
+testpaths: .
+plugins: asyncio-1.4.1.post1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=session, asyncio_default_test_loop_scope=session
+collecting ... collected 14 items
+
+test_auth.py::test_tc01_google_sign_in_account_picker PASSED             [  7%]
+test_auth.py::test_tc02_sign_out_returns_to_sign_in PASSED               [ 14%]
+test_auth.py::test_tc03_invalid_email_shows_error PASSED                 [ 21%]
+test_detail.py::test_tc08_class_and_student_detail_values PASSED         [ 28%]
+test_detail.py::test_tc09_tabs_and_back_navigation PASSED                [ 35%]
+test_flow_a.py::test_tc04_import_csv_shows_counts PASSED                 [ 42%]
+test_flow_a.py::test_tc05_match_with_ai_then_approve PASSED              [ 50%]
+test_flow_b.py::test_tc06_remove_members_blocks_approve_below_five FAILED [ 57%]
+test_flow_c.py::test_tc07_discard_then_manual_add_search_empty PASSED    [ 64%]
+test_notifications.py::test_tc14_push_notification_opens_proposals SKIPPED [ 71%]
+test_profile.py::test_tc10_remote_config_values_change_the_app PASSED    [ 78%]
+test_profile.py::test_tc11_export_pdf_and_upload PASSED                  [ 85%]
+test_profile.py::test_tc12_notification_permission_dialog PASSED         [ 92%]
+test_profile.py::test_tc13_offline_matching_shows_error_with_retry PASSED [100%]
+
+================================== FAILURES ===================================
+_____________ test_tc06_remove_members_blocks_approve_below_five ______________
+
+artemis = <function artemis.<locals>.run at 0x000002ACE5AF8EB0>
+fixture_on_device = 'lab3-demo.csv'
+
+    @pytest.mark.error_path
+    async def test_tc06_remove_members_blocks_approve_below_five(artemis, fixture_on_device):
+        got = await artemis(
+            IMPORT_DEMO
+            + "Tap 'Match with AI' and wait. Open one proposal named 'Group 2'. Remove two of the "
+            "added members: tap the remove button of one added member, tap 'Remove' in the 'Remove "
+            "member?' dialog, and repeat once more. Report banner_text (the exact error banner text "
+            "shown, or null) and approve_enabled (true if the 'Approve proposal' button can be "
+            "tapped). Do not approve. Finally scroll down, tap 'Discard proposal' and tap 'Confirm' "
+            "so this test leaves no pending proposal behind.",
+            ["banner_text", "approve_enabled"],
+        )
+>       assert got.values["banner_text"] == "Needs at least 5 members (now 4)"
+E       AssertionError: assert 'Approval nee...st 6 members.' == 'Needs at lea...mbers (now 4)'
+E         
+E         - Needs at least 5 members (now 4)
+E         + Approval needs at least 5 and at most 6 members.
+
+test_flow_b.py:20: AssertionError
+- generated xml file: D:\02. Project\prm-teamup-mobile\e2e_test\runs\run1.xml -
+=========================== short test summary info ===========================
+FAILED test_flow_b.py::test_tc06_remove_members_blocks_approve_below_five - A...
+============ 1 failed, 12 passed, 1 skipped in 1203.75s (0:20:03) =============
+============================= test session starts =============================
+platform win32 -- Python 3.15.2, pytest-9.2.0, pluggy-1.7.0 -- D:\02. Project\prm-teamup-mobile\e2e_test\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: D:\02. Project\prm-teamup-mobile\e2e_test
+configfile: pyproject.toml
+testpaths: .
+plugins: asyncio-1.4.1.post1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=session, asyncio_default_test_loop_scope=session
+collecting ... collected 14 items
+
+test_auth.py::test_tc01_google_sign_in_account_picker PASSED             [  7%]
+test_auth.py::test_tc02_sign_out_returns_to_sign_in PASSED               [ 14%]
+test_auth.py::test_tc03_invalid_email_shows_error PASSED                 [ 21%]
+test_detail.py::test_tc08_class_and_student_detail_values PASSED         [ 28%]
+test_detail.py::test_tc09_tabs_and_back_navigation FAILED                [ 35%]
+test_flow_a.py::test_tc04_import_csv_shows_counts PASSED                 [ 42%]
+test_flow_a.py::test_tc05_match_with_ai_then_approve PASSED              [ 50%]
+test_flow_b.py::test_tc06_remove_members_blocks_approve_below_five FAILED [ 57%]
+test_flow_c.py::test_tc07_discard_then_manual_add_search_empty PASSED    [ 64%]
+test_notifications.py::test_tc14_push_notification_opens_proposals SKIPPED [ 71%]
+test_profile.py::test_tc10_remote_config_values_change_the_app PASSED    [ 78%]
+test_profile.py::test_tc11_export_pdf_and_upload PASSED                  [ 85%]
+test_profile.py::test_tc12_notification_permission_dialog ============================= test session starts =============================
+platform win32 -- Python 3.15.2, pytest-9.2.0, pluggy-1.7.0 -- D:\02. Project\prm-teamup-mobile\e2e_test\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: D:\02. Project\prm-teamup-mobile\e2e_test
+configfile: pyproject.toml
+testpaths: .
+plugins: asyncio-1.4.1.post1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=session, asyncio_default_test_loop_scope=session
+collecting ... collected 14 items
+
+test_auth.py::test_tc01_google_sign_in_account_picker FAILED             [  7%]
+test_auth.py::test_tc02_sign_out_returns_to_sign_in FAILED               [ 14%]
+test_auth.py::test_tc03_invalid_email_shows_error FAILED                 [ 21%]
+test_detail.py::test_tc08_class_and_student_detail_values FAILED         [ 28%]
+test_detail.py::test_tc09_tabs_and_back_navigation FAILED                [ 35%]
+test_flow_a.py::test_tc04_import_csv_shows_counts FAILED                 [ 42%]
+test_flow_a.py::test_tc05_match_with_ai_then_approve FAILED              [ 50%]
+test_flow_b.py::test_tc06_remove_members_blocks_approve_below_five 

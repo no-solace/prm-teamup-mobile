@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "508852657563-5iv8m6qs4bv05ajlqetocj64d444r1qj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.group6.teamup_exe",
+            "certificate_hash": "7ed4b9a6661634e2792aa7cb37e7de58361a9bf6"
+          }
+        },
+        {
           "client_id": "508852657563-62uedns0a3iq70orh8ipmu5a25orsv3f.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
