@@ -33,7 +33,7 @@
     </section>
     <section>
       <h2>Báo cáo PDF đã xuất (<span id="rcount">0</span>)</h2>
-      <table><thead><tr><th>Thời gian</th><th>Lớp</th><th>Kích thước</th><th>Tải</th></tr></thead><tbody id="reports"></tbody></table>
+      <table><thead><tr><th>Thời gian</th><th>Lớp</th><th>Kích thước</th><th>Chủ sở hữu</th></tr></thead><tbody id="reports"></tbody></table>
     </section>
   </div>
 </main>
@@ -70,7 +70,7 @@ onAuthStateChanged(auth,async user=>{
   },e=>$("msg").textContent=e.message));
   unsubs.push(onSnapshot(query(collection(db,"reports"),orderBy("createdAt","desc"),limit(100)),s=>{
     $("rcount").textContent=s.size;
-    $("reports").innerHTML=s.docs.map(d=>{const x=d.data();return `<tr><td>${fmt(x.createdAt)}</td><td>${esc(x.classId)}</td><td>${esc(x.sizeKb)} KB</td><td><a href="${esc(x.downloadUrl)}" target="_blank" rel="noopener">PDF</a></td></tr>`}).join("");
+    $("reports").innerHTML=s.docs.map(d=>{const x=d.data();return `<tr><td>${fmt(x.createdAt)}</td><td>${esc(x.classId)}</td><td>${esc(x.sizeKb)} KB</td><td>${esc(x.ownerUid)}</td></tr>`}).join("");
   },e=>$("msg").textContent=e.message));
 });
 </script>
