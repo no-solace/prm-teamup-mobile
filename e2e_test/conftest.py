@@ -21,6 +21,7 @@ import os
 import re
 import subprocess
 import time
+import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -29,6 +30,7 @@ import pytest
 from artemis_client import ArtemisClient
 
 APP_ID = os.environ.get("TEAMUP_APP_ID", "com.group6.teamup_exe")
+BASE_URL = os.environ.get("ARTEMIS_BASE_URL", "http://127.0.0.1:8000")
 RUNS_DIR = Path(os.environ.get("TEAMUP_RUNS_DIR", Path(__file__).parent / "runs"))
 
 # Every instruction starts from the same known state so tests do not depend on
@@ -66,6 +68,30 @@ def parse_report(output: Any) -> dict[str, Any]:
     return json.loads(text[start : end + 1])
 
 
+def final_report(trace_id: str) -> str | None:
+    """Fallback when the host leaves `output` empty (seen at the pinned commit).
+
+    The flash agent ends with a `report_task_status` step whose `explanation` holds
+    the JSON line we asked for; read it from the session's steps.
+    """
+    request = urllib.request.Request(f"{BASE_URL}/api/sessions/{trace_id}/steps")
+    if token := os.environ.get("ARTEMIS_TOKEN"):
+        request.add_header("Authorization", f"Bearer {token}")
+    # The host marks the session completed before it persists the last step, so
+    # retry briefly instead of reading a step list that is still one short.
+    for _ in range(10):
+        with urllib.request.urlopen(request, timeout=30) as response:
+            steps = json.load(response)
+        if isinstance(steps, dict):
+            steps = steps.get("steps", [])
+        for step in reversed(steps):
+            action = step.get("action_taken") or {}
+            if action.get("action") == "report_task_status":
+                return (action.get("args") or {}).get("explanation")
+        time.sleep(1.5)
+    return None
+
+
 @pytest.fixture(scope="session")
 def client() -> ArtemisClient:
     kwargs: dict[str, Any] = {
@@ -74,7 +100,7 @@ def client() -> ArtemisClient:
     }
     if token := os.environ.get("ARTEMIS_TOKEN"):
         kwargs["token"] = token
-    return ArtemisClient(os.environ.get("ARTEMIS_BASE_URL", "http://127.0.0.1:8000"), **kwargs)
+    return ArtemisClient(BASE_URL, **kwargs)
 
 
 @pytest.fixture
@@ -93,6 +119,9 @@ def artemis(client: ArtemisClient, request: pytest.FixtureRequest):
             **kwargs,
         )
         seconds = time.monotonic() - started
+        output = result.output
+        if output is None and result.trace_id:
+            output = final_report(result.trace_id)
         RUNS_DIR.mkdir(parents=True, exist_ok=True)
         with (RUNS_DIR / "runs.jsonl").open("a", encoding="utf-8") as log:
             log.write(
@@ -103,14 +132,14 @@ def artemis(client: ArtemisClient, request: pytest.FixtureRequest):
                         "trace_id": result.trace_id,
                         "seconds": round(seconds, 1),
                         "error": result.error,
-                        "output": result.output,
+                        "output": output,
                     },
                     default=str,
                 )
                 + "\n"
             )
         assert result.succeeded, f"{result.status}: {result.error} (trace {result.trace_id})"
-        values = parse_report(result.output) if keys else {}
+        values = parse_report(output) if keys else {}
         missing = [k for k in keys if k not in values]
         assert not missing, f"Agent omitted {missing}; got {values} (trace {result.trace_id})"
         return Observed(values, result.trace_id, seconds, result.status)

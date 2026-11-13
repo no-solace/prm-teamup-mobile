@@ -7,7 +7,8 @@ import pytest
 @pytest.mark.analytics
 async def test_tc01_google_sign_in_account_picker(artemis, analytics_log):
     got = await artemis(
-        "The user is signed out, so the Sign in screen is shown. Tap 'Continue with Google'. "
+        "If you are signed in, open the Profile tab, scroll down and tap 'Sign out' first, so the "
+        "Sign in screen is shown. Tap 'Continue with Google'. "
         "In the Android account picker choose the test account. Wait for the app to load. "
         "Report: signed_in (true if the 'My classes' screen is visible), "
         "tabs (the labels of the bottom navigation bar, in order).",
